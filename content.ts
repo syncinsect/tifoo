@@ -24,6 +24,7 @@ let floatingWindow: HTMLElement | null = null
 let isFloatingWindowFixed = false
 let highlightUpdateTimeout: ReturnType<typeof setTimeout> | null = null
 let lastRect: DOMRect | null = null
+let floatingWindowOffset = { x: 0, y: 0 }
 
 const colors = {
   border: "rgba(59, 130, 246, 0.5)",
@@ -444,15 +445,21 @@ function fixFloatingWindow(e: MouseEvent) {
   e.stopPropagation()
   isFloatingWindowFixed = true
   floatingWindow.style.position = "absolute"
+
+  const rect = lastHighlightedElement.getBoundingClientRect()
+  const scrollX = window.pageXOffset || document.documentElement.scrollLeft
+  const scrollY = window.pageYOffset || document.documentElement.scrollTop
+
+  floatingWindowOffset.x = e.pageX - (rect.left + scrollX)
+  floatingWindowOffset.y = e.pageY - (rect.top + scrollY)
+
   floatingWindow.style.left = `${e.pageX}px`
   floatingWindow.style.top = `${e.pageY}px`
   floatingWindow.style.pointerEvents = "auto"
   document.removeEventListener("mousemove", updateFloatingWindowPosition)
 
-  // Add this line to prevent the window from being removed on mouseout
   floatingWindow.style.display = "block"
 
-  // Update highlight with solid lines
   updateHighlight(lastHighlightedElement, null, true)
 }
 
@@ -496,17 +503,29 @@ function handleMouseOut() {
 
 function handleScroll() {
   if (lastHighlightedElement) {
-    throttledUpdateHighlight(lastHighlightedElement, isFloatingWindowFixed)
+    const rect = lastHighlightedElement.getBoundingClientRect()
+    updateHighlight(lastHighlightedElement, rect, isFloatingWindowFixed)
 
-    // Update floating window position (if not fixed)
-    if (floatingWindow && !isFloatingWindowFixed) {
-      const rect = lastHighlightedElement.getBoundingClientRect()
+    if (floatingWindow && isFloatingWindowFixed) {
       const scrollX = window.pageXOffset || document.documentElement.scrollLeft
       const scrollY = window.pageYOffset || document.documentElement.scrollTop
-      floatingWindow.style.left = `${rect.left + scrollX}px`
-      floatingWindow.style.top = `${rect.top + scrollY}px`
+
+      floatingWindow.style.left = `${rect.left + scrollX + floatingWindowOffset.x}px`
+      floatingWindow.style.top = `${rect.top + scrollY + floatingWindowOffset.y}px`
     }
   }
+}
+
+let scrollRAF: number | null = null
+
+function optimizedHandleScroll() {
+  if (scrollRAF !== null) {
+    cancelAnimationFrame(scrollRAF)
+  }
+  scrollRAF = requestAnimationFrame(() => {
+    handleScroll()
+    scrollRAF = null
+  })
 }
 
 function handleClick(e: MouseEvent) {
@@ -545,7 +564,7 @@ function activateScanner() {
   document.addEventListener("mouseover", handleMouseOver)
   document.addEventListener("mouseout", handleMouseOut)
   const throttledHandleScroll = throttle(handleScroll, 100)
-  window.addEventListener("scroll", throttledHandleScroll)
+  window.addEventListener("scroll", optimizedHandleScroll, { passive: true })
   document.addEventListener("mousemove", updateFloatingWindowPosition)
   document.addEventListener("click", handleClick, true)
 
@@ -570,8 +589,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 function deactivateScanner() {
   document.removeEventListener("mouseover", handleMouseOver)
   document.removeEventListener("mouseout", handleMouseOut)
-  const throttledHandleScroll = throttle(handleScroll, 100)
-  window.removeEventListener("scroll", throttledHandleScroll)
+  window.removeEventListener("scroll", optimizedHandleScroll)
   document.removeEventListener("mousemove", updateFloatingWindowPosition)
   document.removeEventListener("click", handleClick, true)
   removeHighlight()
