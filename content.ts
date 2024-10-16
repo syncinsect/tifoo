@@ -41,37 +41,23 @@ function createElementWithStyles(
 
 function createLine(
   position: "horizontal" | "vertical",
-  offset: number
+  offset: number,
+  isDashed: boolean = true
 ): HTMLElement {
-  const commonStyles = {
-    position: "fixed",
-    backgroundColor: colors.border,
-    zIndex: "9999",
-    pointerEvents: "none"
-  }
-
-  const specificStyles =
-    position === "horizontal"
-      ? {
-          width: "100%",
-          height: "0",
-          borderTop: `1px dashed ${colors.border}`,
-          left: "0",
-          top: `${offset}px`
-        }
-      : {
-          height: "100%",
-          width: "0",
-          borderLeft: `1px dashed ${colors.border}`,
-          top: "0",
-          left: `${offset}px`
-        }
-
   const line = createElementWithStyles("div", {
-    ...commonStyles,
-    ...specificStyles
+    position: position === "horizontal" ? "absolute" : "fixed",
+    backgroundColor: "transparent",
+    zIndex: "9999",
+    pointerEvents: "none",
+    [position === "horizontal" ? "width" : "height"]: "100%",
+    [position === "horizontal" ? "height" : "width"]: "0",
+    [position === "horizontal" ? "left" : "top"]: "0",
+    [position === "horizontal" ? "top" : "left"]: `${offset}px`,
+    borderStyle: isDashed ? "dashed" : "solid",
+    borderColor: colors.border,
+    borderWidth: position === "horizontal" ? "2px 0 0 0" : "0 0 0 2px",
+    ...(isDashed ? { borderDasharray: "6, 4" } : {})
   })
-  document.body.appendChild(line)
   return line
 }
 
@@ -148,7 +134,7 @@ function addMarginHighlight(outerBox: HTMLElement, styles: ComputedStyles) {
       right: `${styles.margin.right}px`,
       bottom: `${styles.margin.bottom}px`,
       backgroundColor: "transparent",
-      border: `2px solid ${colors.border}` // 使用原来定义的 border 颜色
+      border: `2px solid ${colors.border}`
     },
     "transparent"
   )
@@ -202,40 +188,26 @@ function createMarginLabel(value: number, direction: string): HTMLElement {
   return label
 }
 
-function updateHighlight(element: HTMLElement) {
+function updateHighlight(element: HTMLElement, useSolidLines: boolean = false) {
   removeHighlight()
 
   const rect = element.getBoundingClientRect()
   const styles = getElementStyles(element)
 
-  // calculate viewport size
-  const viewportWidth =
-    window.innerWidth || document.documentElement.clientWidth
-  const viewportHeight =
-    window.innerHeight || document.documentElement.clientHeight
+  const scrollX = window.pageXOffset || document.documentElement.scrollLeft
+  const scrollY = window.pageYOffset || document.documentElement.scrollTop
 
-  // create highlight box
+  // Create Highlight Frame
   highlightBox = createHighlightBox()
+  highlightBox.style.left = `${rect.left + scrollX}px`
+  highlightBox.style.top = `${rect.top + scrollY}px`
+  highlightBox.style.width = `${rect.width}px`
+  highlightBox.style.height = `${rect.height}px`
 
-  // ensure highlight box not out of viewport
-  const left = Math.max(
-    0,
-    Math.min(rect.left + window.scrollX, viewportWidth - rect.width)
-  )
-  const top = Math.max(
-    0,
-    Math.min(rect.top + window.scrollY, viewportHeight - rect.height)
-  )
-
-  highlightBox.style.left = `${left}px`
-  highlightBox.style.top = `${top}px`
-  highlightBox.style.width = `${Math.min(rect.width, viewportWidth - left)}px`
-  highlightBox.style.height = `${Math.min(rect.height, viewportHeight - top)}px`
-
-  // add margin highlight
+  // Add margin highlight
   addMarginHighlight(highlightBox, styles)
 
-  // add padding highlight
+  // Add padding highlight
   const paddingBox = createBoxElement(
     {
       position: "absolute",
@@ -248,7 +220,7 @@ function updateHighlight(element: HTMLElement) {
   )
   highlightBox.appendChild(paddingBox)
 
-  // add content highlight
+  // Add content highlight
   const contentBox = createBoxElement(
     {
       position: "absolute",
@@ -261,26 +233,34 @@ function updateHighlight(element: HTMLElement) {
   )
   highlightBox.appendChild(contentBox)
 
-  // add border
+  // Add border
   highlightBox.style.border = `2px solid ${colors.border}`
 
   document.body.appendChild(highlightBox)
 
-  // update info element
+  // Create horizontal lines
+  const horizontalLines = [
+    createLine("horizontal", rect.top + scrollY, !useSolidLines),
+    createLine("horizontal", rect.bottom + scrollY, !useSolidLines)
+  ]
+  horizontalLines.forEach((line) => document.body.appendChild(line))
+
+  // Create vertical lines (fixed position)
+  const verticalLines = [
+    createLine("vertical", rect.left, !useSolidLines),
+    createLine("vertical", rect.right, !useSolidLines)
+  ]
+  verticalLines.forEach((line) => document.body.appendChild(line))
+
+  highlightLines = [...horizontalLines, ...verticalLines]
+
+  // Update info element
   if (!infoElement) {
     infoElement = createInfoElement()
   }
   infoElement.textContent = `${Math.round(rect.width)}x${Math.round(rect.height)}`
-  infoElement.style.left = `${left}px`
-  infoElement.style.top = `${Math.max(0, top - 20)}px`
-
-  // create lines
-  highlightLines = [
-    createLine("horizontal", top),
-    createLine("horizontal", Math.min(top + rect.height, viewportHeight)),
-    createLine("vertical", left),
-    createLine("vertical", Math.min(left + rect.width, viewportWidth))
-  ]
+  infoElement.style.left = `${rect.left + scrollX}px`
+  infoElement.style.top = `${Math.max(0, rect.top + scrollY - 20)}px`
 }
 
 function removeHighlight() {
@@ -314,7 +294,6 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
 
   const window = createElementWithStyles("div", {
     position: "fixed",
-    pointerEvents: "none",
     zIndex: "10001",
     backgroundColor: "rgb(17, 24, 39)",
     border: "2px solid rgb(55, 65, 81)",
@@ -325,14 +304,20 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     fontFamily: "Arial, sans-serif"
   })
 
-  const title = createElementWithStyles("div", {
+  // Add close button
+  const closeButton = createElementWithStyles("button", {
+    position: "absolute",
+    right: "8px",
+    top: "8px",
+    backgroundColor: "transparent",
+    border: "none",
     color: "rgb(209, 213, 219)",
-    fontSize: "14px",
-    fontWeight: "600",
-    marginBottom: "8px"
+    fontSize: "16px",
+    cursor: "pointer"
   })
-  title.textContent = "Element Info"
-  window.appendChild(title)
+  closeButton.textContent = "×"
+  closeButton.addEventListener("click", removeFloatingWindow)
+  window.appendChild(closeButton)
 
   // Tailwind classes display
   const tagsContainer = createElementWithStyles("div", {
@@ -383,11 +368,21 @@ function updateFloatingWindowPosition(e: MouseEvent) {
 }
 
 function fixFloatingWindow(e: MouseEvent) {
-  if (!isActive || !floatingWindow) return
+  if (!isActive || !floatingWindow || !lastHighlightedElement) return
   e.preventDefault()
   e.stopPropagation()
-  isFloatingWindowFixed = !isFloatingWindowFixed
-  floatingWindow.style.pointerEvents = isFloatingWindowFixed ? "auto" : "none"
+  isFloatingWindowFixed = true
+  floatingWindow.style.position = "absolute"
+  floatingWindow.style.left = `${e.pageX}px`
+  floatingWindow.style.top = `${e.pageY}px`
+  floatingWindow.style.pointerEvents = "auto"
+  document.removeEventListener("mousemove", updateFloatingWindowPosition)
+
+  // Add this line to prevent the window from being removed on mouseout
+  floatingWindow.style.display = "block"
+
+  // Update highlight with solid lines
+  updateHighlight(lastHighlightedElement, true)
 }
 
 function disablePageClicks(e: MouseEvent) {
@@ -406,22 +401,24 @@ function removeFloatingWindow() {
 }
 
 function handleMouseOver(e: MouseEvent) {
-  if (!isActive) return
+  if (!isActive || isFloatingWindowFixed) return
   const target = e.target as HTMLElement
   lastHighlightedElement = target
   updateHighlight(target)
 
   // Update floating window with Tailwind classes of the hovered element
-  if (floatingWindow) {
+  if (floatingWindow && !isFloatingWindowFixed) {
     floatingWindow.remove()
   }
-  floatingWindow = createFloatingWindow(target)
+  if (!isFloatingWindowFixed) {
+    floatingWindow = createFloatingWindow(target)
+  }
 }
 
 function handleMouseOut() {
-  if (!isActive) return
+  if (!isActive || isFloatingWindowFixed) return
   removeHighlight()
-  if (floatingWindow) {
+  if (floatingWindow && !isFloatingWindowFixed) {
     floatingWindow.remove()
     floatingWindow = null
   }
@@ -429,11 +426,77 @@ function handleMouseOut() {
 
 function handleScroll() {
   if (lastHighlightedElement) {
-    updateHighlight(lastHighlightedElement)
-    if (floatingWindow) {
-      floatingWindow.remove()
-      floatingWindow = createFloatingWindow(lastHighlightedElement)
+    const rect = lastHighlightedElement.getBoundingClientRect()
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop
+
+    // Update horizontal lines position
+    if (highlightLines.length >= 2) {
+      highlightLines[0].style.top = `${rect.top + scrollY}px`
+      highlightLines[1].style.top = `${rect.bottom + scrollY}px`
     }
+
+    // Update highlight box position
+    if (highlightBox) {
+      highlightBox.style.top = `${rect.top + scrollY}px`
+    }
+
+    // Update info element position
+    if (infoElement) {
+      infoElement.style.top = `${Math.max(0, rect.top + scrollY - 20)}px`
+    }
+
+    // Update floating window position (if not fixed)
+    if (floatingWindow && !isFloatingWindowFixed) {
+      floatingWindow.style.left = `${rect.left}px`
+      floatingWindow.style.top = `${rect.top + scrollY}px`
+    }
+  }
+}
+
+function handleClick(e: MouseEvent) {
+  if (!isActive) return
+  if (floatingWindow) {
+    if (!floatingWindow.contains(e.target as Node)) {
+      if (isFloatingWindowFixed) {
+        unfixFloatingWindow()
+      } else {
+        fixFloatingWindow(e)
+      }
+    }
+  } else {
+    const target = e.target as HTMLElement
+    lastHighlightedElement = target
+    updateHighlight(target)
+    floatingWindow = createFloatingWindow(target)
+    fixFloatingWindow(e)
+  }
+}
+
+function throttle(func: Function, limit: number) {
+  let inThrottle: boolean
+  return function (this: any) {
+    const args = arguments
+    const context = this
+    if (!inThrottle) {
+      func.apply(context, args)
+      inThrottle = true
+      setTimeout(() => (inThrottle = false), limit)
+    }
+  }
+}
+
+function activateScanner() {
+  document.addEventListener("mouseover", handleMouseOver)
+  document.addEventListener("mouseout", handleMouseOut)
+  const throttledHandleScroll = throttle(handleScroll, 100)
+  window.addEventListener("scroll", throttledHandleScroll)
+  document.addEventListener("mousemove", updateFloatingWindowPosition)
+  document.addEventListener("click", handleClick, true)
+
+  isFloatingWindowFixed = false
+  if (floatingWindow) {
+    floatingWindow.remove()
+    floatingWindow = null
   }
 }
 
@@ -441,26 +504,37 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "toggleScanner") {
     isActive = request.isActive
     if (isActive) {
-      document.addEventListener("mouseover", handleMouseOver)
-      document.addEventListener("mouseout", handleMouseOut)
-      window.addEventListener("scroll", handleScroll)
-      document.addEventListener("mousemove", updateFloatingWindowPosition)
-      document.addEventListener("click", fixFloatingWindow, true)
-      document.addEventListener("click", disablePageClicks, true)
-
-      removeFloatingWindow() // Ensure removal of old floating window
-      // Don't create a new floating window here, it will be created on mouse hover
+      activateScanner()
     } else {
-      document.removeEventListener("mouseover", handleMouseOver)
-      document.removeEventListener("mouseout", handleMouseOut)
-      window.removeEventListener("scroll", handleScroll)
-      document.removeEventListener("mousemove", updateFloatingWindowPosition)
-      document.removeEventListener("click", fixFloatingWindow, true)
-      document.removeEventListener("click", disablePageClicks, true)
-      removeHighlight()
-      lastHighlightedElement = null
-
-      removeFloatingWindow()
+      deactivateScanner()
     }
   }
 })
+
+function deactivateScanner() {
+  document.removeEventListener("mouseover", handleMouseOver)
+  document.removeEventListener("mouseout", handleMouseOut)
+  const throttledHandleScroll = throttle(handleScroll, 100)
+  window.removeEventListener("scroll", throttledHandleScroll)
+  document.removeEventListener("mousemove", updateFloatingWindowPosition)
+  document.removeEventListener("click", handleClick, true)
+  removeHighlight()
+  lastHighlightedElement = null
+
+  removeFloatingWindow()
+  isFloatingWindowFixed = false
+}
+
+function unfixFloatingWindow() {
+  if (floatingWindow) {
+    isFloatingWindowFixed = false
+    floatingWindow.style.position = "fixed"
+    floatingWindow.style.pointerEvents = "none"
+    document.addEventListener("mousemove", updateFloatingWindowPosition)
+
+    // Update highlight with dashed lines
+    if (lastHighlightedElement) {
+      updateHighlight(lastHighlightedElement, false)
+    }
+  }
+}
