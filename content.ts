@@ -38,7 +38,7 @@ function createElementWithStyles(
 ): HTMLElement {
   const element = document.createElement(tagName)
   Object.assign(element.style, styles)
-  element.style.transition = "all 0.3s ease" // 添加过渡效果
+  element.style.transition = "all 0.3s ease" // Add transition effect
   return element
 }
 
@@ -60,17 +60,17 @@ function createLine(
     borderColor: colors.border,
     borderWidth: position === "horizontal" ? "2px 0 0 0" : "0 0 0 2px",
     ...(isDashed ? { borderDasharray: "6, 4" } : {}),
-    transition: "all 0.3s ease" // 添加过渡效果
+    transition: "all 0.3s ease" // Add transition effect
   })
   return line
 }
 
 function createHighlightBox(): HTMLElement {
   return createElementWithStyles("div", {
-    position: "absolute", // 改回 absolute 定位
+    position: "absolute", // Change back to absolute positioning
     pointerEvents: "none",
     zIndex: "9998",
-    transition: "none" // 移除过渡效果，因为我们现在使用动画
+    transition: "none" // Remove transition effect as we now use animation
   })
 }
 
@@ -212,21 +212,21 @@ function updateHighlight(
     document.body.appendChild(highlightBox)
   }
 
-  // 更新高亮框位置和大小，考虑滚动位置
+  // Update highlight box position and size, considering scroll position
   highlightBox.style.left = `${rect.left + scrollX}px`
   highlightBox.style.top = `${rect.top + scrollY}px`
   highlightBox.style.width = `${rect.width}px`
   highlightBox.style.height = `${rect.height}px`
 
-  // 清除现有的子元素
+  // Clear existing child elements
   while (highlightBox.firstChild) {
     highlightBox.removeChild(highlightBox.firstChild)
   }
 
-  // 添加margin高亮
+  // Add margin highlight
   addMarginHighlight(highlightBox, styles)
 
-  // 添加padding高亮
+  // Add padding highlight
   const paddingBox = createBoxElement(
     {
       position: "absolute",
@@ -239,7 +239,7 @@ function updateHighlight(
   )
   highlightBox.appendChild(paddingBox)
 
-  // 添加content高亮
+  // Add content highlight
   const contentBox = createBoxElement(
     {
       position: "absolute",
@@ -252,13 +252,13 @@ function updateHighlight(
   )
   highlightBox.appendChild(contentBox)
 
-  // 添加边框
+  // Add border
   highlightBox.style.border = `2px solid ${colors.border}`
 
-  // 更新或创建辅助线
+  // Update or create auxiliary lines
   updateOrCreateLines(rect, scrollY, useSolidLines)
 
-  // 更新信息元素
+  // Update info element
   updateInfoElement(rect, scrollX, scrollY)
 }
 
@@ -268,13 +268,13 @@ function updateOrCreateLines(
   useSolidLines: boolean
 ) {
   if (highlightLines.length === 4) {
-    // 更新现有线条
+    // Update existing lines
     highlightLines[0].style.top = `${rect.top + scrollY}px`
     highlightLines[1].style.top = `${rect.bottom + scrollY}px`
     highlightLines[2].style.left = `${rect.left}px`
     highlightLines[3].style.left = `${rect.right}px`
   } else {
-    // 创建新线条
+    // Create new lines
     const horizontalLines = [
       createLine("horizontal", rect.top + scrollY, !useSolidLines),
       createLine("horizontal", rect.bottom + scrollY, !useSolidLines)
@@ -440,7 +440,7 @@ function handleMouseOver(e: MouseEvent) {
   lastHighlightedElement = target
   throttledUpdateHighlight(target)
 
-  // 更新浮动窗口
+  // Update floating window
   if (floatingWindow && !isFloatingWindowFixed) {
     floatingWindow.remove()
   }
@@ -500,7 +500,7 @@ function handleClick(e: MouseEvent) {
   } else {
     const target = e.target as HTMLElement
     lastHighlightedElement = target
-    updateHighlight(target, null, false) // 添加 null 作为第二个参数
+    updateHighlight(target, null, false) // Add null as the second argument
     floatingWindow = createFloatingWindow(target)
     fixFloatingWindow(e)
   }
@@ -568,7 +568,7 @@ function unfixFloatingWindow() {
 
     // Update highlight with dashed lines
     if (lastHighlightedElement) {
-      updateHighlight(lastHighlightedElement, null, false) // 添加 null 作为第二个参数
+      updateHighlight(lastHighlightedElement, null, false) // Add null as the second argument
     }
   }
 }
@@ -584,15 +584,15 @@ function throttledUpdateHighlight(
   highlightUpdateTimeout = setTimeout(() => {
     const rect = element.getBoundingClientRect()
     if (!lastRect) {
-      // 如果是第一次高亮，直接更新
+      // If it's the first highlight, update directly
       updateHighlight(element, rect, useSolidLines)
     } else {
-      // 如果不是第一次，执行平滑过渡
+      // If not the first time, perform smooth transition
       animateHighlight(element, lastRect, rect, useSolidLines)
     }
     lastRect = rect
     highlightUpdateTimeout = null
-  }, 20) // 将延迟时间从50ms减少到20ms
+  }, 20) // Reduce delay time from 50ms to 20ms
 }
 
 function animateHighlight(
@@ -602,7 +602,7 @@ function animateHighlight(
   useSolidLines: boolean
 ) {
   const startTime = performance.now()
-  const duration = 200
+  const duration = 100
 
   function animate(currentTime: number) {
     const elapsedTime = currentTime - startTime
@@ -634,7 +634,7 @@ function animateHighlight(
   requestAnimationFrame(animate)
 }
 
-// 使用更快的缓动函数
+// Use a faster easing function
 function easeOutQuad(t: number): number {
   return t * (2 - t)
 }
