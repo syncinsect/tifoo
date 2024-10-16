@@ -38,7 +38,6 @@ function createElementWithStyles(
 ): HTMLElement {
   const element = document.createElement(tagName)
   Object.assign(element.style, styles)
-  element.style.transition = "all 0.3s ease" // Add transition effect
   return element
 }
 
@@ -48,7 +47,7 @@ function createLine(
   isDashed: boolean = true
 ): HTMLElement {
   const line = createElementWithStyles("div", {
-    position: position === "horizontal" ? "absolute" : "fixed",
+    position: "fixed",
     backgroundColor: "transparent",
     zIndex: "9999",
     pointerEvents: "none",
@@ -59,18 +58,16 @@ function createLine(
     borderStyle: isDashed ? "dashed" : "solid",
     borderColor: colors.border,
     borderWidth: position === "horizontal" ? "2px 0 0 0" : "0 0 0 2px",
-    ...(isDashed ? { borderDasharray: "6, 4" } : {}),
-    transition: "all 0.3s ease" // Add transition effect
+    ...(isDashed ? { borderDasharray: "6, 4" } : {})
   })
   return line
 }
 
 function createHighlightBox(): HTMLElement {
   return createElementWithStyles("div", {
-    position: "absolute", // Change back to absolute positioning
+    position: "absolute",
     pointerEvents: "none",
-    zIndex: "9998",
-    transition: "none" // Remove transition effect as we now use animation
+    zIndex: "9998"
   })
 }
 
@@ -198,30 +195,23 @@ function updateHighlight(
   rect: DOMRect | null = null,
   useSolidLines: boolean = false
 ) {
-  const styles = getElementStyles(element)
+  removeHighlight()
 
   if (!rect) {
     rect = element.getBoundingClientRect()
   }
+  const styles = getElementStyles(element)
 
   const scrollX = window.pageXOffset || document.documentElement.scrollLeft
   const scrollY = window.pageYOffset || document.documentElement.scrollTop
 
-  if (!highlightBox) {
-    highlightBox = createHighlightBox()
-    document.body.appendChild(highlightBox)
-  }
-
-  // Update highlight box position and size, considering scroll position
-  highlightBox.style.left = `${rect.left + scrollX}px`
-  highlightBox.style.top = `${rect.top + scrollY}px`
+  // Create Highlight Frame
+  highlightBox = createHighlightBox()
+  highlightBox.style.position = "fixed"
+  highlightBox.style.left = `${rect.left}px`
+  highlightBox.style.top = `${rect.top}px`
   highlightBox.style.width = `${rect.width}px`
   highlightBox.style.height = `${rect.height}px`
-
-  // Clear existing child elements
-  while (highlightBox.firstChild) {
-    highlightBox.removeChild(highlightBox.firstChild)
-  }
 
   // Add margin highlight
   addMarginHighlight(highlightBox, styles)
@@ -255,46 +245,26 @@ function updateHighlight(
   // Add border
   highlightBox.style.border = `2px solid ${colors.border}`
 
-  // Update or create auxiliary lines
-  updateOrCreateLines(rect, scrollY, useSolidLines)
+  document.body.appendChild(highlightBox)
+
+  // Create lines
+  updateOrCreateLines(rect, useSolidLines)
 
   // Update info element
   updateInfoElement(rect, scrollX, scrollY)
 }
 
-function updateOrCreateLines(
-  rect: DOMRect,
-  scrollY: number,
-  useSolidLines: boolean
-) {
-  if (highlightLines.length === 4) {
-    // Update existing lines
-    highlightLines[0].style.top = `${rect.top + scrollY}px`
-    highlightLines[1].style.top = `${rect.bottom + scrollY}px`
-    highlightLines[2].style.left = `${rect.left}px`
-    highlightLines[3].style.left = `${rect.right}px`
-  } else {
-    // Create new lines
-    const horizontalLines = [
-      createLine("horizontal", rect.top + scrollY, !useSolidLines),
-      createLine("horizontal", rect.bottom + scrollY, !useSolidLines)
-    ]
-    const verticalLines = [
-      createLine("vertical", rect.left, !useSolidLines),
-      createLine("vertical", rect.right, !useSolidLines)
-    ]
-    highlightLines = [...horizontalLines, ...verticalLines]
-    highlightLines.forEach((line) => document.body.appendChild(line))
-  }
-}
-
-function updateInfoElement(rect: DOMRect, scrollX: number, scrollY: number) {
-  if (!infoElement) {
-    infoElement = createInfoElement()
-  }
-  infoElement.textContent = `${Math.round(rect.width)}x${Math.round(rect.height)}`
-  infoElement.style.left = `${rect.left + scrollX}px`
-  infoElement.style.top = `${Math.max(0, rect.top + scrollY - 20)}px`
+function updateOrCreateLines(rect: DOMRect, useSolidLines: boolean) {
+  const horizontalLines = [
+    createLine("horizontal", rect.top, !useSolidLines),
+    createLine("horizontal", rect.bottom, !useSolidLines)
+  ]
+  const verticalLines = [
+    createLine("vertical", rect.left, !useSolidLines),
+    createLine("vertical", rect.right, !useSolidLines)
+  ]
+  highlightLines = [...horizontalLines, ...verticalLines]
+  highlightLines.forEach((line) => document.body.appendChild(line))
 }
 
 function removeHighlight() {
@@ -440,7 +410,7 @@ function handleMouseOver(e: MouseEvent) {
   lastHighlightedElement = target
   throttledUpdateHighlight(target)
 
-  // Update floating window
+  // Update floating window with Tailwind classes of the hovered element
   if (floatingWindow && !isFloatingWindowFixed) {
     floatingWindow.remove()
   }
@@ -460,28 +430,14 @@ function handleMouseOut() {
 
 function handleScroll() {
   if (lastHighlightedElement) {
-    const rect = lastHighlightedElement.getBoundingClientRect()
-    const scrollY = window.pageYOffset || document.documentElement.scrollTop
-
-    // Update horizontal lines position
-    if (highlightLines.length >= 2) {
-      highlightLines[0].style.top = `${rect.top + scrollY}px`
-      highlightLines[1].style.top = `${rect.bottom + scrollY}px`
-    }
-
-    // Update highlight box position
-    if (highlightBox) {
-      highlightBox.style.top = `${rect.top + scrollY}px`
-    }
-
-    // Update info element position
-    if (infoElement) {
-      infoElement.style.top = `${Math.max(0, rect.top + scrollY - 20)}px`
-    }
+    throttledUpdateHighlight(lastHighlightedElement, isFloatingWindowFixed)
 
     // Update floating window position (if not fixed)
     if (floatingWindow && !isFloatingWindowFixed) {
-      floatingWindow.style.left = `${rect.left}px`
+      const rect = lastHighlightedElement.getBoundingClientRect()
+      const scrollX = window.pageXOffset || document.documentElement.scrollLeft
+      const scrollY = window.pageYOffset || document.documentElement.scrollTop
+      floatingWindow.style.left = `${rect.left + scrollX}px`
       floatingWindow.style.top = `${rect.top + scrollY}px`
     }
   }
@@ -500,7 +456,7 @@ function handleClick(e: MouseEvent) {
   } else {
     const target = e.target as HTMLElement
     lastHighlightedElement = target
-    updateHighlight(target, null, false) // Add null as the second argument
+    updateHighlight(target)
     floatingWindow = createFloatingWindow(target)
     fixFloatingWindow(e)
   }
@@ -568,9 +524,18 @@ function unfixFloatingWindow() {
 
     // Update highlight with dashed lines
     if (lastHighlightedElement) {
-      updateHighlight(lastHighlightedElement, null, false) // Add null as the second argument
+      updateHighlight(lastHighlightedElement, null, false)
     }
   }
+}
+
+function updateInfoElement(rect: DOMRect, scrollX: number, scrollY: number) {
+  if (!infoElement) {
+    infoElement = createInfoElement()
+  }
+  infoElement.textContent = `${Math.round(rect.width)}x${Math.round(rect.height)}`
+  infoElement.style.left = `${rect.left + scrollX}px`
+  infoElement.style.top = `${Math.max(0, rect.top + scrollY - 20)}px`
 }
 
 function throttledUpdateHighlight(
@@ -587,12 +552,12 @@ function throttledUpdateHighlight(
       // If it's the first highlight, update directly
       updateHighlight(element, rect, useSolidLines)
     } else {
-      // If not the first time, perform smooth transition
+      // If it's not the first time, perform a smooth transition
       animateHighlight(element, lastRect, rect, useSolidLines)
     }
     lastRect = rect
     highlightUpdateTimeout = null
-  }, 20) // Reduce delay time from 50ms to 20ms
+  }, 20) // Reduce the delay time from 50ms to 20ms
 }
 
 function animateHighlight(
@@ -602,26 +567,21 @@ function animateHighlight(
   useSolidLines: boolean
 ) {
   const startTime = performance.now()
-  const duration = 100
+  const duration = 150
 
   function animate(currentTime: number) {
     const elapsedTime = currentTime - startTime
     const progress = Math.min(elapsedTime / duration, 1)
 
-    const easeProgress = easeOutQuad(progress)
-
-    const scrollX = window.pageXOffset || document.documentElement.scrollLeft
-    const scrollY = window.pageYOffset || document.documentElement.scrollTop
+    const easeProgress = easeOutCubic(progress)
 
     const currentRect = {
-      left: interpolate(startRect.left, endRect.left, easeProgress) + scrollX,
-      top: interpolate(startRect.top, endRect.top, easeProgress) + scrollY,
+      left: interpolate(startRect.left, endRect.left, easeProgress),
+      top: interpolate(startRect.top, endRect.top, easeProgress),
       width: interpolate(startRect.width, endRect.width, easeProgress),
       height: interpolate(startRect.height, endRect.height, easeProgress),
-      right:
-        interpolate(startRect.right, endRect.right, easeProgress) + scrollX,
-      bottom:
-        interpolate(startRect.bottom, endRect.bottom, easeProgress) + scrollY
+      right: interpolate(startRect.right, endRect.right, easeProgress),
+      bottom: interpolate(startRect.bottom, endRect.bottom, easeProgress)
     } as DOMRect
 
     updateHighlight(element, currentRect, useSolidLines)
@@ -634,9 +594,9 @@ function animateHighlight(
   requestAnimationFrame(animate)
 }
 
-// Use a faster easing function
-function easeOutQuad(t: number): number {
-  return t * (2 - t)
+// use a faster easing function
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3)
 }
 
 function interpolate(start: number, end: number, progress: number): number {
