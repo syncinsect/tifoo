@@ -22,6 +22,8 @@ let infoElement: HTMLElement | null = null
 let lastHighlightedElement: HTMLElement | null = null
 let floatingWindow: HTMLElement | null = null
 let isFloatingWindowFixed = false
+let highlightUpdateTimeout: ReturnType<typeof setTimeout> | null = null
+let lastRect: DOMRect | null = null
 
 const colors = {
   border: "rgba(59, 130, 246, 0.5)",
@@ -36,6 +38,7 @@ function createElementWithStyles(
 ): HTMLElement {
   const element = document.createElement(tagName)
   Object.assign(element.style, styles)
+  element.style.transition = "all 0.3s ease" // 添加过渡效果
   return element
 }
 
@@ -56,16 +59,18 @@ function createLine(
     borderStyle: isDashed ? "dashed" : "solid",
     borderColor: colors.border,
     borderWidth: position === "horizontal" ? "2px 0 0 0" : "0 0 0 2px",
-    ...(isDashed ? { borderDasharray: "6, 4" } : {})
+    ...(isDashed ? { borderDasharray: "6, 4" } : {}),
+    transition: "all 0.3s ease" // 添加过渡效果
   })
   return line
 }
 
 function createHighlightBox(): HTMLElement {
   return createElementWithStyles("div", {
-    position: "absolute",
+    position: "absolute", // 改回 absolute 定位
     pointerEvents: "none",
-    zIndex: "9998"
+    zIndex: "9998",
+    transition: "none" // 移除过渡效果，因为我们现在使用动画
   })
 }
 
@@ -188,26 +193,40 @@ function createMarginLabel(value: number, direction: string): HTMLElement {
   return label
 }
 
-function updateHighlight(element: HTMLElement, useSolidLines: boolean = false) {
-  removeHighlight()
-
-  const rect = element.getBoundingClientRect()
+function updateHighlight(
+  element: HTMLElement,
+  rect: DOMRect | null = null,
+  useSolidLines: boolean = false
+) {
   const styles = getElementStyles(element)
+
+  if (!rect) {
+    rect = element.getBoundingClientRect()
+  }
 
   const scrollX = window.pageXOffset || document.documentElement.scrollLeft
   const scrollY = window.pageYOffset || document.documentElement.scrollTop
 
-  // Create Highlight Frame
-  highlightBox = createHighlightBox()
+  if (!highlightBox) {
+    highlightBox = createHighlightBox()
+    document.body.appendChild(highlightBox)
+  }
+
+  // 更新高亮框位置和大小，考虑滚动位置
   highlightBox.style.left = `${rect.left + scrollX}px`
   highlightBox.style.top = `${rect.top + scrollY}px`
   highlightBox.style.width = `${rect.width}px`
   highlightBox.style.height = `${rect.height}px`
 
-  // Add margin highlight
+  // 清除现有的子元素
+  while (highlightBox.firstChild) {
+    highlightBox.removeChild(highlightBox.firstChild)
+  }
+
+  // 添加margin高亮
   addMarginHighlight(highlightBox, styles)
 
-  // Add padding highlight
+  // 添加padding高亮
   const paddingBox = createBoxElement(
     {
       position: "absolute",
@@ -220,7 +239,7 @@ function updateHighlight(element: HTMLElement, useSolidLines: boolean = false) {
   )
   highlightBox.appendChild(paddingBox)
 
-  // Add content highlight
+  // 添加content高亮
   const contentBox = createBoxElement(
     {
       position: "absolute",
@@ -233,28 +252,43 @@ function updateHighlight(element: HTMLElement, useSolidLines: boolean = false) {
   )
   highlightBox.appendChild(contentBox)
 
-  // Add border
+  // 添加边框
   highlightBox.style.border = `2px solid ${colors.border}`
 
-  document.body.appendChild(highlightBox)
+  // 更新或创建辅助线
+  updateOrCreateLines(rect, scrollY, useSolidLines)
 
-  // Create horizontal lines
-  const horizontalLines = [
-    createLine("horizontal", rect.top + scrollY, !useSolidLines),
-    createLine("horizontal", rect.bottom + scrollY, !useSolidLines)
-  ]
-  horizontalLines.forEach((line) => document.body.appendChild(line))
+  // 更新信息元素
+  updateInfoElement(rect, scrollX, scrollY)
+}
 
-  // Create vertical lines (fixed position)
-  const verticalLines = [
-    createLine("vertical", rect.left, !useSolidLines),
-    createLine("vertical", rect.right, !useSolidLines)
-  ]
-  verticalLines.forEach((line) => document.body.appendChild(line))
+function updateOrCreateLines(
+  rect: DOMRect,
+  scrollY: number,
+  useSolidLines: boolean
+) {
+  if (highlightLines.length === 4) {
+    // 更新现有线条
+    highlightLines[0].style.top = `${rect.top + scrollY}px`
+    highlightLines[1].style.top = `${rect.bottom + scrollY}px`
+    highlightLines[2].style.left = `${rect.left}px`
+    highlightLines[3].style.left = `${rect.right}px`
+  } else {
+    // 创建新线条
+    const horizontalLines = [
+      createLine("horizontal", rect.top + scrollY, !useSolidLines),
+      createLine("horizontal", rect.bottom + scrollY, !useSolidLines)
+    ]
+    const verticalLines = [
+      createLine("vertical", rect.left, !useSolidLines),
+      createLine("vertical", rect.right, !useSolidLines)
+    ]
+    highlightLines = [...horizontalLines, ...verticalLines]
+    highlightLines.forEach((line) => document.body.appendChild(line))
+  }
+}
 
-  highlightLines = [...horizontalLines, ...verticalLines]
-
-  // Update info element
+function updateInfoElement(rect: DOMRect, scrollX: number, scrollY: number) {
   if (!infoElement) {
     infoElement = createInfoElement()
   }
@@ -382,7 +416,7 @@ function fixFloatingWindow(e: MouseEvent) {
   floatingWindow.style.display = "block"
 
   // Update highlight with solid lines
-  updateHighlight(lastHighlightedElement, true)
+  updateHighlight(lastHighlightedElement, null, true)
 }
 
 function disablePageClicks(e: MouseEvent) {
@@ -404,9 +438,9 @@ function handleMouseOver(e: MouseEvent) {
   if (!isActive || isFloatingWindowFixed) return
   const target = e.target as HTMLElement
   lastHighlightedElement = target
-  updateHighlight(target)
+  throttledUpdateHighlight(target)
 
-  // Update floating window with Tailwind classes of the hovered element
+  // 更新浮动窗口
   if (floatingWindow && !isFloatingWindowFixed) {
     floatingWindow.remove()
   }
@@ -466,7 +500,7 @@ function handleClick(e: MouseEvent) {
   } else {
     const target = e.target as HTMLElement
     lastHighlightedElement = target
-    updateHighlight(target)
+    updateHighlight(target, null, false) // 添加 null 作为第二个参数
     floatingWindow = createFloatingWindow(target)
     fixFloatingWindow(e)
   }
@@ -534,7 +568,77 @@ function unfixFloatingWindow() {
 
     // Update highlight with dashed lines
     if (lastHighlightedElement) {
-      updateHighlight(lastHighlightedElement, false)
+      updateHighlight(lastHighlightedElement, null, false) // 添加 null 作为第二个参数
     }
   }
+}
+
+function throttledUpdateHighlight(
+  element: HTMLElement,
+  useSolidLines: boolean = false
+) {
+  if (highlightUpdateTimeout) {
+    clearTimeout(highlightUpdateTimeout)
+  }
+
+  highlightUpdateTimeout = setTimeout(() => {
+    const rect = element.getBoundingClientRect()
+    if (!lastRect) {
+      // 如果是第一次高亮，直接更新
+      updateHighlight(element, rect, useSolidLines)
+    } else {
+      // 如果不是第一次，执行平滑过渡
+      animateHighlight(element, lastRect, rect, useSolidLines)
+    }
+    lastRect = rect
+    highlightUpdateTimeout = null
+  }, 20) // 将延迟时间从50ms减少到20ms
+}
+
+function animateHighlight(
+  element: HTMLElement,
+  startRect: DOMRect,
+  endRect: DOMRect,
+  useSolidLines: boolean
+) {
+  const startTime = performance.now()
+  const duration = 200
+
+  function animate(currentTime: number) {
+    const elapsedTime = currentTime - startTime
+    const progress = Math.min(elapsedTime / duration, 1)
+
+    const easeProgress = easeOutQuad(progress)
+
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop
+
+    const currentRect = {
+      left: interpolate(startRect.left, endRect.left, easeProgress) + scrollX,
+      top: interpolate(startRect.top, endRect.top, easeProgress) + scrollY,
+      width: interpolate(startRect.width, endRect.width, easeProgress),
+      height: interpolate(startRect.height, endRect.height, easeProgress),
+      right:
+        interpolate(startRect.right, endRect.right, easeProgress) + scrollX,
+      bottom:
+        interpolate(startRect.bottom, endRect.bottom, easeProgress) + scrollY
+    } as DOMRect
+
+    updateHighlight(element, currentRect, useSolidLines)
+
+    if (progress < 1) {
+      requestAnimationFrame(animate)
+    }
+  }
+
+  requestAnimationFrame(animate)
+}
+
+// 使用更快的缓动函数
+function easeOutQuad(t: number): number {
+  return t * (2 - t)
+}
+
+function interpolate(start: number, end: number, progress: number): number {
+  return start + (end - start) * progress
 }
