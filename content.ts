@@ -3,6 +3,8 @@ let highlightLines: HTMLElement[] = []
 let highlightBox: HTMLElement | null = null
 let infoElement: HTMLElement | null = null
 let lastHighlightedElement: HTMLElement | null = null
+let floatingWindow: HTMLElement | null = null
+let isFloatingWindowFixed = false
 
 const colors = {
   border: "rgba(59, 130, 246, 0.5)",
@@ -242,6 +244,43 @@ function handleScroll() {
   }
 }
 
+function createFloatingWindow(): HTMLElement {
+  const window = createElementWithStyles("div", {
+    position: "fixed",
+    pointerEvents: "none",
+    zIndex: "10001",
+    backgroundColor: "white",
+    border: "1px solid black",
+    padding: "10px",
+    borderRadius: "5px",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.2)"
+  })
+  window.textContent = "Float Window"
+  document.body.appendChild(window)
+  return window
+}
+
+function updateFloatingWindowPosition(e: MouseEvent) {
+  if (!floatingWindow || isFloatingWindowFixed) return
+  floatingWindow.style.left = `${e.clientX + 10}px`
+  floatingWindow.style.top = `${e.clientY + 10}px`
+}
+
+function fixFloatingWindow(e: MouseEvent) {
+  if (!isActive || !floatingWindow) return
+  e.preventDefault()
+  e.stopPropagation()
+  isFloatingWindowFixed = !isFloatingWindowFixed
+  floatingWindow.style.pointerEvents = isFloatingWindowFixed ? "auto" : "none"
+}
+
+function disablePageClicks(e: MouseEvent) {
+  if (isActive) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "toggleScanner") {
     isActive = request.isActive
@@ -249,12 +288,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       document.addEventListener("mouseover", handleMouseOver)
       document.addEventListener("mouseout", handleMouseOut)
       window.addEventListener("scroll", handleScroll)
+      document.addEventListener("mousemove", updateFloatingWindowPosition)
+      document.addEventListener("click", fixFloatingWindow, true)
+      document.addEventListener("click", disablePageClicks, true)
+
+      if (!floatingWindow) {
+        floatingWindow = createFloatingWindow()
+      }
     } else {
       document.removeEventListener("mouseover", handleMouseOver)
       document.removeEventListener("mouseout", handleMouseOut)
       window.removeEventListener("scroll", handleScroll)
+      document.removeEventListener("mousemove", updateFloatingWindowPosition)
+      document.removeEventListener("click", fixFloatingWindow, true)
+      document.removeEventListener("click", disablePageClicks, true)
       removeHighlight()
       lastHighlightedElement = null
+
+      if (floatingWindow) {
+        floatingWindow.remove()
+        floatingWindow = null
+      }
+      isFloatingWindowFixed = false
     }
   }
 })
