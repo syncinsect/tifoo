@@ -284,9 +284,36 @@ function removeHighlight() {
 // Function to identify Tailwind classes
 function identifyTailwindClasses(element: HTMLElement): string[] {
   const allClasses = element.className.split(/\s+/)
-  // This is a basic regex pattern for Tailwind classes. It may need refinement.
-  const tailwindPattern =
-    /^(bg-|text-|p-|m-|flex|grid|border|rounded|shadow|hover:|focus:|sm:|md:|lg:|xl:).+/
+  const tailwindPattern = new RegExp(
+    `^(
+    bg-\\w+(-\\d+)?|
+    cursor-\\w+|
+    items-\\w+|
+    rounded-\\w+|
+    p[xy]?-\\d+|
+    text-\\w+(-\\d+)?|
+    font-\\w+|
+    hover:[\\w-]+|
+    [mp][xytrblf]?-[0-9]+(/[0-9]+)?|
+    (w|h)-([0-9]+(/[0-9]+)?|full|screen|auto)|
+    (min|max)-(w|h)-([0-9]+(/[0-9]+)?|full|screen|auto)|
+    flex(-[a-z]+)?|
+    grid(-[a-z]+)?|
+    (col|row)-((span-)?[0-9]+|auto|full)|
+    (justify|content|items|self)-[a-z-]+|
+    (shadow)(-[a-z]+)?|
+    (focus|active|group-hover|dark):[\\w-]+|
+    (sm|md|lg|xl|2xl):[\\w-]+|
+    transition(-[a-z]+)?|
+    transform|scale-[0-9]+|rotate-[0-9]+|translate-[xy]-[0-9]+|skew-[xy]-[0-9]+|
+    (opacity|z)-[0-9]+|
+    (overflow|object|tracking|leading|align|whitespace|break|select|resize|list|appearance)-[a-z-]+|
+    (sr|not-sr)-[a-z]+|
+    (block|inline|inline-block|hidden)
+  )$`.replace(/\s+/g, ""),
+    "i"
+  )
+
   return allClasses.filter((cls) => tailwindPattern.test(cls))
 }
 
@@ -328,8 +355,8 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
   })
 
   const tailwindClasses = identifyTailwindClasses(element)
-  tailwindClasses.forEach((cls) => {
-    const tagElement = createElementWithStyles("div", {
+  tailwindClasses.forEach((cls, index) => {
+    const tagElement = createElementWithStyles("label", {
       backgroundColor: "rgb(31, 41, 55)",
       color: "rgb(209, 213, 219)",
       padding: "4px 8px",
@@ -337,36 +364,40 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
       fontSize: "12px",
       display: "flex",
       alignItems: "center",
-      userSelect: "none"
+      userSelect: "none",
+      cursor: "pointer"
     })
 
     const checkbox = createElementWithStyles("input", {
       appearance: "none",
-      WebkitAppearance: "none",
+      webkitAppearance: "none",
       width: "16px",
       height: "16px",
       border: "2px solid rgb(209, 213, 219)",
       borderRadius: "3px",
       marginRight: "8px",
-      cursor: "pointer",
       position: "relative",
       outline: "none"
     }) as HTMLInputElement
     checkbox.type = "checkbox"
-    checkbox.checked = true
+    checkbox.checked = element.classList.contains(cls)
+    checkbox.id = `tailwind-class-${index}`
 
     updateCheckboxStyle(checkbox)
-
-    checkbox.addEventListener("change", () => {
-      updateCheckboxStyle(checkbox)
-      handleClassToggle(element, cls, checkbox.checked)
-    })
 
     tagElement.appendChild(checkbox)
 
     const text = document.createElement("span")
     text.textContent = cls
     tagElement.appendChild(text)
+
+    tagElement.addEventListener("click", (e) => {
+      if (e.target !== checkbox) {
+        checkbox.checked = !checkbox.checked
+      }
+      updateCheckboxStyle(checkbox)
+      handleClassToggle(element, cls, checkbox.checked)
+    })
 
     tagsContainer.appendChild(tagElement)
   })
@@ -417,7 +448,98 @@ function handleClassToggle(
   } else {
     element.classList.remove(className)
   }
+
+  void element.offsetWidth
+
   updateHighlight(element)
+
+  // JIT mode
+  if (window.Tailwind && typeof window.Tailwind.refresh === "function") {
+    window.Tailwind.refresh()
+  }
+
+  if (floatingWindow) {
+    updateFloatingWindowClasses(element)
+  }
+}
+
+function updateFloatingWindowClasses(element: HTMLElement) {
+  if (!floatingWindow) return
+
+  const tagsContainer = floatingWindow.querySelector(
+    ".tags-container"
+  ) as HTMLElement
+  if (!tagsContainer) return
+
+  const currentClasses = new Set(identifyTailwindClasses(element))
+
+  Array.from(tagsContainer.children).forEach((tagElement: HTMLElement) => {
+    const checkbox = tagElement.querySelector(
+      'input[type="checkbox"]'
+    ) as HTMLInputElement
+    const textSpan = tagElement.querySelector("span") as HTMLSpanElement
+    if (checkbox && textSpan) {
+      const className = textSpan.textContent
+      if (className) {
+        if (currentClasses.has(className)) {
+          checkbox.checked = true
+          currentClasses.delete(className)
+        } else {
+          checkbox.checked = false
+        }
+        updateCheckboxStyle(checkbox)
+      }
+    }
+  })
+
+  currentClasses.forEach((cls) => {
+    const newTagElement = createClassTag(element, cls)
+    tagsContainer.appendChild(newTagElement)
+  })
+}
+
+function createClassTag(element: HTMLElement, cls: string): HTMLElement {
+  const tagElement = createElementWithStyles("label", {
+    backgroundColor: "rgb(31, 41, 55)",
+    color: "rgb(209, 213, 219)",
+    padding: "4px 8px",
+    borderRadius: "4px",
+    fontSize: "12px",
+    display: "flex",
+    alignItems: "center",
+    userSelect: "none",
+    cursor: "pointer",
+    marginBottom: "4px"
+  })
+
+  const checkbox = createElementWithStyles("input", {
+    appearance: "none",
+    webkitAppearance: "none",
+    width: "16px",
+    height: "16px",
+    border: "2px solid rgb(209, 213, 219)",
+    borderRadius: "3px",
+    marginRight: "8px",
+    position: "relative",
+    outline: "none"
+  }) as HTMLInputElement
+  checkbox.type = "checkbox"
+  checkbox.checked = true
+
+  updateCheckboxStyle(checkbox)
+
+  checkbox.addEventListener("change", () => {
+    updateCheckboxStyle(checkbox)
+    handleClassToggle(element, cls, checkbox.checked)
+  })
+
+  tagElement.appendChild(checkbox)
+
+  const text = document.createElement("span")
+  text.textContent = cls
+  tagElement.appendChild(text)
+
+  return tagElement
 }
 
 function handleAddClass(event: KeyboardEvent, element: HTMLElement) {
@@ -685,4 +807,12 @@ function easeOutCubic(t: number): number {
 
 function interpolate(start: number, end: number, progress: number): number {
   return start + (end - start) * progress
+}
+
+declare global {
+  interface Window {
+    Tailwind?: {
+      refresh: () => void
+    }
+  }
 }
