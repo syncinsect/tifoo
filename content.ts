@@ -353,6 +353,7 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     flexWrap: "wrap",
     gap: "6px"
   })
+  tagsContainer.className = "tags-container"
 
   const tailwindClasses = identifyTailwindClasses(element)
   tailwindClasses.forEach((cls, index) => {
@@ -471,28 +472,10 @@ function updateFloatingWindowClasses(element: HTMLElement) {
   ) as HTMLElement
   if (!tagsContainer) return
 
-  const currentClasses = new Set(identifyTailwindClasses(element))
+  tagsContainer.innerHTML = ""
 
-  Array.from(tagsContainer.children).forEach((tagElement: HTMLElement) => {
-    const checkbox = tagElement.querySelector(
-      'input[type="checkbox"]'
-    ) as HTMLInputElement
-    const textSpan = tagElement.querySelector("span") as HTMLSpanElement
-    if (checkbox && textSpan) {
-      const className = textSpan.textContent
-      if (className) {
-        if (currentClasses.has(className)) {
-          checkbox.checked = true
-          currentClasses.delete(className)
-        } else {
-          checkbox.checked = false
-        }
-        updateCheckboxStyle(checkbox)
-      }
-    }
-  })
-
-  currentClasses.forEach((cls) => {
+  const currentClasses = identifyTailwindClasses(element)
+  currentClasses.forEach((cls, index) => {
     const newTagElement = createClassTag(element, cls)
     tagsContainer.appendChild(newTagElement)
   })
@@ -550,7 +533,15 @@ function handleAddClass(event: KeyboardEvent, element: HTMLElement) {
       element.classList.add(newClass)
       updateHighlight(element)
       input.value = ""
-      createFloatingWindow(element) // Recreate the window to show the new class
+
+      if (floatingWindow) {
+        updateFloatingWindowClasses(element)
+      }
+
+      // JIT Mode
+      if (window.Tailwind && typeof window.Tailwind.refresh === "function") {
+        window.Tailwind.refresh()
+      }
     }
   }
 }
