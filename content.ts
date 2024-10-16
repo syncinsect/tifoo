@@ -1,3 +1,20 @@
+export {}
+
+type ComputedStyles = {
+  padding: {
+    top: number
+    right: number
+    bottom: number
+    left: number
+  }
+  margin: {
+    top: number
+    right: number
+    bottom: number
+    left: number
+  }
+}
+
 let isActive = false
 let highlightLines: HTMLElement[] = []
 let highlightBox: HTMLElement | null = null
@@ -110,27 +127,79 @@ function createBoxElement(
   })
 }
 
-function addMarginHighlight(
-  outerBox: HTMLElement,
-  styles: ReturnType<typeof getElementStyles>
-) {
-  const directions = ["top", "right", "bottom", "left"] as const
+function addMarginHighlight(outerBox: HTMLElement, styles: ComputedStyles) {
+  const marginBox = createBoxElement(
+    {
+      position: "absolute",
+      left: `-${styles.margin.left}px`,
+      top: `-${styles.margin.top}px`,
+      right: `-${styles.margin.right}px`,
+      bottom: `-${styles.margin.bottom}px`,
+      pointerEvents: "none"
+    },
+    colors.margin
+  )
+
+  const innerBox = createBoxElement(
+    {
+      position: "absolute",
+      left: `${styles.margin.left}px`,
+      top: `${styles.margin.top}px`,
+      right: `${styles.margin.right}px`,
+      bottom: `${styles.margin.bottom}px`,
+      backgroundColor: "transparent",
+      border: `2px solid ${colors.border}` // 使用原来定义的 border 颜色
+    },
+    "transparent"
+  )
+
+  marginBox.appendChild(innerBox)
+  outerBox.appendChild(marginBox)
+
+  // add labels
+  const directions = ["left", "right", "top", "bottom"] as const
   directions.forEach((direction) => {
     if (styles.margin[direction] > 0) {
-      const marginBox = createBoxElement(
-        {
-          position: "absolute",
-          [direction]: `-${styles.margin[direction]}px`,
-          [direction === "left" || direction === "right" ? "width" : "height"]:
-            `${styles.margin[direction]}px`,
-          [direction === "left" || direction === "right" ? "height" : "width"]:
-            "100%"
-        },
-        colors.margin
-      )
-      outerBox.appendChild(marginBox)
+      const label = createMarginLabel(styles.margin[direction], direction)
+      marginBox.appendChild(label)
     }
   })
+}
+
+function createMarginLabel(value: number, direction: string): HTMLElement {
+  const label = document.createElement("div")
+  label.textContent = `${value}px`
+  label.style.position = "absolute"
+  label.style.color = "white"
+  label.style.fontSize = "10px"
+  label.style.backgroundColor = "rgba(0,0,0,0.5)"
+  label.style.padding = "2px 4px"
+  label.style.borderRadius = "2px"
+
+  switch (direction) {
+    case "top":
+      label.style.top = "0"
+      label.style.left = "50%"
+      label.style.transform = "translate(-50%, -50%)"
+      break
+    case "bottom":
+      label.style.bottom = "0"
+      label.style.left = "50%"
+      label.style.transform = "translate(-50%, 50%)"
+      break
+    case "left":
+      label.style.left = "0"
+      label.style.top = "50%"
+      label.style.transform = "translate(-50%, -50%)"
+      break
+    case "right":
+      label.style.right = "0"
+      label.style.top = "50%"
+      label.style.transform = "translate(50%, -50%)"
+      break
+  }
+
+  return label
 }
 
 function updateHighlight(element: HTMLElement) {
@@ -138,49 +207,49 @@ function updateHighlight(element: HTMLElement) {
 
   const rect = element.getBoundingClientRect()
   const styles = getElementStyles(element)
-  const scrollX = window.pageXOffset || document.documentElement.scrollLeft
-  const scrollY = window.pageYOffset || document.documentElement.scrollTop
 
-  const container = createElementWithStyles("div", {
-    position: "absolute",
-    top: "0",
-    left: "0",
-    width: "100%",
-    height: "100%",
-    pointerEvents: "none",
-    zIndex: "9997"
-  })
+  // calculate viewport size
+  const viewportWidth =
+    window.innerWidth || document.documentElement.clientWidth
+  const viewportHeight =
+    window.innerHeight || document.documentElement.clientHeight
 
-  highlightLines = [
-    createLine("horizontal", rect.top + scrollY),
-    createLine("horizontal", rect.bottom + scrollY),
-    createLine("vertical", rect.left + scrollX),
-    createLine("vertical", rect.right + scrollX)
-  ]
+  // create highlight box
+  highlightBox = createHighlightBox()
 
-  const outerBox = createHighlightBox()
-  Object.assign(outerBox.style, {
-    left: `${rect.left + scrollX}px`,
-    top: `${rect.top + scrollY}px`,
-    width: `${rect.width}px`,
-    height: `${rect.height}px`,
-    boxSizing: "border-box",
-    border: `2px solid ${colors.border}`
-  })
+  // ensure highlight box not out of viewport
+  const left = Math.max(
+    0,
+    Math.min(rect.left + window.scrollX, viewportWidth - rect.width)
+  )
+  const top = Math.max(
+    0,
+    Math.min(rect.top + window.scrollY, viewportHeight - rect.height)
+  )
 
+  highlightBox.style.left = `${left}px`
+  highlightBox.style.top = `${top}px`
+  highlightBox.style.width = `${Math.min(rect.width, viewportWidth - left)}px`
+  highlightBox.style.height = `${Math.min(rect.height, viewportHeight - top)}px`
+
+  // add margin highlight
+  addMarginHighlight(highlightBox, styles)
+
+  // add padding highlight
   const paddingBox = createBoxElement(
     {
       position: "absolute",
       left: "0",
       top: "0",
-      width: "100%",
-      height: "100%",
-      boxSizing: "border-box"
+      right: "0",
+      bottom: "0"
     },
     colors.padding
   )
+  highlightBox.appendChild(paddingBox)
 
-  const innerBox = createBoxElement(
+  // add content highlight
+  const contentBox = createBoxElement(
     {
       position: "absolute",
       left: `${styles.padding.left}px`,
@@ -190,27 +259,28 @@ function updateHighlight(element: HTMLElement) {
     },
     colors.content
   )
+  highlightBox.appendChild(contentBox)
 
-  outerBox.appendChild(paddingBox)
-  outerBox.appendChild(innerBox)
+  // add border
+  highlightBox.style.border = `2px solid ${colors.border}`
 
-  addMarginHighlight(outerBox, styles)
+  document.body.appendChild(highlightBox)
 
+  // update info element
   if (!infoElement) {
     infoElement = createInfoElement()
   }
-  Object.assign(infoElement.style, {
-    left: `${rect.left}px`,
-    top: `${rect.bottom + 5}px`
-  })
-  infoElement.innerHTML = `
-    Padding: ${styles.padding.top} ${styles.padding.right} ${styles.padding.bottom} ${styles.padding.left}<br>
-    Margin: ${styles.margin.top} ${styles.margin.right} ${styles.margin.bottom} ${styles.margin.left}
-  `
+  infoElement.textContent = `${Math.round(rect.width)}x${Math.round(rect.height)}`
+  infoElement.style.left = `${left}px`
+  infoElement.style.top = `${Math.max(0, top - 20)}px`
 
-  container.appendChild(outerBox)
-  document.body.appendChild(container)
-  highlightBox = container
+  // create lines
+  highlightLines = [
+    createLine("horizontal", top),
+    createLine("horizontal", Math.min(top + rect.height, viewportHeight)),
+    createLine("vertical", left),
+    createLine("vertical", Math.min(left + rect.width, viewportWidth))
+  ]
 }
 
 function removeHighlight() {
@@ -226,37 +296,83 @@ function removeHighlight() {
   }
 }
 
-function handleMouseOver(e: MouseEvent) {
-  if (!isActive) return
-  const target = e.target as HTMLElement
-  lastHighlightedElement = target
-  updateHighlight(target)
+// Function to identify Tailwind classes
+function identifyTailwindClasses(element: HTMLElement): string[] {
+  const allClasses = element.className.split(/\s+/)
+  // This is a basic regex pattern for Tailwind classes. It may need refinement.
+  const tailwindPattern =
+    /^(bg-|text-|p-|m-|flex|grid|border|rounded|shadow|hover:|focus:|sm:|md:|lg:|xl:).+/
+  return allClasses.filter((cls) => tailwindPattern.test(cls))
 }
 
-function handleMouseOut() {
-  if (!isActive) return
-  removeHighlight()
-}
+function createFloatingWindow(element: HTMLElement): HTMLElement {
+  console.log("Creating new floating window")
 
-function handleScroll() {
-  if (lastHighlightedElement) {
-    updateHighlight(lastHighlightedElement)
+  if (floatingWindow) {
+    floatingWindow.remove()
   }
-}
 
-function createFloatingWindow(): HTMLElement {
   const window = createElementWithStyles("div", {
     position: "fixed",
     pointerEvents: "none",
     zIndex: "10001",
-    backgroundColor: "white",
-    border: "1px solid black",
-    padding: "10px",
-    borderRadius: "5px",
-    boxShadow: "0 2px 5px rgba(0,0,0,0.2)"
+    backgroundColor: "rgb(17, 24, 39)",
+    border: "2px solid rgb(55, 65, 81)",
+    borderRadius: "8px",
+    padding: "12px",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    width: "280px",
+    fontFamily: "Arial, sans-serif"
   })
-  window.textContent = "Float Window"
+
+  const title = createElementWithStyles("div", {
+    color: "rgb(209, 213, 219)",
+    fontSize: "14px",
+    fontWeight: "600",
+    marginBottom: "8px"
+  })
+  title.textContent = "Element Info"
+  window.appendChild(title)
+
+  // Tailwind classes display
+  const tagsContainer = createElementWithStyles("div", {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px"
+  })
+
+  const tailwindClasses = identifyTailwindClasses(element)
+  tailwindClasses.forEach((cls) => {
+    const tagElement = createElementWithStyles("div", {
+      backgroundColor: "rgb(31, 41, 55)",
+      color: "rgb(209, 213, 219)",
+      padding: "4px 8px",
+      borderRadius: "4px",
+      fontSize: "12px",
+      cursor: "pointer"
+    })
+    tagElement.textContent = cls
+    tagsContainer.appendChild(tagElement)
+  })
+
+  window.appendChild(tagsContainer)
+
+  // Input field
+  const input = createElementWithStyles("input", {
+    backgroundColor: "rgb(31, 41, 55)",
+    border: "none",
+    borderRadius: "4px",
+    color: "rgb(209, 213, 219)",
+    padding: "6px",
+    marginTop: "8px",
+    width: "100%",
+    fontSize: "12px"
+  }) as HTMLInputElement
+  input.placeholder = "Add classes"
+  window.appendChild(input)
+
   document.body.appendChild(window)
+  console.log("New floating window created and added to body")
   return window
 }
 
@@ -281,6 +397,46 @@ function disablePageClicks(e: MouseEvent) {
   }
 }
 
+function removeFloatingWindow() {
+  if (floatingWindow) {
+    floatingWindow.remove()
+    floatingWindow = null
+    console.log("Floating window removed") // Add log
+  }
+}
+
+function handleMouseOver(e: MouseEvent) {
+  if (!isActive) return
+  const target = e.target as HTMLElement
+  lastHighlightedElement = target
+  updateHighlight(target)
+
+  // Update floating window with Tailwind classes of the hovered element
+  if (floatingWindow) {
+    floatingWindow.remove()
+  }
+  floatingWindow = createFloatingWindow(target)
+}
+
+function handleMouseOut() {
+  if (!isActive) return
+  removeHighlight()
+  if (floatingWindow) {
+    floatingWindow.remove()
+    floatingWindow = null
+  }
+}
+
+function handleScroll() {
+  if (lastHighlightedElement) {
+    updateHighlight(lastHighlightedElement)
+    if (floatingWindow) {
+      floatingWindow.remove()
+      floatingWindow = createFloatingWindow(lastHighlightedElement)
+    }
+  }
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "toggleScanner") {
     isActive = request.isActive
@@ -292,9 +448,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       document.addEventListener("click", fixFloatingWindow, true)
       document.addEventListener("click", disablePageClicks, true)
 
-      if (!floatingWindow) {
-        floatingWindow = createFloatingWindow()
-      }
+      removeFloatingWindow() // Ensure removal of old floating window
+      // Don't create a new floating window here, it will be created on mouse hover
     } else {
       document.removeEventListener("mouseover", handleMouseOver)
       document.removeEventListener("mouseout", handleMouseOut)
@@ -305,11 +460,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       removeHighlight()
       lastHighlightedElement = null
 
-      if (floatingWindow) {
-        floatingWindow.remove()
-        floatingWindow = null
-      }
-      isFloatingWindowFixed = false
+      removeFloatingWindow()
     }
   }
 })
