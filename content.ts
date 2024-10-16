@@ -57,7 +57,7 @@ function createLine(
     [position === "horizontal" ? "top" : "left"]: `${offset}px`,
     borderStyle: isDashed ? "dashed" : "solid",
     borderColor: colors.border,
-    borderWidth: position === "horizontal" ? "2px 0 0 0" : "0 0 0 2px",
+    borderWidth: position === "horizontal" ? "3px 0 0 0" : "0 0 0 3px",
     ...(isDashed ? { borderDasharray: "6, 4" } : {})
   })
   return line
@@ -290,8 +290,6 @@ function identifyTailwindClasses(element: HTMLElement): string[] {
 }
 
 function createFloatingWindow(element: HTMLElement): HTMLElement {
-  console.log("Creating new floating window")
-
   if (floatingWindow) {
     floatingWindow.remove()
   }
@@ -308,7 +306,6 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     fontFamily: "Arial, sans-serif"
   })
 
-  // Add close button
   const closeButton = createElementWithStyles("button", {
     position: "absolute",
     right: "8px",
@@ -323,7 +320,6 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
   closeButton.addEventListener("click", removeFloatingWindow)
   window.appendChild(closeButton)
 
-  // Tailwind classes display
   const tagsContainer = createElementWithStyles("div", {
     display: "flex",
     flexWrap: "wrap",
@@ -338,15 +334,44 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
       padding: "4px 8px",
       borderRadius: "4px",
       fontSize: "12px",
-      cursor: "pointer"
+      display: "flex",
+      alignItems: "center",
+      userSelect: "none"
     })
-    tagElement.textContent = cls
+
+    const checkbox = createElementWithStyles("input", {
+      appearance: "none",
+      WebkitAppearance: "none",
+      width: "16px",
+      height: "16px",
+      border: "2px solid rgb(209, 213, 219)",
+      borderRadius: "3px",
+      marginRight: "8px",
+      cursor: "pointer",
+      position: "relative",
+      outline: "none"
+    }) as HTMLInputElement
+    checkbox.type = "checkbox"
+    checkbox.checked = true
+
+    updateCheckboxStyle(checkbox)
+
+    checkbox.addEventListener("change", () => {
+      updateCheckboxStyle(checkbox)
+      handleClassToggle(element, cls, checkbox.checked)
+    })
+
+    tagElement.appendChild(checkbox)
+
+    const text = document.createElement("span")
+    text.textContent = cls
+    tagElement.appendChild(text)
+
     tagsContainer.appendChild(tagElement)
   })
 
   window.appendChild(tagsContainer)
 
-  // Input field
   const input = createElementWithStyles("input", {
     backgroundColor: "rgb(31, 41, 55)",
     border: "none",
@@ -357,12 +382,54 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     width: "100%",
     fontSize: "12px"
   }) as HTMLInputElement
-  input.placeholder = "Add classes"
+  input.placeholder = "Add class"
+  input.addEventListener("keydown", (e) => handleAddClass(e, element))
   window.appendChild(input)
 
   document.body.appendChild(window)
-  console.log("New floating window created and added to body")
   return window
+}
+
+function updateCheckboxStyle(checkbox: HTMLInputElement) {
+  if (checkbox.checked) {
+    checkbox.style.backgroundColor = "rgb(59, 130, 246)"
+    checkbox.style.borderColor = "rgb(59, 130, 246)"
+    checkbox.style.backgroundImage =
+      'url(\'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>\')'
+    checkbox.style.backgroundSize = "10px"
+    checkbox.style.backgroundRepeat = "no-repeat"
+    checkbox.style.backgroundPosition = "center"
+  } else {
+    checkbox.style.backgroundColor = "transparent"
+    checkbox.style.borderColor = "rgb(209, 213, 219)"
+    checkbox.style.backgroundImage = "none"
+  }
+}
+
+function handleClassToggle(
+  element: HTMLElement,
+  className: string,
+  isChecked: boolean
+) {
+  if (isChecked) {
+    element.classList.add(className)
+  } else {
+    element.classList.remove(className)
+  }
+  updateHighlight(element)
+}
+
+function handleAddClass(event: KeyboardEvent, element: HTMLElement) {
+  if (event.key === "Enter") {
+    const input = event.target as HTMLInputElement
+    const newClass = input.value.trim()
+    if (newClass) {
+      element.classList.add(newClass)
+      updateHighlight(element)
+      input.value = ""
+      createFloatingWindow(element) // Recreate the window to show the new class
+    }
+  }
 }
 
 function updateFloatingWindowPosition(e: MouseEvent) {
@@ -400,7 +467,6 @@ function removeFloatingWindow() {
   if (floatingWindow) {
     floatingWindow.remove()
     floatingWindow = null
-    console.log("Floating window removed") // Add log
   }
 }
 
