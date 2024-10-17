@@ -373,22 +373,76 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     padding: "12px",
     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
     width: "280px",
-    fontFamily: "Arial, sans-serif"
+    fontFamily: "Arial, sans-serif",
+    color: "white"
   })
 
-  const closeButton = createElementWithStyles("button", {
-    position: "absolute",
-    right: "8px",
-    top: "8px",
+  const header = createElementWithStyles("div", {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "12px",
+    paddingBottom: "8px",
+    borderBottom: "1px solid rgb(55, 65, 81)"
+  })
+
+  const tailwindText = createElementWithStyles("span", {
+    fontWeight: "bold",
+    fontSize: "14px"
+  })
+  tailwindText.textContent = "tailware"
+  header.appendChild(tailwindText)
+
+  const buttonContainer = createElementWithStyles("div", {
+    display: "flex",
+    gap: "8px"
+  })
+
+  const buttonStyles = {
     backgroundColor: "transparent",
     border: "none",
     color: "rgb(209, 213, 219)",
-    fontSize: "16px",
-    cursor: "pointer"
-  })
-  closeButton.textContent = "×"
+    cursor: "pointer",
+    padding: "4px",
+    borderRadius: "4px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "24px",
+    height: "24px"
+  }
+
+  const copyClassesButton = createElementWithStyles(
+    "button",
+    buttonStyles
+  ) as HTMLButtonElement
+  copyClassesButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`
+  copyClassesButton.title = "Copy Classes"
+  copyClassesButton.addEventListener("click", () => copyClasses(element))
+
+  const copyElementButton = createElementWithStyles(
+    "button",
+    buttonStyles
+  ) as HTMLButtonElement
+  copyElementButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>`
+  copyElementButton.title = "Copy Element"
+  copyElementButton.addEventListener("click", () => copyElement(element))
+
+  const closeButton = createElementWithStyles(
+    "button",
+    buttonStyles
+  ) as HTMLButtonElement
+  closeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`
+  closeButton.title = "Close"
   closeButton.addEventListener("click", removeFloatingWindow)
-  window.appendChild(closeButton)
+
+  buttonContainer.appendChild(copyClassesButton)
+  buttonContainer.appendChild(copyElementButton)
+  buttonContainer.appendChild(closeButton)
+
+  header.appendChild(buttonContainer)
+
+  window.appendChild(header)
 
   const tagsContainer = createElementWithStyles("div", {
     display: "flex",
@@ -536,6 +590,62 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
 
   document.body.appendChild(window)
   return window
+}
+
+function copyClasses(element: HTMLElement) {
+  const classes = Array.from(element.classList).join(" ")
+  navigator.clipboard
+    .writeText(classes)
+    .then(() => {
+      showToast("Classes copied to clipboard!")
+    })
+    .catch((err) => {
+      console.error("Failed to copy classes: ", err)
+      showToast("Failed to copy classes", true)
+    })
+}
+
+function copyElement(element: HTMLElement) {
+  const elementString = element.outerHTML
+  navigator.clipboard
+    .writeText(elementString)
+    .then(() => {
+      showToast("Element copied to clipboard!")
+    })
+    .catch((err) => {
+      console.error("Failed to copy element: ", err)
+      showToast("Failed to copy element", true)
+    })
+}
+
+function showToast(message: string, isError: boolean = false) {
+  const toast = createElementWithStyles("div", {
+    position: "fixed",
+    bottom: "20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    backgroundColor: isError ? "rgb(220, 38, 38)" : "rgb(34, 197, 94)",
+    color: "white",
+    padding: "8px 16px",
+    borderRadius: "4px",
+    fontSize: "14px",
+    zIndex: "10002",
+    opacity: "0",
+    transition: "opacity 0.3s ease-in-out"
+  })
+  toast.textContent = message
+  document.body.appendChild(toast)
+
+  setTimeout(() => {
+    toast.style.opacity = "1"
+  }, 10)
+
+  setTimeout(() => {
+    toast.style.opacity = "0"
+    setTimeout(() => {
+      document.body.removeChild(toast)
+    }, 300)
+  }, 3000)
 }
 
 function updateCheckboxStyle(checkbox: HTMLInputElement) {
