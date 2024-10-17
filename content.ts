@@ -1,3 +1,5 @@
+import tailwindClasses from "./tailwind-classes.json"
+
 export {}
 
 type ComputedStyles = {
@@ -31,6 +33,46 @@ const colors = {
   padding: "rgba(147, 196, 125, 0.55)",
   margin: "rgba(246, 178, 107, 0.66)",
   content: "rgba(111, 168, 220, 0.66)"
+}
+
+type TrieNode = {
+  [key: string]: TrieNode | string
+}
+
+let tailwindClassesTrie: TrieNode = {}
+
+function buildTailwindClassesTrie(classes: { [key: string]: string }) {
+  for (const className of Object.keys(classes)) {
+    let node = tailwindClassesTrie
+    for (const char of className) {
+      if (!node[char]) {
+        node[char] = {}
+      }
+      node = node[char] as TrieNode
+    }
+    node["$"] = className
+  }
+}
+
+function searchTailwindClasses(prefix: string, limit: number = 10): string[] {
+  const results: string[] = []
+  const queue: [TrieNode, string][] = [[tailwindClassesTrie, ""]]
+
+  while (queue.length > 0 && results.length < limit) {
+    const [node, current] = queue.shift()!
+
+    if ("$" in node && current.includes(prefix)) {
+      results.push(current)
+    }
+
+    for (const [char, childNode] of Object.entries(node)) {
+      if (char !== "$") {
+        queue.push([childNode as TrieNode, current + char])
+      }
+    }
+  }
+
+  return results
 }
 
 function createElementWithStyles(
@@ -373,9 +415,124 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     width: "100%",
     fontSize: "12px"
   }) as HTMLInputElement
-  input.placeholder = "Add class"
-  input.addEventListener("keydown", (e) => handleAddClass(e, element))
+  input.placeholder = "Add Classes"
   window.appendChild(input)
+
+  const autocompleteList = createElementWithStyles("ul", {
+    position: "absolute",
+    top: "calc(100% + 4px)",
+    left: "0",
+    right: "0",
+    backgroundColor: "rgb(24, 31, 46)",
+    border: "1px solid rgb(55, 65, 81)",
+    borderRadius: "6px",
+    maxHeight: "200px",
+    overflowY: "auto",
+    display: "none",
+    zIndex: "10002",
+    listStyle: "none",
+    padding: "4px 0",
+    margin: "0",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    fontFamily: "Arial, sans-serif",
+    fontSize: "12px"
+  })
+
+  autocompleteList.style.scrollbarWidth = "thin"
+  autocompleteList.style.scrollbarColor = "rgb(75, 85, 99) rgb(31, 41, 55)"
+
+  let selectedIndex = -1
+
+  input.addEventListener("input", () => {
+    const value = input.value.trim().toLowerCase()
+    if (value === "") {
+      autocompleteList.style.display = "none"
+      return
+    }
+
+    const matches = searchTailwindClasses(value)
+    autocompleteList.innerHTML = ""
+    autocompleteList.style.display = matches.length ? "block" : "none"
+    matches.forEach((match, index) => {
+      const li = createElementWithStyles("li", {
+        padding: "6px 12px",
+        cursor: "pointer",
+        transition: "background-color 0.2s",
+        color: "rgb(209, 213, 219)"
+      })
+
+      const matchIndex = match.toLowerCase().indexOf(value)
+      if (matchIndex !== -1) {
+        li.innerHTML =
+          match.substring(0, matchIndex) +
+          `<strong style="color: rgb(59, 130, 246);">${match.substring(matchIndex, matchIndex + value.length)}</strong>` +
+          match.substring(matchIndex + value.length)
+      } else {
+        li.textContent = match
+      }
+
+      li.addEventListener("click", () => {
+        input.value = match
+        autocompleteList.style.display = "none"
+        handleAddClass(
+          { key: "Enter", target: input } as unknown as KeyboardEvent,
+          element
+        )
+      })
+
+      li.addEventListener("mouseover", () => {
+        selectedIndex = index
+        updateSelectedItem()
+      })
+
+      autocompleteList.appendChild(li)
+    })
+    selectedIndex = -1
+    updateSelectedItem()
+  })
+
+  input.addEventListener("keydown", (e: KeyboardEvent) => {
+    const items = autocompleteList.children
+    if (items.length === 0) return
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault()
+      selectedIndex = (selectedIndex + 1) % items.length
+      updateSelectedItem()
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      selectedIndex = (selectedIndex - 1 + items.length) % items.length
+      updateSelectedItem()
+    } else if (e.key === "Enter") {
+      e.preventDefault()
+      if (selectedIndex !== -1) {
+        const selectedItem = items[selectedIndex] as HTMLLIElement
+        input.value = selectedItem.textContent || ""
+      }
+      autocompleteList.style.display = "none"
+      handleAddClass(e, element)
+    } else if (e.key === "Escape") {
+      autocompleteList.style.display = "none"
+    }
+  })
+
+  function updateSelectedItem() {
+    const items = autocompleteList.children
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i] as HTMLLIElement
+      if (i === selectedIndex) {
+        item.style.backgroundColor = "rgb(55, 65, 81)"
+      } else {
+        item.style.backgroundColor = ""
+      }
+    }
+    if (selectedIndex !== -1) {
+      const selectedItem = items[selectedIndex] as HTMLLIElement
+      selectedItem.scrollIntoView({ block: "nearest" })
+    }
+  }
+
+  window.appendChild(autocompleteList)
 
   document.body.appendChild(window)
   return window
@@ -497,6 +654,10 @@ function handleAddClass(event: KeyboardEvent, element: HTMLElement) {
         window.Tailwind.refresh()
       }
     }
+  }
+  const autocompleteList = floatingWindow?.querySelector("ul")
+  if (autocompleteList) {
+    autocompleteList.style.display = "none"
   }
 }
 
@@ -761,3 +922,5 @@ declare global {
     }
   }
 }
+
+buildTailwindClassesTrie(tailwindClasses)
