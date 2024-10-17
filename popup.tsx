@@ -43,8 +43,8 @@ function IndexPopup() {
         <button
           className={`w-full py-2 px-4 rounded-lg text-white font-medium transition-all duration-300 ${
             isActive
-              ? "bg-green-500 hover:bg-green-600"
-              : "bg-blue-500 hover:bg-blue-600"
+              ? "bg-red-500 hover:bg-red-600"
+              : "bg-green-500 hover:bg-green-600"
           } hover:shadow-md transform hover:-translate-y-0.5`}
           onClick={() => setIsActive(!isActive)}>
           {isActive ? "Deactivate" : "Activate"}
