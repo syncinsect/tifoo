@@ -324,39 +324,24 @@ function removeHighlight() {
 }
 
 // Function to identify Tailwind classes
-function identifyTailwindClasses(element: HTMLElement): string[] {
-  const allClasses = element.className.split(/\s+/)
+function identifyTailwindClasses(element) {
+  let classNames = []
+
+  if (element.className) {
+    if (typeof element.className === "string") {
+      classNames = element.className.split(/\s+/)
+    } else if (element.className.baseVal) {
+      classNames = element.className.baseVal.split(/\s+/)
+    }
+  } else if (element.classList && element.classList.length) {
+    classNames = Array.from(element.classList)
+  }
+
   const tailwindPattern = new RegExp(
-    `^(
-    bg-\\w+(-\\d+)?|
-    cursor-\\w+|
-    items-\\w+|
-    rounded-\\w+|
-    p[xy]?-\\d+|
-    text-\\w+(-\\d+)?|
-    font-\\w+|
-    hover:[\\w-]+|
-    [mp][xytrblf]?-[0-9]+(/[0-9]+)?|
-    (w|h)-([0-9]+(/[0-9]+)?|full|screen|auto)|
-    (min|max)-(w|h)-([0-9]+(/[0-9]+)?|full|screen|auto)|
-    flex(-[a-z]+)?|
-    grid(-[a-z]+)?|
-    (col|row)-((span-)?[0-9]+|auto|full)|
-    (justify|content|items|self)-[a-z-]+|
-    (shadow)(-[a-z]+)?|
-    (focus|active|group-hover|dark):[\\w-]+|
-    (sm|md|lg|xl|2xl):[\\w-]+|
-    transition(-[a-z]+)?|
-    transform|scale-[0-9]+|rotate-[0-9]+|translate-[xy]-[0-9]+|skew-[xy]-[0-9]+|
-    (opacity|z)-[0-9]+|
-    (overflow|object|tracking|leading|align|whitespace|break|select|resize|list|appearance)-[a-z-]+|
-    (sr|not-sr)-[a-z]+|
-    (block|inline|inline-block|hidden)
-  )$`.replace(/\s+/g, ""),
-    "i"
+    "^(bg-|text-|p-|m-|flex|grid|border|shadow|rounded|transition|transform|cursor-|hover:|focus:|active:|disabled:)"
   )
 
-  return allClasses.filter((cls) => tailwindPattern.test(cls))
+  return classNames.filter((className) => tailwindPattern.test(className))
 }
 
 function createFloatingWindow(element: HTMLElement): HTMLElement {
