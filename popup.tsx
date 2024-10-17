@@ -16,13 +16,25 @@ function IndexPopup() {
   }, [])
 
   useEffect(() => {
-    storage.set("isActive", isActive)
+    storage
+      .set("isActive", isActive)
+      .catch((error) => console.error("Error setting state:", error))
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          action: "toggleScanner",
-          isActive
-        })
+        chrome.tabs
+          .sendMessage(tabs[0].id, {
+            action: "toggleScanner",
+            isActive
+          })
+          .catch((error) => {
+            if (error.message.includes("Could not establish connection")) {
+              console.log(
+                "Content script not ready or not injected in this tab."
+              )
+            } else {
+              console.error("Error sending message:", error)
+            }
+          })
       }
     })
   }, [isActive])
