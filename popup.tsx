@@ -1,34 +1,86 @@
+import Icon from "data-base64:~assets/icon.png"
 import React, { useEffect, useState } from "react"
 
+import { Storage } from "@plasmohq/storage"
+
 import "./style.css"
+
+const storage = new Storage()
 
 function IndexPopup() {
   const [isActive, setIsActive] = useState(false)
 
   useEffect(() => {
+    storage.get("isActive").then((value) => {
+      setIsActive(Boolean(value))
+    })
+  }, [])
+
+  useEffect(() => {
+    storage
+      .set("isActive", isActive)
+      .catch((error) => console.error("Error setting state:", error))
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          action: "toggleScanner",
-          isActive
-        })
+        chrome.tabs
+          .sendMessage(tabs[0].id, {
+            action: "toggleScanner",
+            isActive
+          })
+          .catch((error) => {
+            if (error.message.includes("Could not establish connection")) {
+              console.log(
+                "Content script not ready or not injected in this tab."
+              )
+            } else {
+              console.error("Error sending message:", error)
+            }
+          })
       }
     })
   }, [isActive])
 
   return (
-    <div className="popup">
-      <h1>Tailware</h1>
-      <div className="toggle">
-        <span>Now is {isActive ? "active" : "inactive"}</span>
-        <label className="switch">
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={() => setIsActive(!isActive)}
-          />
-          <span className="slider round"></span>
-        </label>
+    <div
+      className={`w-80 ${isActive ? "bg-blue-50" : "bg-white"} transition-colors duration-300`}>
+      <div className="bg-slate-900 text-white p-4 flex justify-between items-center">
+        <div className="flex items-center">
+          <img src={Icon} alt="Tailware icon" className="w-6 h-6 mr-2" />
+          <h1 className="text-xl font-semibold">tailware</h1>
+        </div>
+        <div className="flex items-center">
+          <span
+            className={`w-2 h-2 rounded-full mr-2 ${isActive ? "bg-green-500" : "bg-gray-400"} transition-colors duration-300`}></span>
+          <span className="text-sm">{isActive ? "Active" : "Inactive"}</span>
+        </div>
+      </div>
+      <div className="p-4">
+        <p className="text-gray-600 mb-4">Tailwind CSS inspector and editor</p>
+        <button
+          className={`w-full py-2 px-4 rounded-lg text-white font-medium transition-all duration-300 ${
+            isActive
+              ? "bg-red-500 hover:bg-red-600"
+              : "bg-green-500 hover:bg-green-600"
+          } hover:shadow-md transform hover:-translate-y-0.5`}
+          onClick={() => setIsActive(!isActive)}>
+          {isActive ? "Deactivate" : "Activate"}
+        </button>
+      </div>
+      <div className="bg-gray-100 p-3 flex justify-between text-xs text-gray-500">
+        <a
+          href="https://github.com/actopas/tailware"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-blue-500 transition-colors duration-300">
+          Learn more
+        </a>
+        <a
+          href="https://github.com/actopas/tailware/issues/new"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-blue-500 transition-colors duration-300">
+          Report an issue
+        </a>
       </div>
     </div>
   )
