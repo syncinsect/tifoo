@@ -784,7 +784,6 @@ function positionFloatingWindow(e: MouseEvent) {
   floatingWindow.style.left = `${left}px`
   floatingWindow.style.top = `${top}px`
 
-  // 更新全局变量
   floatingWindowPosition = { x: left, y: top }
 }
 
