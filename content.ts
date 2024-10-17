@@ -357,49 +357,7 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
 
   const tailwindClasses = identifyTailwindClasses(element)
   tailwindClasses.forEach((cls, index) => {
-    const tagElement = createElementWithStyles("label", {
-      backgroundColor: "rgb(31, 41, 55)",
-      color: "rgb(209, 213, 219)",
-      padding: "4px 8px",
-      borderRadius: "4px",
-      fontSize: "12px",
-      display: "flex",
-      alignItems: "center",
-      userSelect: "none",
-      cursor: "pointer"
-    })
-
-    const checkbox = createElementWithStyles("input", {
-      appearance: "none",
-      webkitAppearance: "none",
-      width: "16px",
-      height: "16px",
-      border: "2px solid rgb(209, 213, 219)",
-      borderRadius: "3px",
-      marginRight: "8px",
-      position: "relative",
-      outline: "none"
-    }) as HTMLInputElement
-    checkbox.type = "checkbox"
-    checkbox.checked = element.classList.contains(cls)
-    checkbox.id = `tailwind-class-${index}`
-
-    updateCheckboxStyle(checkbox)
-
-    tagElement.appendChild(checkbox)
-
-    const text = document.createElement("span")
-    text.textContent = cls
-    tagElement.appendChild(text)
-
-    tagElement.addEventListener("click", (e) => {
-      if (e.target !== checkbox) {
-        checkbox.checked = !checkbox.checked
-      }
-      updateCheckboxStyle(checkbox)
-      handleClassToggle(element, cls, checkbox.checked)
-    })
-
+    const tagElement = createClassTag(element, cls)
     tagsContainer.appendChild(tagElement)
   })
 
@@ -458,10 +416,6 @@ function handleClassToggle(
   if (window.Tailwind && typeof window.Tailwind.refresh === "function") {
     window.Tailwind.refresh()
   }
-
-  if (floatingWindow) {
-    updateFloatingWindowClasses(element)
-  }
 }
 
 function updateFloatingWindowClasses(element: HTMLElement) {
@@ -507,7 +461,7 @@ function createClassTag(element: HTMLElement, cls: string): HTMLElement {
     outline: "none"
   }) as HTMLInputElement
   checkbox.type = "checkbox"
-  checkbox.checked = true
+  checkbox.checked = element.classList.contains(cls)
 
   updateCheckboxStyle(checkbox)
 
