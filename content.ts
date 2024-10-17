@@ -363,8 +363,6 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     color: "white"
   })
 
-  window.classList.add("tailware-floating-window")
-
   const header = createElementWithStyles("div", {
     display: "flex",
     justifyContent: "space-between",
@@ -820,7 +818,7 @@ function fixFloatingWindow(e: MouseEvent) {
 }
 
 function disablePageClicks(e: MouseEvent) {
-  if (isActive && !(e.target as Element).closest(".tailware-floating-window")) {
+  if (isActive) {
     e.preventDefault()
     e.stopPropagation()
   }
@@ -895,9 +893,6 @@ function optimizedHandleScroll() {
 
 function handleClick(e: MouseEvent) {
   if (!isActive) return
-  e.preventDefault()
-  e.stopPropagation()
-
   if (floatingWindow) {
     if (!floatingWindow.contains(e.target as Node)) {
       if (isFloatingWindowFixed) {
@@ -936,10 +931,6 @@ function activateScanner() {
   document.addEventListener("mousemove", updateFloatingWindowPosition)
   document.addEventListener("click", handleClick, true)
 
-  document.addEventListener("click", disablePageClicks, true)
-  document.addEventListener("mousedown", disablePageClicks, true)
-  document.addEventListener("mouseup", disablePageClicks, true)
-
   isFloatingWindowFixed = false
   if (floatingWindow) {
     floatingWindow.remove()
@@ -966,10 +957,6 @@ function deactivateScanner() {
   document.removeEventListener("click", handleClick, true)
   removeHighlight()
   lastHighlightedElement = null
-
-  document.removeEventListener("click", disablePageClicks, true)
-  document.removeEventListener("mousedown", disablePageClicks, true)
-  document.removeEventListener("mouseup", disablePageClicks, true)
 
   removeFloatingWindow()
   isFloatingWindowFixed = false
