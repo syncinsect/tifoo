@@ -1,3 +1,4 @@
+import Icon from "data-base64:~assets/icon.png"
 import React, { useEffect, useState } from "react"
 
 import { Storage } from "@plasmohq/storage"
@@ -43,7 +44,10 @@ function IndexPopup() {
     <div
       className={`w-80 ${isActive ? "bg-blue-50" : "bg-white"} transition-colors duration-300`}>
       <div className="bg-slate-900 text-white p-4 flex justify-between items-center">
-        <h1 className="text-xl font-semibold">tailware</h1>
+        <div className="flex items-center">
+          <img src={Icon} alt="Tailware icon" className="w-6 h-6 mr-2" />
+          <h1 className="text-xl font-semibold">tailware</h1>
+        </div>
         <div className="flex items-center">
           <span
             className={`w-2 h-2 rounded-full mr-2 ${isActive ? "bg-green-500" : "bg-gray-400"} transition-colors duration-300`}></span>
