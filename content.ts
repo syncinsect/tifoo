@@ -711,10 +711,21 @@ function createClassTag(element: HTMLElement, cls: string): HTMLElement {
     borderRadius: "3px",
     marginRight: "8px",
     position: "relative",
-    outline: "none"
+    backgroundColor: "transparent",
+    cursor: "pointer"
   }) as HTMLInputElement
   checkbox.type = "checkbox"
   checkbox.checked = element.classList.contains(cls)
+
+  checkbox.addEventListener("focus", () => {
+    checkbox.style.boxShadow = "none"
+    checkbox.style.outline = "none"
+  })
+
+  checkbox.addEventListener("blur", () => {
+    checkbox.style.boxShadow = ""
+    checkbox.style.outline = ""
+  })
 
   updateCheckboxStyle(checkbox)
 
