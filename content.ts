@@ -36,11 +36,7 @@ const colors = {
   content: "rgba(111, 168, 220, 0.66)"
 }
 
-type TailwindClassData = {
-  [className: string]: {
-    [property: string]: string
-  }
-}
+type TailwindClassData = [string, string][]
 
 const tailwindClasses: TailwindClassData =
   tailwindClassesData as TailwindClassData
@@ -69,24 +65,20 @@ function buildTailwindClassesTrie(classes: TailwindClassData) {
 
 interface TailwindClassResult {
   className: string
-  properties: { [key: string]: string }
+  properties: string
 }
 
 function searchTailwindClasses(
   prefix: string,
   limit: number = 10
-): TailwindClassResult[] {
-  const results: TailwindClassResult[] = []
-  for (const className in tailwindClasses) {
+): [string, string][] {
+  const results: [string, string][] = []
+  for (const [className, properties] of tailwindClasses) {
     if (className.startsWith(prefix)) {
-      results.push({
-        className: className,
-        properties: tailwindClasses[className]
-      })
+      results.push([className, properties])
       if (results.length >= limit) break
     }
   }
-  console.log("Search results for", prefix, ":", results)
   return results
 }
 
@@ -507,8 +499,7 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     const matches = searchTailwindClasses(value)
     autocompleteList.innerHTML = ""
     autocompleteList.style.display = matches.length ? "block" : "none"
-    matches.forEach((match, index) => {
-      console.log("Creating autocomplete item for:", match.className)
+    matches.forEach(([className, properties], index) => {
       const li = createElementWithStyles("li", {
         padding: "6px 12px",
         cursor: "pointer",
@@ -519,17 +510,9 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
         alignItems: "center"
       })
 
-      const matchSpan = document.createElement("span")
-      const matchIndex = match.className.toLowerCase().indexOf(value)
-      if (matchIndex !== -1) {
-        matchSpan.innerHTML =
-          match.className.substring(0, matchIndex) +
-          `<strong style="color: rgb(59, 130, 246);">${match.className.substring(matchIndex, matchIndex + value.length)}</strong>` +
-          match.className.substring(matchIndex + value.length)
-      } else {
-        matchSpan.textContent = match.className
-      }
-      li.appendChild(matchSpan)
+      const classNameSpan = document.createElement("span")
+      classNameSpan.textContent = className
+      li.appendChild(classNameSpan)
 
       const propertySpan = createElementWithStyles("span", {
         color: "rgb(156, 163, 175)",
@@ -539,18 +522,12 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
         textOverflow: "ellipsis",
         maxWidth: "50%"
       })
-      const properties = match.properties
-      if (properties) {
-        const propertiesString = Object.entries(properties)
-          .map(([key, value]) => `${key}: ${value}`)
-          .join("; ")
-        propertySpan.textContent = propertiesString
-        propertySpan.title = propertiesString
-      }
+      propertySpan.textContent = properties
+      propertySpan.title = properties
       li.appendChild(propertySpan)
 
       li.addEventListener("click", () => {
-        input.value = match.className
+        input.value = className // 只设置类名
         autocompleteList.style.display = "none"
         handleAddClass(
           { key: "Enter", target: input } as unknown as KeyboardEvent,
@@ -611,7 +588,8 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
       e.preventDefault()
       if (selectedIndex !== -1) {
         const selectedItem = items[selectedIndex] as HTMLLIElement
-        input.value = selectedItem.textContent || ""
+        const className = selectedItem.querySelector("span")?.textContent || ""
+        input.value = className.trim()
       }
       autocompleteList.style.display = "none"
       handleAddClass(e, element)
@@ -660,7 +638,6 @@ function copyClasses(element: HTMLElement) {
       showToast("Classes copied to clipboard!")
     })
     .catch((err) => {
-      console.error("Failed to copy classes: ", err)
       showToast("Failed to copy classes", true)
     })
 }
@@ -673,7 +650,6 @@ function copyElement(element: HTMLElement) {
       showToast("Element copied to clipboard!")
     })
     .catch((err) => {
-      console.error("Failed to copy element: ", err)
       showToast("Failed to copy element", true)
     })
 }
@@ -748,10 +724,13 @@ function handleClassToggle(
 }
 
 function removeTailwindStyle(element: HTMLElement, className: string) {
-  const styles = tailwindClasses[className]
-  if (styles) {
-    for (const property of Object.keys(styles)) {
-      element.style.removeProperty(property)
+  const classData = tailwindClasses.find(([cls]) => cls === className)
+  if (classData) {
+    const [, properties] = classData
+    const styleProperties = properties.split(";").map((prop) => prop.trim())
+    for (const property of styleProperties) {
+      const [key] = property.split(":").map((part) => part.trim())
+      element.style.removeProperty(key)
     }
   }
 }
@@ -831,8 +810,9 @@ function createClassTag(element: HTMLElement, cls: string): HTMLElement {
 function handleAddClass(event: KeyboardEvent, element: HTMLElement) {
   if (event.key === "Enter") {
     const input = event.target as HTMLInputElement
-    const newClass = input.value.trim()
-    if (newClass) {
+    const newClass = input.value.trim().split(" ")[0]
+    const classData = tailwindClasses.find(([cls]) => cls === newClass)
+    if (classData) {
       element.classList.add(newClass)
       applyTailwindStyle(element, newClass)
       updateHighlight(element, null, isFloatingWindowFixed)
@@ -855,12 +835,13 @@ function handleAddClass(event: KeyboardEvent, element: HTMLElement) {
 }
 
 function applyTailwindStyle(element: HTMLElement, className: string) {
-  const styles = tailwindClasses[className]
-  if (styles && typeof styles === "object") {
-    for (const [property, value] of Object.entries(styles)) {
-      if (typeof value === "string") {
-        element.style.setProperty(property, value)
-      }
+  const classData = tailwindClasses.find(([cls]) => cls === className)
+  if (classData) {
+    const [, properties] = classData
+    const styleProperties = properties.split(";").map((prop) => prop.trim())
+    for (const property of styleProperties) {
+      const [key, value] = property.split(":").map((part) => part.trim())
+      element.style.setProperty(key, value)
     }
   }
 
