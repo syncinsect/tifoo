@@ -429,6 +429,18 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
 
   window.appendChild(header)
 
+  const elementNameContainer = createElementWithStyles("div", {
+    backgroundColor: "rgb(31, 41, 55)",
+    color: "rgb(209, 213, 219)",
+    padding: "6px 8px",
+    borderRadius: "4px",
+    fontSize: "12px",
+    marginBottom: "8px",
+    fontWeight: "bold"
+  })
+  elementNameContainer.textContent = element.tagName.toLowerCase()
+  window.appendChild(elementNameContainer)
+
   const tagsContainer = createElementWithStyles("div", {
     display: "flex",
     flexWrap: "wrap",
@@ -877,6 +889,13 @@ function handleMouseOut() {
 
 function updateFloatingWindowContent(element: HTMLElement) {
   if (!floatingWindow) return
+
+  const elementNameContainer = floatingWindow.querySelector(
+    "div:nth-child(2)"
+  ) as HTMLElement
+  if (elementNameContainer) {
+    elementNameContainer.textContent = element.tagName.toLowerCase()
+  }
 
   const tagsContainer = floatingWindow.querySelector(
     ".tags-container"
