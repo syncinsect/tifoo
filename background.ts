@@ -31,4 +31,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       })
     return true
   }
+  if (request.action === "scannerDeactivated") {
+    updateExtensionState(false)
+    storage.set("isActive", false).then(() => {
+      chrome.runtime.sendMessage({
+        action: "updatePopupState",
+        isActive: false
+      })
+      sendResponse({ success: true })
+    })
+    return true
+  }
 })
+
+function updateExtensionState(isActive: boolean) {
+  chrome.action.setIcon({
+    path: isActive ? "icon-active.png" : "icon-inactive.png"
+  })
+}
