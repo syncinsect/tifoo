@@ -67,14 +67,26 @@ function buildTailwindClassesTrie(classes: TailwindClassData) {
   }
 }
 
-function searchTailwindClasses(prefix: string, limit: number = 10): string[] {
-  const results: string[] = []
+interface TailwindClassResult {
+  className: string
+  properties: { [key: string]: string }
+}
+
+function searchTailwindClasses(
+  prefix: string,
+  limit: number = 10
+): TailwindClassResult[] {
+  const results: TailwindClassResult[] = []
   for (const className in tailwindClasses) {
-    if (className.includes(prefix)) {
-      results.push(className.startsWith(".") ? className.slice(1) : className)
+    if (className.startsWith(prefix)) {
+      results.push({
+        className: className,
+        properties: tailwindClasses[className]
+      })
       if (results.length >= limit) break
     }
   }
+  console.log("Search results for", prefix, ":", results)
   return results
 }
 
@@ -496,25 +508,49 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     autocompleteList.innerHTML = ""
     autocompleteList.style.display = matches.length ? "block" : "none"
     matches.forEach((match, index) => {
+      console.log("Creating autocomplete item for:", match.className)
       const li = createElementWithStyles("li", {
         padding: "6px 12px",
         cursor: "pointer",
         transition: "background-color 0.2s",
-        color: "rgb(209, 213, 219)"
+        color: "rgb(209, 213, 219)",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center"
       })
 
-      const matchIndex = match.toLowerCase().indexOf(value)
+      const matchSpan = document.createElement("span")
+      const matchIndex = match.className.toLowerCase().indexOf(value)
       if (matchIndex !== -1) {
-        li.innerHTML =
-          match.substring(0, matchIndex) +
-          `<strong style="color: rgb(59, 130, 246);">${match.substring(matchIndex, matchIndex + value.length)}</strong>` +
-          match.substring(matchIndex + value.length)
+        matchSpan.innerHTML =
+          match.className.substring(0, matchIndex) +
+          `<strong style="color: rgb(59, 130, 246);">${match.className.substring(matchIndex, matchIndex + value.length)}</strong>` +
+          match.className.substring(matchIndex + value.length)
       } else {
-        li.textContent = match
+        matchSpan.textContent = match.className
       }
+      li.appendChild(matchSpan)
+
+      const propertySpan = createElementWithStyles("span", {
+        color: "rgb(156, 163, 175)",
+        fontSize: "10px",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        maxWidth: "50%"
+      })
+      const properties = match.properties
+      if (properties) {
+        const propertiesString = Object.entries(properties)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join("; ")
+        propertySpan.textContent = propertiesString
+        propertySpan.title = propertiesString
+      }
+      li.appendChild(propertySpan)
 
       li.addEventListener("click", () => {
-        input.value = match
+        input.value = match.className
         autocompleteList.style.display = "none"
         handleAddClass(
           { key: "Enter", target: input } as unknown as KeyboardEvent,
@@ -525,6 +561,27 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
       li.addEventListener("mouseover", () => {
         selectedIndex = index
         updateSelectedItem()
+      })
+
+      li.addEventListener("mouseenter", () => {
+        propertySpan.style.whiteSpace = "normal"
+        propertySpan.style.overflow = "visible"
+        propertySpan.style.position = "absolute"
+        propertySpan.style.backgroundColor = "rgb(31, 41, 55)"
+        propertySpan.style.padding = "4px"
+        propertySpan.style.borderRadius = "4px"
+        propertySpan.style.zIndex = "10003"
+        propertySpan.style.right = "12px"
+        propertySpan.style.maxWidth = "none"
+      })
+
+      li.addEventListener("mouseleave", () => {
+        propertySpan.style.whiteSpace = "nowrap"
+        propertySpan.style.overflow = "hidden"
+        propertySpan.style.position = "static"
+        propertySpan.style.backgroundColor = "transparent"
+        propertySpan.style.padding = "0"
+        propertySpan.style.maxWidth = "50%"
       })
 
       autocompleteList.appendChild(li)
