@@ -119,7 +119,7 @@ function createHighlightBox(): HTMLElement {
 
 function createInfoElement(): HTMLElement {
   const info = createElementWithStyles("div", {
-    position: "fixed",
+    position: "absolute",
     backgroundColor: "rgba(0, 0, 0, 0.8)",
     color: "white",
     padding: "5px",
@@ -127,7 +127,6 @@ function createInfoElement(): HTMLElement {
     fontSize: "12px",
     zIndex: "10000"
   })
-  document.body.appendChild(info)
   return info
 }
 
@@ -349,7 +348,7 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     borderRadius: "8px",
     padding: "12px",
     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-    width: "280px",
+    width: "22rem",
     fontFamily: "Arial, sans-serif",
     color: "white"
   })
@@ -420,6 +419,18 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
   header.appendChild(buttonContainer)
 
   window.appendChild(header)
+
+  const elementNameContainer = createElementWithStyles("div", {
+    backgroundColor: "rgb(31, 41, 55)",
+    color: "rgb(209, 213, 219)",
+    padding: "6px 8px",
+    borderRadius: "4px",
+    fontSize: "12px",
+    marginBottom: "8px",
+    fontWeight: "bold"
+  })
+  elementNameContainer.textContent = element.tagName.toLowerCase()
+  window.appendChild(elementNameContainer)
 
   const tagsContainer = createElementWithStyles("div", {
     display: "flex",
@@ -518,8 +529,13 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
 
       autocompleteList.appendChild(li)
     })
-    selectedIndex = -1
-    updateSelectedItem()
+
+    if (matches.length > 0) {
+      selectedIndex = 0
+      updateSelectedItem()
+    } else {
+      selectedIndex = -1
+    }
   })
 
   input.addEventListener("keydown", (e: KeyboardEvent) => {
@@ -666,7 +682,7 @@ function handleClassToggle(
 
   void element.offsetWidth
 
-  updateHighlight(element)
+  updateHighlight(element, null, isFloatingWindowFixed)
 
   // JIT mode
   if (window.Tailwind && typeof window.Tailwind.refresh === "function") {
@@ -893,6 +909,13 @@ function handleMouseOut() {
 function updateFloatingWindowContent(element: HTMLElement) {
   if (!floatingWindow) return
 
+  const elementNameContainer = floatingWindow.querySelector(
+    "div:nth-child(2)"
+  ) as HTMLElement
+  if (elementNameContainer) {
+    elementNameContainer.textContent = element.tagName.toLowerCase()
+  }
+
   const tagsContainer = floatingWindow.querySelector(
     ".tags-container"
   ) as HTMLElement
@@ -1037,7 +1060,7 @@ function updateInfoElement(rect: DOMRect, scrollX: number, scrollY: number) {
 
 function throttledUpdateHighlight(
   element: HTMLElement,
-  useSolidLines: boolean = false
+  useSolidLines: boolean = isFloatingWindowFixed
 ) {
   if (highlightUpdateTimeout) {
     clearTimeout(highlightUpdateTimeout)
@@ -1054,7 +1077,7 @@ function throttledUpdateHighlight(
     }
     lastRect = rect
     highlightUpdateTimeout = null
-  }, 20) // Reduce the delay time from 50ms to 20ms
+  }, 20)
 }
 
 function animateHighlight(
