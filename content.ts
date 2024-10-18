@@ -538,8 +538,13 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
 
       autocompleteList.appendChild(li)
     })
-    selectedIndex = -1
-    updateSelectedItem()
+
+    if (matches.length > 0) {
+      selectedIndex = 0
+      updateSelectedItem()
+    } else {
+      selectedIndex = -1
+    }
   })
 
   input.addEventListener("keydown", (e: KeyboardEvent) => {
