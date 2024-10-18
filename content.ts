@@ -673,7 +673,7 @@ function handleClassToggle(
 
   void element.offsetWidth
 
-  updateHighlight(element)
+  updateHighlight(element, null, isFloatingWindowFixed)
 
   // JIT mode
   if (window.Tailwind && typeof window.Tailwind.refresh === "function") {
@@ -1023,7 +1023,7 @@ function updateInfoElement(rect: DOMRect, scrollX: number, scrollY: number) {
 
 function throttledUpdateHighlight(
   element: HTMLElement,
-  useSolidLines: boolean = false
+  useSolidLines: boolean = isFloatingWindowFixed
 ) {
   if (highlightUpdateTimeout) {
     clearTimeout(highlightUpdateTimeout)
@@ -1040,7 +1040,7 @@ function throttledUpdateHighlight(
     }
     lastRect = rect
     highlightUpdateTimeout = null
-  }, 20) // Reduce the delay time from 50ms to 20ms
+  }, 20)
 }
 
 function animateHighlight(
