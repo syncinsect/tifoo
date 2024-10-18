@@ -778,7 +778,7 @@ function handleAddClass(event: KeyboardEvent, element: HTMLElement) {
     if (newClass) {
       element.classList.add(newClass)
       applyTailwindStyle(element, newClass)
-      updateHighlight(element)
+      updateHighlight(element, null, isFloatingWindowFixed)
       input.value = ""
 
       if (floatingWindow) {
@@ -806,6 +806,8 @@ function applyTailwindStyle(element: HTMLElement, className: string) {
       }
     }
   }
+
+  updateHighlight(element, null, isFloatingWindowFixed)
 }
 
 function updateFloatingWindowPosition(e: MouseEvent) {
