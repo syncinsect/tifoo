@@ -40,6 +40,32 @@ function IndexPopup() {
     })
   }, [isActive])
 
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "updatePopupState") {
+      updatePopupUI(request.isActive)
+    }
+  })
+
+  function updatePopupUI(isActive: boolean) {
+    const statusElement = document.getElementById("status")
+    const toggleButton = document.getElementById("toggleButton")
+
+    if (statusElement) {
+      statusElement.textContent = isActive ? "Active" : "Inactive"
+      statusElement.style.color = isActive ? "green" : "red"
+    }
+
+    if (toggleButton) {
+      toggleButton.textContent = isActive ? "Deactivate" : "Activate"
+    }
+  }
+
+  chrome.runtime.sendMessage({ action: "getState" }, (response) => {
+    if (response && response.isActive !== undefined) {
+      updatePopupUI(response.isActive)
+    }
+  })
+
   return (
     <div
       className={`w-80 ${isActive ? "bg-blue-50" : "bg-white"} transition-colors duration-300`}>
