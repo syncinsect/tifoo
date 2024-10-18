@@ -1,4 +1,4 @@
-import tailwindClasses from "./tailwind-classes.json"
+import tailwindClassesData from "./tailwind-classes.json"
 
 export {}
 
@@ -36,43 +36,45 @@ const colors = {
   content: "rgba(111, 168, 220, 0.66)"
 }
 
+type TailwindClassData = {
+  [className: string]: {
+    [property: string]: string
+  }
+}
+
+const tailwindClasses: TailwindClassData =
+  tailwindClassesData as TailwindClassData
+
 type TrieNode = {
   [key: string]: TrieNode | string
 }
 
 let tailwindClassesTrie: TrieNode = {}
 
-function buildTailwindClassesTrie(classes: { [key: string]: string }) {
-  for (const className of Object.keys(classes)) {
-    let node = tailwindClassesTrie
-    for (const char of className) {
-      if (!node[char]) {
-        node[char] = {}
+function buildTailwindClassesTrie(classes: TailwindClassData) {
+  for (const selector of Object.keys(classes)) {
+    if (selector.startsWith(".")) {
+      const className = selector.slice(1)
+      let node = tailwindClassesTrie
+      for (const char of className) {
+        if (!node[char]) {
+          node[char] = {}
+        }
+        node = node[char] as TrieNode
       }
-      node = node[char] as TrieNode
+      node["$"] = className
     }
-    node["$"] = className
   }
 }
 
 function searchTailwindClasses(prefix: string, limit: number = 10): string[] {
   const results: string[] = []
-  const queue: [TrieNode, string][] = [[tailwindClassesTrie, ""]]
-
-  while (queue.length > 0 && results.length < limit) {
-    const [node, current] = queue.shift()!
-
-    if ("$" in node && current.includes(prefix)) {
-      results.push(current)
-    }
-
-    for (const [char, childNode] of Object.entries(node)) {
-      if (char !== "$") {
-        queue.push([childNode as TrieNode, current + char])
-      }
+  for (const className in tailwindClasses) {
+    if (className.includes(prefix)) {
+      results.push(className.startsWith(".") ? className.slice(1) : className)
+      if (results.length >= limit) break
     }
   }
-
   return results
 }
 
@@ -325,24 +327,13 @@ function removeHighlight() {
 }
 
 // Function to identify Tailwind classes
-function identifyTailwindClasses(element) {
-  let classNames = []
-
-  if (element.className) {
-    if (typeof element.className === "string") {
-      classNames = element.className.split(/\s+/)
-    } else if (element.className.baseVal) {
-      classNames = element.className.baseVal.split(/\s+/)
-    }
-  } else if (element.classList && element.classList.length) {
-    classNames = Array.from(element.classList)
+function identifyTailwindClasses(element: HTMLElement): string[] {
+  if (element.classList && element.classList.length) {
+    return Array.from(element.classList)
+  } else if (element.className && typeof element.className === "string") {
+    return element.className.split(/\s+/)
   }
-
-  const tailwindPattern = new RegExp(
-    "^(bg-|text-|p-|m-|flex|grid|border|shadow|rounded|transition|transform|cursor-|hover:|focus:|active:|disabled:)"
-  )
-
-  return classNames.filter((className) => tailwindPattern.test(className))
+  return []
 }
 
 function createFloatingWindow(element: HTMLElement): HTMLElement {
@@ -657,8 +648,10 @@ function handleClassToggle(
 ) {
   if (isChecked) {
     element.classList.add(className)
+    applyTailwindStyle(element, className)
   } else {
     element.classList.remove(className)
+    removeTailwindStyle(element, className)
   }
 
   void element.offsetWidth
@@ -668,6 +661,15 @@ function handleClassToggle(
   // JIT mode
   if (window.Tailwind && typeof window.Tailwind.refresh === "function") {
     window.Tailwind.refresh()
+  }
+}
+
+function removeTailwindStyle(element: HTMLElement, className: string) {
+  const styles = tailwindClasses[className]
+  if (styles) {
+    for (const property of Object.keys(styles)) {
+      element.style.removeProperty(property)
+    }
   }
 }
 
@@ -682,7 +684,7 @@ function updateFloatingWindowClasses(element: HTMLElement) {
   tagsContainer.innerHTML = ""
 
   const currentClasses = identifyTailwindClasses(element)
-  currentClasses.forEach((cls, index) => {
+  currentClasses.forEach((cls) => {
     const newTagElement = createClassTag(element, cls)
     tagsContainer.appendChild(newTagElement)
   })
@@ -749,6 +751,7 @@ function handleAddClass(event: KeyboardEvent, element: HTMLElement) {
     const newClass = input.value.trim()
     if (newClass) {
       element.classList.add(newClass)
+      applyTailwindStyle(element, newClass)
       updateHighlight(element)
       input.value = ""
 
@@ -765,6 +768,17 @@ function handleAddClass(event: KeyboardEvent, element: HTMLElement) {
   const autocompleteList = floatingWindow?.querySelector("ul")
   if (autocompleteList) {
     autocompleteList.style.display = "none"
+  }
+}
+
+function applyTailwindStyle(element: HTMLElement, className: string) {
+  const styles = tailwindClasses[className]
+  if (styles && typeof styles === "object") {
+    for (const [property, value] of Object.entries(styles)) {
+      if (typeof value === "string") {
+        element.style.setProperty(property, value)
+      }
+    }
   }
 }
 
@@ -1083,5 +1097,3 @@ declare global {
     }
   }
 }
-
-buildTailwindClassesTrie(tailwindClasses)
