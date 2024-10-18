@@ -20,9 +20,15 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "getState") {
-    storage.get("isActive").then((isActive) => {
-      sendResponse({ isActive: isActive || false })
-    })
+    storage
+      .get("isActive")
+      .then((isActive) => {
+        sendResponse({ isActive: isActive || false })
+      })
+      .catch((error) => {
+        console.error("Error getting state:", error)
+        sendResponse({ isActive: false, error: error.message })
+      })
     return true
   }
 })

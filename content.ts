@@ -26,7 +26,8 @@ let floatingWindow: HTMLElement | null = null
 let isFloatingWindowFixed = false
 let highlightUpdateTimeout: ReturnType<typeof setTimeout> | null = null
 let lastRect: DOMRect | null = null
-let floatingWindowOffset = { x: 0, y: 0 }
+let floatingWindowPosition = { x: 0, y: 0 }
+let initialClickPosition = { x: 0, y: 0 }
 
 const colors = {
   border: "rgba(59, 130, 246, 0.5)",
@@ -324,39 +325,24 @@ function removeHighlight() {
 }
 
 // Function to identify Tailwind classes
-function identifyTailwindClasses(element: HTMLElement): string[] {
-  const allClasses = element.className.split(/\s+/)
+function identifyTailwindClasses(element) {
+  let classNames = []
+
+  if (element.className) {
+    if (typeof element.className === "string") {
+      classNames = element.className.split(/\s+/)
+    } else if (element.className.baseVal) {
+      classNames = element.className.baseVal.split(/\s+/)
+    }
+  } else if (element.classList && element.classList.length) {
+    classNames = Array.from(element.classList)
+  }
+
   const tailwindPattern = new RegExp(
-    `^(
-    bg-\\w+(-\\d+)?|
-    cursor-\\w+|
-    items-\\w+|
-    rounded-\\w+|
-    p[xy]?-\\d+|
-    text-\\w+(-\\d+)?|
-    font-\\w+|
-    hover:[\\w-]+|
-    [mp][xytrblf]?-[0-9]+(/[0-9]+)?|
-    (w|h)-([0-9]+(/[0-9]+)?|full|screen|auto)|
-    (min|max)-(w|h)-([0-9]+(/[0-9]+)?|full|screen|auto)|
-    flex(-[a-z]+)?|
-    grid(-[a-z]+)?|
-    (col|row)-((span-)?[0-9]+|auto|full)|
-    (justify|content|items|self)-[a-z-]+|
-    (shadow)(-[a-z]+)?|
-    (focus|active|group-hover|dark):[\\w-]+|
-    (sm|md|lg|xl|2xl):[\\w-]+|
-    transition(-[a-z]+)?|
-    transform|scale-[0-9]+|rotate-[0-9]+|translate-[xy]-[0-9]+|skew-[xy]-[0-9]+|
-    (opacity|z)-[0-9]+|
-    (overflow|object|tracking|leading|align|whitespace|break|select|resize|list|appearance)-[a-z-]+|
-    (sr|not-sr)-[a-z]+|
-    (block|inline|inline-block|hidden)
-  )$`.replace(/\s+/g, ""),
-    "i"
+    "^(bg-|text-|p-|m-|flex|grid|border|shadow|rounded|transition|transform|cursor-|hover:|focus:|active:|disabled:)"
   )
 
-  return allClasses.filter((cls) => tailwindPattern.test(cls))
+  return classNames.filter((className) => tailwindPattern.test(className))
 }
 
 function createFloatingWindow(element: HTMLElement): HTMLElement {
@@ -725,10 +711,21 @@ function createClassTag(element: HTMLElement, cls: string): HTMLElement {
     borderRadius: "3px",
     marginRight: "8px",
     position: "relative",
-    outline: "none"
+    backgroundColor: "transparent",
+    cursor: "pointer"
   }) as HTMLInputElement
   checkbox.type = "checkbox"
   checkbox.checked = element.classList.contains(cls)
+
+  checkbox.addEventListener("focus", () => {
+    checkbox.style.boxShadow = "none"
+    checkbox.style.outline = "none"
+  })
+
+  checkbox.addEventListener("blur", () => {
+    checkbox.style.boxShadow = ""
+    checkbox.style.outline = ""
+  })
 
   updateCheckboxStyle(checkbox)
 
@@ -773,8 +770,30 @@ function handleAddClass(event: KeyboardEvent, element: HTMLElement) {
 
 function updateFloatingWindowPosition(e: MouseEvent) {
   if (!floatingWindow || isFloatingWindowFixed) return
-  floatingWindow.style.left = `${e.clientX + 10}px`
-  floatingWindow.style.top = `${e.clientY + 10}px`
+  positionFloatingWindow(e)
+}
+
+function positionFloatingWindow(e: MouseEvent) {
+  if (!floatingWindow || isFloatingWindowFixed) return
+
+  const windowWidth = window.innerWidth
+  const windowHeight = window.innerHeight
+  const floatingWindowRect = floatingWindow.getBoundingClientRect()
+
+  let left = e.clientX + 10
+  let top = e.clientY + 10
+
+  if (left + floatingWindowRect.width > windowWidth) {
+    left = e.clientX - floatingWindowRect.width - 10
+  }
+  if (top + floatingWindowRect.height > windowHeight) {
+    top = e.clientY - floatingWindowRect.height - 10
+  }
+
+  floatingWindow.style.left = `${left}px`
+  floatingWindow.style.top = `${top}px`
+
+  floatingWindowPosition = { x: left, y: top }
 }
 
 function fixFloatingWindow(e: MouseEvent) {
@@ -782,17 +801,25 @@ function fixFloatingWindow(e: MouseEvent) {
   e.preventDefault()
   e.stopPropagation()
   isFloatingWindowFixed = true
-  floatingWindow.style.position = "absolute"
 
-  const rect = lastHighlightedElement.getBoundingClientRect()
+  const floatingWindowRect = floatingWindow.getBoundingClientRect()
   const scrollX = window.pageXOffset || document.documentElement.scrollLeft
   const scrollY = window.pageYOffset || document.documentElement.scrollTop
 
-  floatingWindowOffset.x = e.pageX - (rect.left + scrollX)
-  floatingWindowOffset.y = e.pageY - (rect.top + scrollY)
+  initialClickPosition = {
+    x: e.clientX,
+    y: e.clientY
+  }
 
-  floatingWindow.style.left = `${e.pageX}px`
-  floatingWindow.style.top = `${e.pageY}px`
+  const left = Math.round(floatingWindowRect.left + scrollX)
+  const top = Math.round(floatingWindowRect.top + scrollY)
+
+  floatingWindow.style.position = "absolute"
+  floatingWindow.style.left = `${left}px`
+  floatingWindow.style.top = `${top}px`
+
+  floatingWindowPosition = { x: left, y: top }
+
   floatingWindow.style.pointerEvents = "auto"
   document.removeEventListener("mousemove", updateFloatingWindowPosition)
 
@@ -821,12 +848,12 @@ function handleMouseOver(e: MouseEvent) {
   lastHighlightedElement = target
   throttledUpdateHighlight(target)
 
-  // Update floating window with Tailwind classes of the hovered element
   if (floatingWindow && !isFloatingWindowFixed) {
-    floatingWindow.remove()
-  }
-  if (!isFloatingWindowFixed) {
+    updateFloatingWindowContent(target)
+    positionFloatingWindow(e)
+  } else if (!isFloatingWindowFixed) {
     floatingWindow = createFloatingWindow(target)
+    positionFloatingWindow(e)
   }
 }
 
@@ -839,18 +866,27 @@ function handleMouseOut() {
   }
 }
 
+function updateFloatingWindowContent(element: HTMLElement) {
+  if (!floatingWindow) return
+
+  const tagsContainer = floatingWindow.querySelector(
+    ".tags-container"
+  ) as HTMLElement
+  if (!tagsContainer) return
+
+  tagsContainer.innerHTML = ""
+
+  const tailwindClasses = identifyTailwindClasses(element)
+  tailwindClasses.forEach((cls) => {
+    const tagElement = createClassTag(element, cls)
+    tagsContainer.appendChild(tagElement)
+  })
+}
+
 function handleScroll() {
   if (lastHighlightedElement) {
     const rect = lastHighlightedElement.getBoundingClientRect()
     updateHighlight(lastHighlightedElement, rect, isFloatingWindowFixed)
-
-    if (floatingWindow && isFloatingWindowFixed) {
-      const scrollX = window.pageXOffset || document.documentElement.scrollLeft
-      const scrollY = window.pageYOffset || document.documentElement.scrollTop
-
-      floatingWindow.style.left = `${rect.left + scrollX + floatingWindowOffset.x}px`
-      floatingWindow.style.top = `${rect.top + scrollY + floatingWindowOffset.y}px`
-    }
   }
 }
 
@@ -938,16 +974,31 @@ function deactivateScanner() {
 }
 
 function unfixFloatingWindow() {
-  if (floatingWindow) {
+  if (floatingWindow && lastHighlightedElement) {
     isFloatingWindowFixed = false
+
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop
+
+    const left = Math.round(floatingWindowPosition.x - scrollX)
+    const top = Math.round(floatingWindowPosition.y - scrollY)
+
     floatingWindow.style.position = "fixed"
+    floatingWindow.style.left = `${left}px`
+    floatingWindow.style.top = `${top}px`
+
     floatingWindow.style.pointerEvents = "none"
     document.addEventListener("mousemove", updateFloatingWindowPosition)
 
-    // Update highlight with dashed lines
-    if (lastHighlightedElement) {
-      updateHighlight(lastHighlightedElement, null, false)
-    }
+    updateHighlight(lastHighlightedElement, null, false)
+
+    floatingWindow.style.display = "block"
+
+    const mouseEvent = new MouseEvent("mousemove", {
+      clientX: initialClickPosition.x,
+      clientY: initialClickPosition.y
+    })
+    updateFloatingWindowPosition(mouseEvent)
   }
 }
 
