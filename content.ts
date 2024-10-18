@@ -117,7 +117,7 @@ function createHighlightBox(): HTMLElement {
 
 function createInfoElement(): HTMLElement {
   const info = createElementWithStyles("div", {
-    position: "fixed",
+    position: "absolute",
     backgroundColor: "rgba(0, 0, 0, 0.8)",
     color: "white",
     padding: "5px",
@@ -125,7 +125,6 @@ function createInfoElement(): HTMLElement {
     fontSize: "12px",
     zIndex: "10000"
   })
-  document.body.appendChild(info)
   return info
 }
 
