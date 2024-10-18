@@ -357,7 +357,7 @@ function createFloatingWindow(element: HTMLElement): HTMLElement {
     borderRadius: "8px",
     padding: "12px",
     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-    width: "280px",
+    width: "22rem",
     fontFamily: "Arial, sans-serif",
     color: "white"
   })
