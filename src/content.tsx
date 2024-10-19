@@ -81,6 +81,18 @@ const App: React.FC = () => {
     }
   }, [highlightedElement, isFloatingWindowFixed])
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isFloatingWindowFixed && highlightedElement) {
+        const rect = highlightedElement.getBoundingClientRect()
+        updateHighlight(highlightedElement, rect, true)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [isFloatingWindowFixed, highlightedElement])
+
   const handleCopyClasses = () => {
     if (highlightedElement) {
       const classes = Array.from(highlightedElement.classList).join(" ")

@@ -60,10 +60,22 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
 
   return (
     <div
-      className={`fixed z-[10001] bg-gray-900 border-2 border-gray-700 rounded-lg p-3 shadow-lg w-88 font-sans text-white ${
-        isFixed ? "pointer-events-auto" : "pointer-events-none"
-      }`}
-      style={{ left: `${position.x}px`, top: `${position.y}px` }}>
+      className={`floating-window ${isFixed ? "fixed" : ""}`}
+      style={{
+        position: isFixed ? "absolute" : "fixed",
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        zIndex: 10001,
+        backgroundColor: "rgb(17, 24, 39)",
+        border: "2px solid rgb(55, 65, 81)",
+        borderRadius: "8px",
+        padding: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        width: "22rem",
+        fontFamily: "Arial, sans-serif",
+        color: "white",
+        pointerEvents: "auto"
+      }}>
       <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-700">
         <span className="font-bold text-sm">tailware</span>
         <div className="flex gap-2">
