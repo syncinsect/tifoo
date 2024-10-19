@@ -85,6 +85,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       applyTailwindStyle(element, newClass)
       setClasses([...classes, newClass])
       onClassChange()
+      refreshTailwind()
     }
     setInputValue("")
     setAutocompleteResults([])
@@ -97,6 +98,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     removeTailwindStyle(element, classToRemove)
     setClasses(classes.filter((c) => c !== classToRemove))
     onClassChange()
+    refreshTailwind()
   }
 
   useEffect(() => {
