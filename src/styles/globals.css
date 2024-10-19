@@ -3,12 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 可以在这里添加任何全局样式 */
 body {
   @apply antialiased;
 }
 
-/* 自定义滚动条样式 */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -23,4 +21,30 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-500;
+}
+
+.floating-window {
+  @apply bg-gray-900 border-2 border-gray-700 rounded-lg p-3 shadow-lg w-80 font-sans text-white;
+}
+
+.autocomplete-list {
+  @apply absolute top-full left-0 right-0 bg-gray-800 border border-gray-700 rounded-md mt-1 max-h-48 overflow-y-auto z-50;
+  font-size: 12px;
+}
+
+.autocomplete-item {
+  @apply px-2 py-1 cursor-pointer text-sm hover:bg-gray-700 flex justify-between items-center;
+}
+
+.autocomplete-item-selected {
+  @apply bg-gray-700;
+}
+
+.autocomplete-class-name {
+  @apply text-gray-200;
+}
+
+.autocomplete-properties {
+  @apply text-gray-400 text-xs truncate ml-2;
+  max-width: 60%; /* 限制属性文本的最大宽度 */
 }

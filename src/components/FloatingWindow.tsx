@@ -140,9 +140,26 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       .catch(() => setToastMessage("Failed to copy element"))
   }
 
+  const renderAutocompleteItem = (
+    className: string,
+    properties: string,
+    index: number
+  ) => (
+    <li
+      key={className}
+      className={`autocomplete-item ${index === selectedIndex ? "autocomplete-item-selected" : ""}`}
+      onMouseEnter={() => setSelectedIndex(index)}
+      onClick={() => handleAddClass(className)}>
+      <span className="autocomplete-class-name">{className}</span>
+      <span className="autocomplete-properties" title={properties}>
+        {properties}
+      </span>
+    </li>
+  )
+
   return (
     <div
-      className={`floating-window absolute bg-gray-900 border-2 border-gray-700 rounded-lg p-3 shadow-lg w-88 font-sans text-white ${
+      className={`floating-window ${
         isFixed ? "pointer-events-auto" : "pointer-events-none"
       }`}
       style={{
@@ -235,25 +252,10 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           placeholder="Add Classes"
         />
         {autocompleteResults.length > 0 && (
-          <ul
-            ref={autocompleteRef}
-            className="absolute top-full left-0 right-0 bg-gray-800 border border-gray-700 rounded-b max-h-50 overflow-y-auto z-[10002] list-none p-1 m-0 shadow-lg">
-            {autocompleteResults.map(([className, properties], index) => (
-              <li
-                key={className}
-                onClick={() => handleAddClass(className)}
-                onMouseEnter={() => setSelectedIndex(index)}
-                className={`p-1.5 cursor-pointer hover:bg-gray-700 text-gray-300 text-xs flex justify-between items-center ${
-                  index === selectedIndex ? "bg-gray-700" : ""
-                }`}>
-                <span>{className}</span>
-                <span
-                  className="text-gray-400 text-2xs truncate ml-2"
-                  title={properties}>
-                  {properties}
-                </span>
-              </li>
-            ))}
+          <ul className="autocomplete-list" ref={autocompleteRef}>
+            {autocompleteResults.map(([className, properties], index) =>
+              renderAutocompleteItem(className, properties, index)
+            )}
           </ul>
         )}
       </div>
