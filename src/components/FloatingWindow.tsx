@@ -9,13 +9,12 @@ import {
   searchTailwindClasses
 } from "../utils/tailwindUtils"
 import ClassTag from "./ClassTag"
+import Toast from "./Toast"
 
 interface FloatingWindowProps {
   element: HTMLElement
   position: { x: number; y: number }
   isFixed: boolean
-  onCopyClasses: () => void
-  onCopyElement: () => void
   onDeactivate: () => void
   onClassChange: () => void
 }
@@ -24,8 +23,6 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   element,
   position,
   isFixed,
-  onCopyClasses,
-  onCopyElement,
   onDeactivate,
   onClassChange
 }) => {
@@ -35,6 +32,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     [string, string][]
   >([])
   const [selectedIndex, setSelectedIndex] = useState(-1)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
   const autocompleteRef = useRef<HTMLUListElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -110,6 +108,26 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     }
   }, [selectedIndex])
 
+  const handleCopyClasses = () => {
+    const classesString = classes.join(" ")
+    navigator.clipboard
+      .writeText(classesString)
+      .then(() => {
+        setToastMessage("Classes copied to clipboard!")
+      })
+      .catch(() => setToastMessage("Failed to copy classes"))
+  }
+
+  const handleCopyElement = () => {
+    const elementString = element.outerHTML
+    navigator.clipboard
+      .writeText(elementString)
+      .then(() => {
+        setToastMessage("Element copied to clipboard!")
+      })
+      .catch(() => setToastMessage("Failed to copy element"))
+  }
+
   return (
     <div
       className={`floating-window absolute bg-gray-900 border-2 border-gray-700 rounded-lg p-3 shadow-lg w-88 font-sans text-white ${
@@ -125,7 +143,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
         <span className="font-bold text-sm">tailware</span>
         <div className="flex gap-2">
           <button
-            onClick={onCopyClasses}
+            onClick={handleCopyClasses}
             className="bg-transparent border-none text-gray-300 cursor-pointer p-1 rounded hover:bg-gray-800"
             title="Copy Classes">
             <svg
@@ -143,7 +161,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
             </svg>
           </button>
           <button
-            onClick={onCopyElement}
+            onClick={handleCopyElement}
             className="bg-transparent border-none text-gray-300 cursor-pointer p-1 rounded hover:bg-gray-800"
             title="Copy Element">
             <svg
@@ -225,6 +243,9 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           </ul>
         )}
       </div>
+      {toastMessage && (
+        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+      )}
     </div>
   )
 }

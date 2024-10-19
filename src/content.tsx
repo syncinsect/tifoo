@@ -93,26 +93,6 @@ const App: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [isFloatingWindowFixed, highlightedElement])
 
-  const handleCopyClasses = () => {
-    if (highlightedElement) {
-      const classes = Array.from(highlightedElement.classList).join(" ")
-      navigator.clipboard
-        .writeText(classes)
-        .then(() => setToastMessage("Classes copied to clipboard!"))
-        .catch(() => setToastMessage("Failed to copy classes"))
-    }
-  }
-
-  const handleCopyElement = () => {
-    if (highlightedElement) {
-      const elementString = highlightedElement.outerHTML
-      navigator.clipboard
-        .writeText(elementString)
-        .then(() => setToastMessage("Element copied to clipboard!"))
-        .catch(() => setToastMessage("Failed to copy element"))
-    }
-  }
-
   const handleDeactivate = () => {
     setIsActive(false)
     chrome.runtime.sendMessage({ action: "scannerDeactivated" })
@@ -144,8 +124,6 @@ const App: React.FC = () => {
             element={highlightedElement}
             position={floatingWindowPosition}
             isFixed={isFloatingWindowFixed}
-            onCopyClasses={handleCopyClasses}
-            onCopyElement={handleCopyElement}
             onDeactivate={handleDeactivate}
             onClassChange={handleClassChange}
           />
