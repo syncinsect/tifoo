@@ -2,7 +2,7 @@ import fs from "fs"
 import path from "path"
 import { fileURLToPath } from "url"
 
-function cssToArray(filePath) {
+function cssToObjectArray(filePath) {
   if (!fs.existsSync(filePath)) {
     console.log(`file ${filePath} does not exist`)
     return
@@ -39,13 +39,13 @@ function cssToArray(filePath) {
           .split(";")
           .map((prop) => {
             const [key, value] = prop.split(":").map((item) => item.trim())
-            return key && value ? `${key}: ${value}` : null
+            return key && value ? `${key}:${value}` : null
           })
           .filter(Boolean)
-          .join("; ")
+          .join(";")
 
         if (propsString) {
-          cssArray.push([className, propsString])
+          cssArray.push({ c: className, p: propsString })
         }
       }
     })
@@ -55,17 +55,17 @@ function cssToArray(filePath) {
 }
 
 function saveCssArrayToFile(cssArray, outputPath) {
-  fs.writeFileSync(outputPath, JSON.stringify(cssArray, null, 2))
-  console.log(`JSON saved ${outputPath}`)
+  fs.writeFileSync(outputPath, JSON.stringify(cssArray))
+  console.log(`Compressed JSON saved to ${outputPath}`)
 }
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const cssFilePath = path.join(__dirname, "output.css")
-const jsonFilePath = path.join(__dirname, "output.json")
+const jsonFilePath = path.join(__dirname, "output.min.json")
 
-const cssArray = cssToArray(cssFilePath)
+const cssArray = cssToObjectArray(cssFilePath)
 if (cssArray) {
   saveCssArrayToFile(cssArray, jsonFilePath)
   console.log("Complete")
