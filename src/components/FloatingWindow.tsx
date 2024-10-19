@@ -51,20 +51,20 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   const debouncedSearch = useMemo(
     () =>
       debounce((searchQuery: string) => {
-        const matches = searchTailwindClasses(searchQuery)
-        setAutocompleteResults(matches)
-        setDisplayedResults(matches.slice(0, INITIAL_RESULTS_LIMIT))
+        if (searchQuery.trim() === "") {
+          setAutocompleteResults([])
+          setDisplayedResults([])
+        } else {
+          const matches = searchTailwindClasses(searchQuery)
+          setAutocompleteResults(matches)
+          setDisplayedResults(matches.slice(0, INITIAL_RESULTS_LIMIT))
+        }
       }, 300),
     []
   )
 
   useEffect(() => {
-    if (query) {
-      debouncedSearch(query)
-    } else {
-      setAutocompleteResults([])
-      setDisplayedResults([])
-    }
+    debouncedSearch(query)
     return () => {
       debouncedSearch.cancel()
     }
@@ -263,31 +263,33 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       </div>
       <Combobox value={selectedClass} onChange={handleAddClass}>
         <div className="relative mt-1">
-          <Combobox.Options
-            ref={optionsRef}
-            className="absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-gray-900 rounded-md shadow-lg max-h-60 ring-1 ring-gray-700 focus:outline-none"
-            onScroll={handleScroll}
-            static>
-            {displayedResults.map(([className, properties], index) => (
-              <Combobox.Option key={className} value={className}>
-                {({ selected }) => (
-                  <li
-                    className={`${
-                      index === activeIndex
-                        ? "bg-gray-700 text-white"
-                        : "text-gray-300"
-                    } cursor-default select-none relative py-1 pl-3 pr-9 flex justify-between items-center`}>
-                    <span className="block truncate">{className}</span>
-                    <span
-                      className="block truncate text-gray-500 text-right"
-                      title={properties}>
-                      {properties}
-                    </span>
-                  </li>
-                )}
-              </Combobox.Option>
-            ))}
-          </Combobox.Options>
+          {query.trim() !== "" && displayedResults.length > 0 && (
+            <Combobox.Options
+              ref={optionsRef}
+              className="absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-gray-900 rounded-md shadow-lg max-h-60 ring-1 ring-gray-700 focus:outline-none"
+              onScroll={handleScroll}
+              static>
+              {displayedResults.map(([className, properties], index) => (
+                <Combobox.Option key={className} value={className}>
+                  {({ selected }) => (
+                    <li
+                      className={`${
+                        index === activeIndex
+                          ? "bg-gray-700 text-white"
+                          : "text-gray-300"
+                      } cursor-default select-none relative py-1 pl-3 pr-9 flex justify-between items-center`}>
+                      <span className="block truncate">{className}</span>
+                      <span
+                        className="block truncate text-gray-500 text-right"
+                        title={properties}>
+                        {properties}
+                      </span>
+                    </li>
+                  )}
+                </Combobox.Option>
+              ))}
+            </Combobox.Options>
+          )}
           <Combobox.Input
             className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
             onChange={(event) => setQuery(event.target.value)}
