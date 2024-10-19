@@ -1,7 +1,11 @@
 // src/components/FloatingWindow.tsx
-import { Combobox } from "@headlessui/react"
-import debounce from "lodash/debounce"
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions
+} from "@headlessui/react"
+import React, { useEffect, useState } from "react"
 
 import {
   applyTailwindStyle,
@@ -21,9 +25,6 @@ interface FloatingWindowProps {
   onClassChange: () => void
 }
 
-const INITIAL_RESULTS_LIMIT = 100
-const LOAD_MORE_INCREMENT = 50
-
 const FloatingWindow: React.FC<FloatingWindowProps> = ({
   element,
   position,
@@ -35,40 +36,22 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   const [query, setQuery] = useState("")
   const [selectedClass, setSelectedClass] = useState<string | null>(null)
   const [autocompleteResults, setAutocompleteResults] = useState<
-    [string, string][]
+    { c: string; p: string }[]
   >([])
-  const [displayedResults, setDisplayedResults] = useState<[string, string][]>(
-    []
-  )
   const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const optionsRef = useRef<HTMLUListElement>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
 
   useEffect(() => {
     setClasses(identifyTailwindClasses(element))
   }, [element])
 
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((searchQuery: string) => {
-        if (searchQuery.trim() === "") {
-          setAutocompleteResults([])
-          setDisplayedResults([])
-        } else {
-          const matches = searchTailwindClasses(searchQuery)
-          setAutocompleteResults(matches)
-          setDisplayedResults(matches.slice(0, INITIAL_RESULTS_LIMIT))
-        }
-      }, 300),
-    []
-  )
-
   useEffect(() => {
-    debouncedSearch(query)
-    return () => {
-      debouncedSearch.cancel()
+    if (query.trim() === "") {
+      setAutocompleteResults([])
+    } else {
+      const matches = searchTailwindClasses(query)
+      setAutocompleteResults(matches)
     }
-  }, [query, debouncedSearch])
+  }, [query])
 
   const handleAddClass = (newClass: string) => {
     if (!classes.includes(newClass)) {
@@ -121,61 +104,6 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       })
       .catch(() => setToastMessage("Failed to copy element"))
   }
-
-  const loadMoreResults = useCallback(() => {
-    setDisplayedResults((prevResults) => {
-      const newResults = [
-        ...prevResults,
-        ...autocompleteResults.slice(
-          prevResults.length,
-          prevResults.length + LOAD_MORE_INCREMENT
-        )
-      ]
-      return newResults.length > autocompleteResults.length
-        ? autocompleteResults
-        : newResults
-    })
-  }, [autocompleteResults])
-
-  const handleScroll = useCallback(() => {
-    if (optionsRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = optionsRef.current
-      if (scrollHeight - scrollTop <= clientHeight + 1) {
-        loadMoreResults()
-      }
-    }
-  }, [loadMoreResults])
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "ArrowDown") {
-      event.preventDefault()
-      if (activeIndex >= displayedResults.length - 1) {
-        loadMoreResults()
-      }
-      setActiveIndex((prevIndex) =>
-        Math.min(prevIndex + 1, autocompleteResults.length - 1)
-      )
-    } else if (event.key === "ArrowUp") {
-      event.preventDefault()
-      setActiveIndex((prevIndex) => Math.max(prevIndex - 1, 0))
-    } else if (event.key === "Enter") {
-      event.preventDefault()
-      if (displayedResults[activeIndex]) {
-        handleAddClass(displayedResults[activeIndex][0])
-      }
-    }
-  }
-
-  useEffect(() => {
-    if (optionsRef.current) {
-      const activeElement = optionsRef.current.children[
-        activeIndex
-      ] as HTMLElement
-      if (activeElement) {
-        activeElement.scrollIntoView({ block: "nearest" })
-      }
-    }
-  }, [activeIndex])
 
   return (
     <div
@@ -261,43 +189,46 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           />
         ))}
       </div>
-      <Combobox value={selectedClass} onChange={handleAddClass}>
+      <Combobox
+        value={selectedClass}
+        onChange={handleAddClass}
+        virtual={{
+          options: autocompleteResults.map(({ c }) => c)
+        }}>
         <div className="relative mt-1">
-          {query.trim() !== "" && displayedResults.length > 0 && (
-            <Combobox.Options
-              ref={optionsRef}
-              className="absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-gray-900 rounded-md shadow-lg max-h-60 ring-1 ring-gray-700 focus:outline-none"
-              onScroll={handleScroll}
-              static>
-              {displayedResults.map(([className, properties], index) => (
-                <Combobox.Option key={className} value={className}>
-                  {({ selected }) => (
-                    <li
-                      className={`${
-                        index === activeIndex
-                          ? "bg-gray-700 text-white"
-                          : "text-gray-300"
-                      } cursor-default select-none relative py-1 px-3 flex justify-between items-center`}>
-                      <span className="block truncate">{className}</span>
-                      <span
-                        className="block truncate text-gray-500 text-right"
-                        title={properties}>
-                        {properties}
-                      </span>
-                    </li>
-                  )}
-                </Combobox.Option>
-              ))}
-            </Combobox.Options>
-          )}
-          <Combobox.Input
+          <ComboboxInput
             className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
             onChange={(event) => setQuery(event.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="add classes"
+            placeholder="添加类名"
             autoComplete="off"
             spellCheck="false"
           />
+          <ComboboxOptions className="absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-gray-900 rounded-md shadow-lg max-h-60 ring-1 ring-gray-700 focus:outline-none">
+            {({ option: className }) => {
+              const classData = autocompleteResults.find(
+                ({ c }) => c === className
+              )
+              return (
+                <ComboboxOption
+                  key={className}
+                  value={className}
+                  className={({ active }) =>
+                    `cursor-default select-none relative py-1 px-3 flex justify-between items-center ${
+                      active ? "bg-gray-700 text-white" : "text-gray-300"
+                    }`
+                  }>
+                  <span className="block truncate">{className}</span>
+                  {classData && (
+                    <span
+                      className="block truncate text-gray-500 text-right"
+                      title={classData.p}>
+                      {classData.p}
+                    </span>
+                  )}
+                </ComboboxOption>
+              )
+            }}
+          </ComboboxOptions>
         </div>
       </Combobox>
       {toastMessage && (
