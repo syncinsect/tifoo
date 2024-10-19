@@ -99,6 +99,18 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     refreshTailwind()
   }
 
+  const handleClassToggle = (className: string, isChecked: boolean) => {
+    if (isChecked) {
+      element.classList.add(className)
+      applyTailwindStyle(element, className)
+    } else {
+      element.classList.remove(className)
+      removeTailwindStyle(element, className)
+    }
+    onClassChange()
+    refreshTailwind()
+  }
+
   useEffect(() => {
     if (autocompleteRef.current && selectedIndex !== -1) {
       const selectedItem = autocompleteRef.current.children[
@@ -206,7 +218,9 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           <ClassTag
             key={cls}
             className={cls}
-            onRemove={() => handleRemoveClass(cls)}
+            element={element}
+            onToggle={handleClassToggle}
+            onRemove={handleRemoveClass}
           />
         ))}
       </div>
