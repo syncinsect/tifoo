@@ -25,6 +25,9 @@ let highlightLines: HTMLElement[] = []
 let highlightBox: HTMLElement | null = null
 let infoElement: HTMLElement | null = null
 
+let lastRect: DOMRect | null = null
+let highlightUpdateTimeout: ReturnType<typeof setTimeout> | null = null
+
 export function getElementStyles(element: HTMLElement): ComputedStyles {
   const styles = window.getComputedStyle(element)
   const getIntValue = (prop: string) =>
@@ -281,4 +284,68 @@ export function removeHighlight() {
     infoElement.remove()
     infoElement = null
   }
+}
+
+export function throttledUpdateHighlight(
+  element: HTMLElement,
+  useSolidLines: boolean = false
+) {
+  if (highlightUpdateTimeout) {
+    clearTimeout(highlightUpdateTimeout)
+  }
+
+  highlightUpdateTimeout = setTimeout(() => {
+    const rect = element.getBoundingClientRect()
+    if (!lastRect) {
+      // 如果是第一次高亮,直接更新
+      updateHighlight(element, rect, useSolidLines)
+    } else {
+      // 如果不是第一次,执行平滑过渡
+      animateHighlight(element, lastRect, rect, useSolidLines)
+    }
+    lastRect = rect
+    highlightUpdateTimeout = null
+  }, 20)
+}
+
+function animateHighlight(
+  element: HTMLElement,
+  startRect: DOMRect,
+  endRect: DOMRect,
+  useSolidLines: boolean
+) {
+  const startTime = performance.now()
+  const duration = 150
+
+  function animate(currentTime: number) {
+    const elapsedTime = currentTime - startTime
+    const progress = Math.min(elapsedTime / duration, 1)
+
+    const easeProgress = easeOutCubic(progress)
+
+    const currentRect = {
+      left: interpolate(startRect.left, endRect.left, easeProgress),
+      top: interpolate(startRect.top, endRect.top, easeProgress),
+      width: interpolate(startRect.width, endRect.width, easeProgress),
+      height: interpolate(startRect.height, endRect.height, easeProgress),
+      right: interpolate(startRect.right, endRect.right, easeProgress),
+      bottom: interpolate(startRect.bottom, endRect.bottom, easeProgress)
+    } as DOMRect
+
+    updateHighlight(element, currentRect, useSolidLines)
+
+    if (progress < 1) {
+      requestAnimationFrame(animate)
+    }
+  }
+
+  requestAnimationFrame(animate)
+}
+
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3)
+}
+
+function interpolate(start: number, end: number, progress: number): number {
+  return start + (end - start) * progress
 }

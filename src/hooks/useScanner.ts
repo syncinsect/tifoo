@@ -1,7 +1,11 @@
 // src/hooks/useScanner.ts
 import { useCallback, useRef, useState } from "react"
 
-import { removeHighlight, updateHighlight } from "../utils/domUtils"
+import {
+  removeHighlight,
+  throttledUpdateHighlight,
+  updateHighlight
+} from "../utils/domUtils"
 
 interface UseScannerProps {
   isActive: boolean
@@ -28,7 +32,7 @@ const useScanner = ({
       const target = e.target as HTMLElement
       setLastHighlightedElement(target)
       setHighlightedElement(target)
-      updateHighlight(target, null, false)
+      throttledUpdateHighlight(target, isFloatingWindowFixedRef.current)
     },
     [isActive, setHighlightedElement]
   )
