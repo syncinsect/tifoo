@@ -1,5 +1,5 @@
 // src/content.tsx
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 
 import FloatingWindow from "./components/FloatingWindow"
@@ -118,6 +118,20 @@ const App: React.FC = () => {
     chrome.runtime.sendMessage({ action: "scannerDeactivated" })
   }
 
+  const updateHighlightAndLines = useCallback(() => {
+    if (highlightedElement) {
+      const rect = highlightedElement.getBoundingClientRect()
+      updateHighlight(highlightedElement, rect, isFloatingWindowFixed)
+    }
+  }, [highlightedElement, isFloatingWindowFixed])
+
+  const handleClassChange = useCallback(() => {
+    updateHighlightAndLines()
+    if (window.Tailwind && typeof window.Tailwind.refresh === "function") {
+      window.Tailwind.refresh()
+    }
+  }, [updateHighlightAndLines])
+
   return (
     <>
       {isActive && highlightedElement && (
@@ -133,6 +147,7 @@ const App: React.FC = () => {
             onCopyClasses={handleCopyClasses}
             onCopyElement={handleCopyElement}
             onDeactivate={handleDeactivate}
+            onClassChange={handleClassChange}
           />
         </>
       )}

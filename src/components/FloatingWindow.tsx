@@ -1,8 +1,11 @@
 // src/components/FloatingWindow.tsx
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import {
+  applyTailwindStyle,
   identifyTailwindClasses,
+  refreshTailwind,
+  removeTailwindStyle,
   searchTailwindClasses
 } from "../utils/tailwindUtils"
 import ClassTag from "./ClassTag"
@@ -14,6 +17,7 @@ interface FloatingWindowProps {
   onCopyClasses: () => void
   onCopyElement: () => void
   onDeactivate: () => void
+  onClassChange: () => void
 }
 
 const FloatingWindow: React.FC<FloatingWindowProps> = ({
@@ -22,13 +26,17 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   isFixed,
   onCopyClasses,
   onCopyElement,
-  onDeactivate
+  onDeactivate,
+  onClassChange
 }) => {
   const [classes, setClasses] = useState<string[]>([])
   const [inputValue, setInputValue] = useState("")
   const [autocompleteResults, setAutocompleteResults] = useState<
     [string, string][]
   >([])
+  const [selectedIndex, setSelectedIndex] = useState(-1)
+  const autocompleteRef = useRef<HTMLUListElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setClasses(identifyTailwindClasses(element))
@@ -38,43 +46,78 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     const value = e.target.value.trim().toLowerCase()
     setInputValue(value)
     if (value) {
-      setAutocompleteResults(searchTailwindClasses(value))
+      const matches = searchTailwindClasses(value)
+      setAutocompleteResults(matches)
+      setSelectedIndex(matches.length > 0 ? 0 : -1)
     } else {
       setAutocompleteResults([])
+      setSelectedIndex(-1)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const items = autocompleteResults
+    if (items.length === 0) return
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault()
+      setSelectedIndex((prevIndex) => (prevIndex + 1) % items.length)
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      setSelectedIndex(
+        (prevIndex) => (prevIndex - 1 + items.length) % items.length
+      )
+    } else if (e.key === "Enter") {
+      e.preventDefault()
+      if (selectedIndex !== -1) {
+        const selectedClass = items[selectedIndex][0]
+        handleAddClass(selectedClass)
+      }
+    } else if (e.key === "Escape") {
+      setAutocompleteResults([])
+      setSelectedIndex(-1)
     }
   }
 
   const handleAddClass = (newClass: string) => {
     if (!classes.includes(newClass)) {
       element.classList.add(newClass)
+      applyTailwindStyle(element, newClass)
       setClasses([...classes, newClass])
+      onClassChange()
     }
     setInputValue("")
     setAutocompleteResults([])
+    setSelectedIndex(-1)
+    inputRef.current?.focus()
   }
 
   const handleRemoveClass = (classToRemove: string) => {
     element.classList.remove(classToRemove)
+    removeTailwindStyle(element, classToRemove)
     setClasses(classes.filter((c) => c !== classToRemove))
+    onClassChange()
   }
+
+  useEffect(() => {
+    if (autocompleteRef.current && selectedIndex !== -1) {
+      const selectedItem = autocompleteRef.current.children[
+        selectedIndex
+      ] as HTMLLIElement
+      selectedItem.scrollIntoView({ block: "nearest" })
+    }
+  }, [selectedIndex])
 
   return (
     <div
-      className={`floating-window ${isFixed ? "fixed" : ""}`}
+      className={`floating-window absolute bg-gray-900 border-2 border-gray-700 rounded-lg p-3 shadow-lg w-88 font-sans text-white ${
+        isFixed ? "pointer-events-auto" : "pointer-events-none"
+      }`}
       style={{
-        position: isFixed ? "absolute" : "fixed",
         left: `${position.x}px`,
         top: `${position.y}px`,
-        zIndex: 10001,
-        backgroundColor: "rgb(17, 24, 39)",
-        border: "2px solid rgb(55, 65, 81)",
-        borderRadius: "8px",
-        padding: "12px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        width: "22rem",
-        fontFamily: "Arial, sans-serif",
-        color: "white",
-        pointerEvents: "auto"
+        position: isFixed ? "absolute" : "fixed",
+        zIndex: 2147483647
       }}>
       <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-700">
         <span className="font-bold text-sm">tailware</span>
@@ -135,7 +178,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           </button>
         </div>
       </div>
-      <div className="bg-gray-800 text-gray-300 p-1.5 rounded text-xs font-bold mb-2">
+      <div className="bg-gray-800 text-gray-300 p-1.5 rounded text-xs mb-2 font-bold">
         {element.tagName.toLowerCase()}
       </div>
       <div className="flex flex-wrap gap-1.5 mb-2">
@@ -149,19 +192,26 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       </div>
       <div className="relative">
         <input
+          ref={inputRef}
           type="text"
           value={inputValue}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
           placeholder="Add Classes"
-          className="w-full bg-gray-800 border-none rounded p-1.5 text-gray-300 text-xs"
         />
         {autocompleteResults.length > 0 && (
-          <ul className="absolute top-full left-0 right-0 bg-gray-800 border border-gray-700 rounded-b max-h-50 overflow-y-auto z-[10002] list-none p-1 m-0 shadow-lg">
-            {autocompleteResults.map(([className, properties]) => (
+          <ul
+            ref={autocompleteRef}
+            className="absolute top-full left-0 right-0 bg-gray-800 border border-gray-700 rounded-b max-h-50 overflow-y-auto z-[10002] list-none p-1 m-0 shadow-lg">
+            {autocompleteResults.map(([className, properties], index) => (
               <li
                 key={className}
                 onClick={() => handleAddClass(className)}
-                className="p-1.5 cursor-pointer hover:bg-gray-700 text-gray-300 text-xs flex justify-between items-center">
+                onMouseEnter={() => setSelectedIndex(index)}
+                className={`p-1.5 cursor-pointer hover:bg-gray-700 text-gray-300 text-xs flex justify-between items-center ${
+                  index === selectedIndex ? "bg-gray-700" : ""
+                }`}>
                 <span>{className}</span>
                 <span
                   className="text-gray-400 text-2xs truncate ml-2"
