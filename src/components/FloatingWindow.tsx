@@ -1,5 +1,7 @@
 // src/components/FloatingWindow.tsx
-import React, { useEffect, useRef, useState } from "react"
+import { Combobox } from "@headlessui/react"
+import debounce from "lodash/debounce"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import {
   applyTailwindStyle,
@@ -19,6 +21,9 @@ interface FloatingWindowProps {
   onClassChange: () => void
 }
 
+const INITIAL_RESULTS_LIMIT = 100
+const LOAD_MORE_INCREMENT = 50
+
 const FloatingWindow: React.FC<FloatingWindowProps> = ({
   element,
   position,
@@ -27,55 +32,43 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   onClassChange
 }) => {
   const [classes, setClasses] = useState<string[]>([])
-  const [inputValue, setInputValue] = useState("")
+  const [query, setQuery] = useState("")
+  const [selectedClass, setSelectedClass] = useState<string | null>(null)
   const [autocompleteResults, setAutocompleteResults] = useState<
     [string, string][]
   >([])
-  const [selectedIndex, setSelectedIndex] = useState(-1)
+  const [displayedResults, setDisplayedResults] = useState<[string, string][]>(
+    []
+  )
   const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const autocompleteRef = useRef<HTMLUListElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const optionsRef = useRef<HTMLUListElement>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
 
   useEffect(() => {
     setClasses(identifyTailwindClasses(element))
   }, [element])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim().toLowerCase()
-    setInputValue(value)
-    if (value) {
-      const matches = searchTailwindClasses(value)
-      setAutocompleteResults(matches)
-      setSelectedIndex(matches.length > 0 ? 0 : -1)
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((searchQuery: string) => {
+        const matches = searchTailwindClasses(searchQuery)
+        setAutocompleteResults(matches)
+        setDisplayedResults(matches.slice(0, INITIAL_RESULTS_LIMIT))
+      }, 300),
+    []
+  )
+
+  useEffect(() => {
+    if (query) {
+      debouncedSearch(query)
     } else {
       setAutocompleteResults([])
-      setSelectedIndex(-1)
+      setDisplayedResults([])
     }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const items = autocompleteResults
-    if (items.length === 0) return
-
-    if (e.key === "ArrowDown") {
-      e.preventDefault()
-      setSelectedIndex((prevIndex) => (prevIndex + 1) % items.length)
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault()
-      setSelectedIndex(
-        (prevIndex) => (prevIndex - 1 + items.length) % items.length
-      )
-    } else if (e.key === "Enter") {
-      e.preventDefault()
-      if (selectedIndex !== -1) {
-        const selectedClass = items[selectedIndex][0]
-        handleAddClass(selectedClass)
-      }
-    } else if (e.key === "Escape") {
-      setAutocompleteResults([])
-      setSelectedIndex(-1)
+    return () => {
+      debouncedSearch.cancel()
     }
-  }
+  }, [query, debouncedSearch])
 
   const handleAddClass = (newClass: string) => {
     if (!classes.includes(newClass)) {
@@ -85,10 +78,8 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       onClassChange()
       refreshTailwind()
     }
-    setInputValue("")
-    setAutocompleteResults([])
-    setSelectedIndex(-1)
-    inputRef.current?.focus()
+    setQuery("")
+    setSelectedClass(null)
   }
 
   const handleRemoveClass = (classToRemove: string) => {
@@ -111,15 +102,6 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     refreshTailwind()
   }
 
-  useEffect(() => {
-    if (autocompleteRef.current && selectedIndex !== -1) {
-      const selectedItem = autocompleteRef.current.children[
-        selectedIndex
-      ] as HTMLLIElement
-      selectedItem.scrollIntoView({ block: "nearest" })
-    }
-  }, [selectedIndex])
-
   const handleCopyClasses = () => {
     const classesString = classes.join(" ")
     navigator.clipboard
@@ -140,22 +122,60 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       .catch(() => setToastMessage("Failed to copy element"))
   }
 
-  const renderAutocompleteItem = (
-    className: string,
-    properties: string,
-    index: number
-  ) => (
-    <li
-      key={className}
-      className={`autocomplete-item ${index === selectedIndex ? "autocomplete-item-selected" : ""}`}
-      onMouseEnter={() => setSelectedIndex(index)}
-      onClick={() => handleAddClass(className)}>
-      <span className="autocomplete-class-name">{className}</span>
-      <span className="autocomplete-properties" title={properties}>
-        {properties}
-      </span>
-    </li>
-  )
+  const loadMoreResults = useCallback(() => {
+    setDisplayedResults((prevResults) => {
+      const newResults = [
+        ...prevResults,
+        ...autocompleteResults.slice(
+          prevResults.length,
+          prevResults.length + LOAD_MORE_INCREMENT
+        )
+      ]
+      return newResults.length > autocompleteResults.length
+        ? autocompleteResults
+        : newResults
+    })
+  }, [autocompleteResults])
+
+  const handleScroll = useCallback(() => {
+    if (optionsRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = optionsRef.current
+      if (scrollHeight - scrollTop <= clientHeight + 1) {
+        loadMoreResults()
+      }
+    }
+  }, [loadMoreResults])
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault()
+      if (activeIndex >= displayedResults.length - 1) {
+        loadMoreResults()
+      }
+      setActiveIndex((prevIndex) =>
+        Math.min(prevIndex + 1, autocompleteResults.length - 1)
+      )
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault()
+      setActiveIndex((prevIndex) => Math.max(prevIndex - 1, 0))
+    } else if (event.key === "Enter") {
+      event.preventDefault()
+      if (displayedResults[activeIndex]) {
+        handleAddClass(displayedResults[activeIndex][0])
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (optionsRef.current) {
+      const activeElement = optionsRef.current.children[
+        activeIndex
+      ] as HTMLElement
+      if (activeElement) {
+        activeElement.scrollIntoView({ block: "nearest" })
+      }
+    }
+  }, [activeIndex])
 
   return (
     <div
@@ -241,24 +261,41 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           />
         ))}
       </div>
-      <div className="relative">
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
-          placeholder="Add Classes"
-        />
-        {autocompleteResults.length > 0 && (
-          <ul className="autocomplete-list" ref={autocompleteRef}>
-            {autocompleteResults.map(([className, properties], index) =>
-              renderAutocompleteItem(className, properties, index)
-            )}
-          </ul>
-        )}
-      </div>
+      <Combobox value={selectedClass} onChange={handleAddClass}>
+        <div className="relative mt-1">
+          <Combobox.Options
+            ref={optionsRef}
+            className="absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-gray-900 rounded-md shadow-lg max-h-60 ring-1 ring-gray-700 focus:outline-none"
+            onScroll={handleScroll}
+            static>
+            {displayedResults.map(([className, properties], index) => (
+              <Combobox.Option key={className} value={className}>
+                {({ selected }) => (
+                  <li
+                    className={`${
+                      index === activeIndex
+                        ? "bg-gray-700 text-white"
+                        : "text-gray-300"
+                    } cursor-default select-none relative py-1 pl-3 pr-9 flex justify-between items-center`}>
+                    <span className="block truncate">{className}</span>
+                    <span
+                      className="block truncate text-gray-500 text-right"
+                      title={properties}>
+                      {properties}
+                    </span>
+                  </li>
+                )}
+              </Combobox.Option>
+            ))}
+          </Combobox.Options>
+          <Combobox.Input
+            className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
+            onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Add Classes"
+          />
+        </div>
+      </Combobox>
       {toastMessage && (
         <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
       )}

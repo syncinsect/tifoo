@@ -19,15 +19,11 @@ export function identifyTailwindClasses(element: HTMLElement): string[] {
   return []
 }
 
-export function searchTailwindClasses(
-  prefix: string,
-  limit: number = 10
-): [string, string][] {
+export function searchTailwindClasses(prefix: string): [string, string][] {
   const results: [string, string][] = []
   for (const [className, properties] of tailwindClasses) {
     if (className.startsWith(prefix)) {
       results.push([className, properties])
-      if (results.length >= limit) break
     }
   }
   return results
