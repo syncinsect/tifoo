@@ -12,15 +12,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-200;
+  @apply bg-gray-900;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-400 rounded;
+  @apply bg-gray-800 rounded;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500;
+  @apply bg-gray-700;
 }
 
 .floating-window {
