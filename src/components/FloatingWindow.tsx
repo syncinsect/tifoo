@@ -294,7 +294,9 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
             className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Add Classes"
+            placeholder="add classes"
+            autoComplete="off"
+            spellCheck="false"
           />
         </div>
       </Combobox>
