@@ -1,4 +1,5 @@
 // src/components/ClassTag.tsx
+import { Switch } from "@headlessui/react"
 import React, { useEffect, useState } from "react"
 
 import {
@@ -33,13 +34,20 @@ const ClassTag: React.FC<ClassTagProps> = ({
   }
 
   return (
-    <label className="bg-gray-800 text-gray-300 px-2 py-1 rounded-md text-sm flex items-center mr-2 mb-2 cursor-pointer">
-      <input
-        type="checkbox"
+    <div className="bg-gray-800 text-gray-300 px-2 py-1 rounded-md text-sm flex items-center mr-2 mb-2">
+      <Switch
         checked={isChecked}
         onChange={handleChange}
-        className="appearance-none w-4 h-4 border-2 border-gray-500 rounded mr-2 bg-transparent cursor-pointer checked:bg-blue-500 checked:border-blue-500 transition-colors duration-200 ease-in-out"
-      />
+        className={`${
+          isChecked ? "bg-blue-500" : "bg-gray-500"
+        } relative inline-flex h-4 w-7 items-center rounded-full mr-2`}>
+        <span className="sr-only">{className}</span>
+        <span
+          className={`${
+            isChecked ? "translate-x-3" : "translate-x-1"
+          } inline-block h-3 w-3 transform rounded-full bg-white transition`}
+        />
+      </Switch>
       <span>{className}</span>
       <button
         onClick={(e) => {
@@ -49,7 +57,7 @@ const ClassTag: React.FC<ClassTagProps> = ({
         className="ml-2 text-gray-400 hover:text-gray-200 focus:outline-none">
         ×
       </button>
-    </label>
+    </div>
   )
 }
 
