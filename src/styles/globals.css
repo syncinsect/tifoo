@@ -24,7 +24,7 @@ body {
 }
 
 .floating-window {
-  @apply bg-gray-900 border-2 border-gray-700 rounded-lg p-3 shadow-lg w-80 font-sans text-white;
+  @apply bg-gray-900 border-2 border-gray-700 rounded-lg p-3 shadow-lg w-96 font-sans text-white;
 }
 
 .autocomplete-list {

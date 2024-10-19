@@ -277,7 +277,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
                         index === activeIndex
                           ? "bg-gray-700 text-white"
                           : "text-gray-300"
-                      } cursor-default select-none relative py-1 pl-3 pr-9 flex justify-between items-center`}>
+                      } cursor-default select-none relative py-1 px-3 flex justify-between items-center`}>
                       <span className="block truncate">{className}</span>
                       <span
                         className="block truncate text-gray-500 text-right"
