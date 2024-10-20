@@ -1,11 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./**/*.{ts,tsx}"],
-  safelist: [
-    {
-      pattern: /./ // "." matches all content
-      // variants: ["sm", "md", "lg", "xl", "2xl"] // you can add the variants you need here
-    }
+  mode: "jit",
+  content: [
+    "./src/**/*.{ts,tsx,css,html}",
+    "./assets/**/*.{html,js}",
+    "./*.{ts,tsx,html}"
   ],
   theme: {
     extend: {
