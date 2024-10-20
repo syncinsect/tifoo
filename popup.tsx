@@ -24,7 +24,7 @@ function IndexPopup() {
       if (tabs[0]?.id) {
         chrome.tabs
           .sendMessage(tabs[0].id, {
-            action: "toggleScanner",
+            action: "toggleTailware",
             isActive
           })
           .catch((error) => {

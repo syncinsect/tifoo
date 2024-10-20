@@ -11,7 +11,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     const isActive = await storage.get("isActive")
     if (isActive) {
       chrome.tabs.sendMessage(tabId, {
-        action: "toggleScanner",
+        action: "toggleTailware",
         isActive: true
       })
     }

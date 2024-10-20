@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client"
 import FloatingWindow from "./components/FloatingWindow"
 import HighlightBox from "./components/HighlightBox"
 import Toast from "./components/Toast"
-import useScanner from "./hooks/useScanner"
+import useTailware from "./hooks/useTailware"
 import { removeHighlight, updateHighlight } from "./utils/domUtils"
 
 import "./styles/globals.css"
@@ -27,7 +27,7 @@ const App: React.FC = () => {
     handleClick,
     handleScroll,
     updateFloatingWindowPosition
-  } = useScanner({
+  } = useTailware({
     isActive,
     setHighlightedElement,
     setFloatingWindowPosition,
@@ -36,7 +36,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const handleMessage = (request: any) => {
-      if (request.action === "toggleScanner") {
+      if (request.action === "toggleTailware") {
         setIsActive(request.isActive)
       }
     }
@@ -95,7 +95,7 @@ const App: React.FC = () => {
 
   const handleDeactivate = () => {
     setIsActive(false)
-    chrome.runtime.sendMessage({ action: "scannerDeactivated" })
+    chrome.runtime.sendMessage({ action: "tailwareDeactivated" })
   }
 
   const updateHighlightAndLines = useCallback(() => {

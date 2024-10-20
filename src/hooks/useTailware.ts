@@ -1,4 +1,4 @@
-// src/hooks/useScanner.ts
+// src/hooks/useTailware.ts
 import { useCallback, useRef, useState } from "react"
 
 import {
@@ -7,19 +7,19 @@ import {
   updateHighlight
 } from "../utils/domUtils"
 
-interface UseScannerProps {
+interface UseTailwareProps {
   isActive: boolean
   setHighlightedElement: (element: HTMLElement | null) => void
   setFloatingWindowPosition: (position: { x: number; y: number }) => void
   setIsFloatingWindowFixed: (isFixed: boolean) => void
 }
 
-const useScanner = ({
+const useTailware = ({
   isActive,
   setHighlightedElement,
   setFloatingWindowPosition,
   setIsFloatingWindowFixed
-}: UseScannerProps) => {
+}: UseTailwareProps) => {
   const [lastHighlightedElement, setLastHighlightedElement] =
     useState<HTMLElement | null>(null)
   const isFloatingWindowFixedRef = useRef(false)
@@ -122,17 +122,20 @@ const useScanner = ({
       const windowWidth = window.innerWidth
       const windowHeight = window.innerHeight
       const floatingWindowWidth = 352 // 22rem
-      const floatingWindowHeight = 300 // 估计值，可能需要调整
+      const maxFloatingWindowHeight = 352 + 100 // 452px
 
       let left = e.clientX + 10
       let top = e.clientY + 10
 
       if (left + floatingWindowWidth > windowWidth) {
-        left = e.clientX - floatingWindowWidth - 10
+        left = windowWidth - floatingWindowWidth - 10
       }
-      if (top + floatingWindowHeight > windowHeight) {
-        top = e.clientY - floatingWindowHeight - 10
+
+      if (top + maxFloatingWindowHeight > windowHeight) {
+        top = e.clientY - maxFloatingWindowHeight - 10
       }
+
+      top = Math.max(0, top)
 
       floatingWindowPositionRef.current = { x: left, y: top }
       setFloatingWindowPosition({ x: left, y: top })
@@ -157,4 +160,4 @@ const useScanner = ({
   }
 }
 
-export default useScanner
+export default useTailware
