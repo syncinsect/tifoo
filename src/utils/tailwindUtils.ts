@@ -10,16 +10,29 @@ const tailwindClasses: TailwindClassData =
   tailwindClassesData as TailwindClassData
 
 export function identifyTailwindClasses(element: HTMLElement): string[] {
-  if (element.classList && element.classList.length) {
-    return Array.from(element.classList).filter((cls) =>
-      tailwindClasses.some(({ c }) => c === cls)
-    )
-  } else if (element.className && typeof element.className === "string") {
-    return element.className
-      .split(/\s+/)
-      .filter((cls) => tailwindClasses.some(({ c }) => c === cls))
-  }
-  return []
+  const classNames = element.classList
+    ? Array.from(element.classList)
+    : element.className.split(/\s+/)
+
+  return classNames.filter((cls) => {
+    if (tailwindClasses.some(({ c }) => c === cls)) {
+      return true
+    }
+
+    const parts = cls.split(":")
+    if (parts.length > 1) {
+      const prefix = parts[0]
+      const restOfClass = parts.slice(1).join(":")
+      if (
+        ["sm", "md", "lg", "xl", "2xl"].includes(prefix) &&
+        tailwindClasses.some(({ c }) => c === restOfClass)
+      ) {
+        return true
+      }
+    }
+
+    return false
+  })
 }
 
 export function searchTailwindClasses(prefix: string): TailwindClassData {
@@ -32,6 +45,7 @@ export function applyTailwindStyle(
 ): void {
   if (!element.classList.contains(className)) {
     element.classList.add(className)
+    refreshTailwind()
   }
 }
 
@@ -41,6 +55,7 @@ export function removeTailwindStyle(
 ): void {
   if (element.classList.contains(className)) {
     element.classList.remove(className)
+    refreshTailwind()
   }
 }
 
