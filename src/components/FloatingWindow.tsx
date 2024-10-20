@@ -213,18 +213,18 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
                   key={className}
                   value={className}
                   className={({ active }) =>
-                    `group w-full cursor-default select-none relative py-1 px-2 flex items-center justify-between text-xs ${
+                    `group w-full cursor-default select-none relative py-1 px-2 flex items-center justify-between text-xs overflow-hidden ${
                       active ? "bg-gray-700" : "bg-gray-900"
                     }`
                   }>
-                  <span className="font-mono text-gray-300 flex-shrink-0 mr-2">
+                  <span className="font-mono text-gray-300 flex-shrink-0">
                     {className}
                   </span>
                   {classData && (
-                    <span className="text-gray-500 flex-grow min-w-0 overflow-hidden">
-                      <span className="block truncate group-hover:overflow-visible group-hover:whitespace-nowrap">
-                        <span className="inline-block group-hover:animate-marquee group-focus:animate-marquee">
-                          {classData.p}&nbsp;&nbsp;&nbsp;&nbsp;{classData.p}
+                    <span className="text-gray-500 flex-shrink-0 ml-2 overflow-hidden">
+                      <span className="block truncate group-hover:whitespace-nowrap">
+                        <span className="inline-block w-full group-hover:animate-marquee">
+                          {classData.p}
                         </span>
                       </span>
                     </span>
