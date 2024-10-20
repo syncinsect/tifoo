@@ -179,16 +179,18 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       <div className="bg-gray-800 text-gray-300 p-1.5 rounded text-xs mb-2 font-bold">
         {element.tagName.toLowerCase()}
       </div>
-      <div className="flex flex-wrap gap-1.5 mb-2">
-        {classes.map((cls) => (
-          <ClassTag
-            key={cls}
-            className={cls}
-            element={element}
-            onToggle={handleClassToggle}
-            onRemove={handleRemoveClass}
-          />
-        ))}
+      <div className="h-80 overflow-auto">
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {classes.map((cls) => (
+            <ClassTag
+              key={cls}
+              className={cls}
+              element={element}
+              onToggle={handleClassToggle}
+              onRemove={handleRemoveClass}
+            />
+          ))}
+        </div>
       </div>
       <Combobox
         value={selectedClass}
