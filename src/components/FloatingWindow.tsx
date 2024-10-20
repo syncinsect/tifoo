@@ -54,6 +54,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   }, [query])
 
   const handleAddClass = (newClass: string) => {
+    if (newClass.trim() === "") return
     if (!classes.includes(newClass)) {
       element.classList.add(newClass)
       applyTailwindStyle(element, newClass)
@@ -203,36 +204,38 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
             autoComplete="off"
             spellCheck="false"
           />
-          <ComboboxOptions className="absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-gray-900 rounded-md shadow-lg max-h-60 ring-1 ring-gray-700 focus:outline-none">
-            {({ option: className }) => {
-              const classData = autocompleteResults.find(
-                ({ c }) => c === className
-              )
-              return (
-                <ComboboxOption
-                  key={className}
-                  value={className}
-                  className={({ active }) =>
-                    `group w-full cursor-default select-none relative py-1 px-2 flex items-center justify-between text-xs overflow-hidden ${
-                      active ? "bg-gray-700" : "bg-gray-900"
-                    }`
-                  }>
-                  <span className="font-mono text-gray-300 flex-shrink-0">
-                    {className}
-                  </span>
-                  {classData && (
-                    <span className="text-gray-500 flex-shrink-0 ml-2 overflow-hidden">
-                      <span className="block truncate group-hover:whitespace-nowrap">
-                        <span className="inline-block w-full group-hover:animate-marquee">
-                          {classData.p}
+          {autocompleteResults.length > 0 && (
+            <ComboboxOptions className="absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-gray-900 rounded-md shadow-lg max-h-60 ring-1 ring-gray-700 focus:outline-none">
+              {({ option: className }) => {
+                const classData = autocompleteResults.find(
+                  ({ c }) => c === className
+                )
+                return (
+                  <ComboboxOption
+                    key={className}
+                    value={className}
+                    className={({ active }) =>
+                      `group w-full cursor-default select-none relative py-1 px-2 flex items-center justify-between text-xs overflow-hidden ${
+                        active ? "bg-gray-700" : "bg-gray-900"
+                      }`
+                    }>
+                    <span className="font-mono text-gray-300 flex-shrink-0">
+                      {className}
+                    </span>
+                    {classData && (
+                      <span className="text-gray-500 flex-shrink-0 ml-2 overflow-hidden">
+                        <span className="block truncate group-hover:whitespace-nowrap">
+                          <span className="inline-block w-full group-hover:animate-marquee">
+                            {classData.p}
+                          </span>
                         </span>
                       </span>
-                    </span>
-                  )}
-                </ComboboxOption>
-              )
-            }}
-          </ComboboxOptions>
+                    )}
+                  </ComboboxOption>
+                )
+              }}
+            </ComboboxOptions>
+          )}
         </div>
       </Combobox>
       {toastMessage && (
