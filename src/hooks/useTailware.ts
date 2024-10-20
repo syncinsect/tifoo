@@ -1,4 +1,4 @@
-// src/hooks/useScanner.ts
+// src/hooks/useTailware.ts
 import { useCallback, useRef, useState } from "react"
 
 import {
@@ -7,19 +7,19 @@ import {
   updateHighlight
 } from "../utils/domUtils"
 
-interface UseScannerProps {
+interface UseTailwareProps {
   isActive: boolean
   setHighlightedElement: (element: HTMLElement | null) => void
   setFloatingWindowPosition: (position: { x: number; y: number }) => void
   setIsFloatingWindowFixed: (isFixed: boolean) => void
 }
 
-const useScanner = ({
+const useTailware = ({
   isActive,
   setHighlightedElement,
   setFloatingWindowPosition,
   setIsFloatingWindowFixed
-}: UseScannerProps) => {
+}: UseTailwareProps) => {
   const [lastHighlightedElement, setLastHighlightedElement] =
     useState<HTMLElement | null>(null)
   const isFloatingWindowFixedRef = useRef(false)
@@ -160,4 +160,4 @@ const useScanner = ({
   }
 }
 
-export default useScanner
+export default useTailware
