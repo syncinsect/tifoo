@@ -30,13 +30,8 @@ export function applyTailwindStyle(
   element: HTMLElement,
   className: string
 ): void {
-  const classData = tailwindClasses.find(({ c }) => c === className)
-  if (classData) {
-    const styleProperties = classData.p.split(";").map((prop) => prop.trim())
-    for (const property of styleProperties) {
-      const [key, value] = property.split(":").map((part) => part.trim())
-      element.style.setProperty(key, value)
-    }
+  if (!element.classList.contains(className)) {
+    element.classList.add(className)
   }
 }
 
@@ -44,13 +39,8 @@ export function removeTailwindStyle(
   element: HTMLElement,
   className: string
 ): void {
-  const classData = tailwindClasses.find(({ c }) => c === className)
-  if (classData) {
-    const styleProperties = classData.p.split(";").map((prop) => prop.trim())
-    for (const property of styleProperties) {
-      const [key] = property.split(":").map((part) => part.trim())
-      element.style.removeProperty(key)
-    }
+  if (element.classList.contains(className)) {
+    element.classList.remove(className)
   }
 }
 
