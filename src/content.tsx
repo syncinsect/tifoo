@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 
 import FloatingWindow from "./components/FloatingWindow"
-import HighlightBox from "./components/HighlightBox"
+// import HighlightBox from "./components/HighlightBox"
 import Toast from "./components/Toast"
 import useTailware from "./hooks/useTailware"
 import { removeHighlight, updateHighlight } from "./utils/domUtils"
@@ -116,10 +116,10 @@ const App: React.FC = () => {
     <>
       {isActive && highlightedElement && (
         <>
-          <HighlightBox
+          {/* <HighlightBox
             element={highlightedElement}
             isFixed={isFloatingWindowFixed}
-          />
+          /> */}
           <FloatingWindow
             element={highlightedElement}
             position={floatingWindowPosition}
