@@ -199,7 +199,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           <ComboboxInput
             className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="添加类名"
+            placeholder="add classes"
             autoComplete="off"
             spellCheck="false"
           />
@@ -213,16 +213,20 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
                   key={className}
                   value={className}
                   className={({ active }) =>
-                    `cursor-default select-none relative py-1 px-3 flex justify-between items-center ${
-                      active ? "bg-gray-700 text-white" : "text-gray-300"
+                    `group w-full cursor-default select-none relative py-1 px-2 flex items-center justify-between text-xs ${
+                      active ? "bg-gray-700" : "bg-gray-900"
                     }`
                   }>
-                  <span className="block truncate">{className}</span>
+                  <span className="font-mono text-gray-300 flex-shrink-0 mr-2">
+                    {className}
+                  </span>
                   {classData && (
-                    <span
-                      className="block truncate text-gray-500 text-right"
-                      title={classData.p}>
-                      {classData.p}
+                    <span className="text-gray-500 flex-grow min-w-0 overflow-hidden">
+                      <span className="block truncate group-hover:overflow-visible group-hover:whitespace-nowrap">
+                        <span className="inline-block group-hover:animate-marquee group-focus:animate-marquee">
+                          {classData.p}&nbsp;&nbsp;&nbsp;&nbsp;{classData.p}
+                        </span>
+                      </span>
                     </span>
                   )}
                 </ComboboxOption>
