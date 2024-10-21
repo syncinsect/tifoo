@@ -110,24 +110,32 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
           height: `${currentRect.height}px`
         }}>
         <div
-          className="absolute inset-0 bg-yellow-500 opacity-20"
+          className="absolute inset-0"
           style={{
             left: `-${styles.margin.left}px`,
             top: `-${styles.margin.top}px`,
             right: `-${styles.margin.right}px`,
-            bottom: `-${styles.margin.bottom}px`
+            bottom: `-${styles.margin.bottom}px`,
+            backgroundColor: "rgba(246, 178, 107, 0.3)"
           }}
         />
         <div
-          className="absolute bg-green-500 opacity-20"
+          className="absolute inset-0"
+          style={{
+            backgroundColor: "rgba(147, 196, 125, 0.3)"
+          }}
+        />
+        <div
+          className="absolute"
           style={{
             left: `${styles.padding.left}px`,
             top: `${styles.padding.top}px`,
             right: `${styles.padding.right}px`,
-            bottom: `${styles.padding.bottom}px`
+            bottom: `${styles.padding.bottom}px`,
+            backgroundColor: "rgba(59, 130, 246, 0.3)",
+            zIndex: 1
           }}
         />
-        <div className="absolute inset-0 bg-blue-500 opacity-20" />
       </div>
       <div
         className={`absolute left-0 right-0 ${lineStyle} border-t-2`}
