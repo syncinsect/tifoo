@@ -16,13 +16,15 @@ module.exports = {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" }
         }
+      },
+      borderWidth: {
+        3: "3px"
+      },
+      borderStyle: {
+        "dashed-large": "dashed 3px"
       }
     }
   },
-  variants: {
-    extend: {
-      animation: ["group-hover", "group-focus"]
-    }
-  },
+  variants: {},
   plugins: []
 }
