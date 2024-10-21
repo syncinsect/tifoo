@@ -3,10 +3,10 @@ import React, { useCallback, useEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 
 import FloatingWindow from "./components/FloatingWindow"
-// import HighlightBox from "./components/HighlightBox"
+import HighlightBox from "./components/HighlightBox"
 import Toast from "./components/Toast"
 import useTailware from "./hooks/useTailware"
-import { removeHighlight, updateHighlight } from "./utils/domUtils"
+import { removeHighlight } from "./utils/domUtils"
 
 import "./styles/globals.css"
 
@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [isActive, setIsActive] = useState(false)
   const [highlightedElement, setHighlightedElement] =
     useState<HTMLElement | null>(null)
+  const [animatedRect, setAnimatedRect] = useState<DOMRect | null>(null)
   const [floatingWindowPosition, setFloatingWindowPosition] = useState({
     x: 0,
     y: 0
@@ -77,21 +78,39 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (highlightedElement) {
-      updateHighlight(highlightedElement, null, isFloatingWindowFixed)
-    }
-  }, [highlightedElement, isFloatingWindowFixed])
+      const startRect =
+        animatedRect || highlightedElement.getBoundingClientRect()
+      const endRect = highlightedElement.getBoundingClientRect()
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (isFloatingWindowFixed && highlightedElement) {
-        const rect = highlightedElement.getBoundingClientRect()
-        updateHighlight(highlightedElement, rect, true)
+      const animate = (progress: number) => {
+        const currentRect = {
+          left: startRect.left + (endRect.left - startRect.left) * progress,
+          top: startRect.top + (endRect.top - startRect.top) * progress,
+          width: startRect.width + (endRect.width - startRect.width) * progress,
+          height:
+            startRect.height + (endRect.height - startRect.height) * progress,
+          right: startRect.right + (endRect.right - startRect.right) * progress,
+          bottom:
+            startRect.bottom + (endRect.bottom - startRect.bottom) * progress
+        } as DOMRect
+        setAnimatedRect(currentRect)
       }
-    }
 
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [isFloatingWindowFixed, highlightedElement])
+      const duration = 300
+      const startTime = performance.now()
+
+      const step = (currentTime: number) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        animate(progress)
+        if (progress < 1) {
+          requestAnimationFrame(step)
+        }
+      }
+
+      requestAnimationFrame(step)
+    }
+  }, [highlightedElement])
 
   const handleDeactivate = () => {
     setIsActive(false)
@@ -100,32 +119,27 @@ const App: React.FC = () => {
 
   const updateHighlightAndLines = useCallback(() => {
     if (highlightedElement) {
-      const rect = highlightedElement.getBoundingClientRect()
-      updateHighlight(highlightedElement, rect, isFloatingWindowFixed)
+      setAnimatedRect(null)
+      setHighlightedElement(null)
+      setTimeout(() => setHighlightedElement(highlightedElement), 0)
     }
-  }, [highlightedElement, isFloatingWindowFixed])
-
-  const handleClassChange = useCallback(() => {
-    updateHighlightAndLines()
-    if (window.Tailwind && typeof window.Tailwind.refresh === "function") {
-      window.Tailwind.refresh()
-    }
-  }, [updateHighlightAndLines])
+  }, [highlightedElement])
 
   return (
     <>
       {isActive && highlightedElement && (
         <>
-          {/* <HighlightBox
+          <HighlightBox
             element={highlightedElement}
             isFixed={isFloatingWindowFixed}
-          /> */}
+            animatedRect={animatedRect}
+          />
           <FloatingWindow
             element={highlightedElement}
             position={floatingWindowPosition}
             isFixed={isFloatingWindowFixed}
             onDeactivate={handleDeactivate}
-            onClassChange={handleClassChange}
+            onClassChange={updateHighlightAndLines}
           />
         </>
       )}

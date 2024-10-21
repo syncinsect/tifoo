@@ -1,47 +1,49 @@
 // src/components/HighlightBox.tsx
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import { getElementStyles } from "../utils/domUtils"
 
 interface HighlightBoxProps {
   element: HTMLElement
   isFixed: boolean
+  animatedRect: DOMRect | null
 }
 
-const HighlightBox: React.FC<HighlightBoxProps> = ({ element, isFixed }) => {
+const HighlightBox: React.FC<HighlightBoxProps> = ({
+  element,
+  isFixed,
+  animatedRect
+}) => {
   const boxRef = useRef<HTMLDivElement>(null)
+  const [rect, setRect] = useState<DOMRect | null>(null)
+  const [pageHeight, setPageHeight] = useState(document.body.scrollHeight)
+  const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 })
+  const fixedScrollPositionRef = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
     const updateBox = () => {
-      if (boxRef.current) {
-        const rect = element.getBoundingClientRect()
-        const styles = getElementStyles(element)
+      if (element) {
+        const newRect = element.getBoundingClientRect()
+        const scrollX =
+          window.pageXOffset || document.documentElement.scrollLeft
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop
+        setRect({
+          top: newRect.top,
+          left: newRect.left,
+          bottom: newRect.bottom,
+          right: newRect.right,
+          width: newRect.width,
+          height: newRect.height
+        } as DOMRect)
+        setPageHeight(Math.max(document.body.scrollHeight, window.innerHeight))
+        setScrollPosition({ x: scrollX, y: scrollY })
 
-        boxRef.current.style.left = `${rect.left}px`
-        boxRef.current.style.top = `${rect.top}px`
-        boxRef.current.style.width = `${rect.width}px`
-        boxRef.current.style.height = `${rect.height}px`
-
-        // Update margin highlight
-        const marginBox = boxRef.current.querySelector(
-          ".margin-box"
-        ) as HTMLElement
-        if (marginBox) {
-          marginBox.style.left = `-${styles.margin.left}px`
-          marginBox.style.top = `-${styles.margin.top}px`
-          marginBox.style.right = `-${styles.margin.right}px`
-          marginBox.style.bottom = `-${styles.margin.bottom}px`
-        }
-
-        // Update padding highlight
-        const paddingBox = boxRef.current.querySelector(
-          ".padding-box"
-        ) as HTMLElement
-        if (paddingBox) {
-          paddingBox.style.left = `${styles.padding.left}px`
-          paddingBox.style.top = `${styles.padding.top}px`
-          paddingBox.style.right = `${styles.padding.right}px`
-          paddingBox.style.bottom = `${styles.padding.bottom}px`
+        if (
+          isFixed &&
+          fixedScrollPositionRef.current.x === 0 &&
+          fixedScrollPositionRef.current.y === 0
+        ) {
+          fixedScrollPositionRef.current = { x: scrollX, y: scrollY }
         }
       }
     }
@@ -54,19 +56,95 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({ element, isFixed }) => {
       window.removeEventListener("resize", updateBox)
       window.removeEventListener("scroll", updateBox)
     }
-  }, [element])
+  }, [element, isFixed])
+
+  useEffect(() => {
+    if (!isFixed) {
+      fixedScrollPositionRef.current = { x: 0, y: 0 }
+    }
+  }, [isFixed])
+
+  const currentRect = animatedRect || rect
+
+  if (!currentRect) return null
+
+  const styles = getElementStyles(element)
+
+  const lineStyle = isFixed
+    ? "border-blue-500 border-solid"
+    : "border-blue-500 border-dashed"
+
+  const containerStyle = isFixed
+    ? {
+        position: "absolute" as const,
+        top: 0,
+        left: 0,
+        height: `${pageHeight}px`,
+        width: "100vw"
+      }
+    : {
+        position: "absolute" as const,
+        top: 0,
+        left: `${scrollPosition.x}px`,
+        height: `${pageHeight}px`,
+        width: "100%"
+      }
+
+  const getAdjustedPosition = (pos: number, axis: "x" | "y") => {
+    if (isFixed) {
+      return pos + fixedScrollPositionRef.current[axis]
+    } else {
+      return pos + scrollPosition[axis]
+    }
+  }
 
   return (
-    <div
-      ref={boxRef}
-      className={`fixed pointer-events-none z-[9998] ${
-        isFixed
-          ? "border-2 border-blue-500"
-          : "border border-blue-500 border-dashed"
-      }`}>
-      <div className="absolute inset-0 bg-yellow-500 opacity-20 margin-box" />
-      <div className="absolute bg-green-500 opacity-20 padding-box" />
-      <div className="absolute inset-0 bg-blue-500 opacity-20" />
+    <div className="pointer-events-none z-[9997]" style={containerStyle}>
+      <div
+        ref={boxRef}
+        className="absolute pointer-events-none z-[9998]"
+        style={{
+          left: `${getAdjustedPosition(currentRect.left, "x")}px`,
+          top: `${getAdjustedPosition(currentRect.top, "y")}px`,
+          width: `${currentRect.width}px`,
+          height: `${currentRect.height}px`
+        }}>
+        <div
+          className="absolute inset-0 bg-yellow-500 opacity-20"
+          style={{
+            left: `-${styles.margin.left}px`,
+            top: `-${styles.margin.top}px`,
+            right: `-${styles.margin.right}px`,
+            bottom: `-${styles.margin.bottom}px`
+          }}
+        />
+        <div
+          className="absolute bg-green-500 opacity-20"
+          style={{
+            left: `${styles.padding.left}px`,
+            top: `${styles.padding.top}px`,
+            right: `${styles.padding.right}px`,
+            bottom: `${styles.padding.bottom}px`
+          }}
+        />
+        <div className="absolute inset-0 bg-blue-500 opacity-20" />
+      </div>
+      <div
+        className={`absolute left-0 right-0 ${lineStyle} border-t-2`}
+        style={{ top: `${getAdjustedPosition(currentRect.top, "y")}px` }}
+      />
+      <div
+        className={`absolute left-0 right-0 ${lineStyle} border-t-2`}
+        style={{ top: `${getAdjustedPosition(currentRect.bottom, "y")}px` }}
+      />
+      <div
+        className={`absolute top-0 bottom-0 ${lineStyle} border-l-2`}
+        style={{ left: `${getAdjustedPosition(currentRect.left, "x")}px` }}
+      />
+      <div
+        className={`absolute top-0 bottom-0 ${lineStyle} border-l-2`}
+        style={{ left: `${getAdjustedPosition(currentRect.right, "x")}px` }}
+      />
     </div>
   )
 }

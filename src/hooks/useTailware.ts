@@ -32,7 +32,6 @@ const useTailware = ({
       const target = e.target as HTMLElement
       setLastHighlightedElement(target)
       setHighlightedElement(target)
-      throttledUpdateHighlight(target, isFloatingWindowFixedRef.current)
     },
     [isActive, setHighlightedElement]
   )
@@ -145,10 +144,9 @@ const useTailware = ({
 
   const handleScroll = useCallback(() => {
     if (isFloatingWindowFixedRef.current && lastHighlightedElement) {
-      const rect = lastHighlightedElement.getBoundingClientRect()
-      updateHighlight(lastHighlightedElement, rect, true)
+      setHighlightedElement(lastHighlightedElement)
     }
-  }, [lastHighlightedElement])
+  }, [lastHighlightedElement, setHighlightedElement])
 
   return {
     handleMouseOver,
