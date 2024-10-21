@@ -5,7 +5,7 @@ import {
   ComboboxOption,
   ComboboxOptions
 } from "@headlessui/react"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 
 import {
   applyTailwindStyle,
@@ -106,6 +106,8 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       .catch(() => setToastMessage("Failed to copy element"))
   }
 
+  const memoizedClasses = useMemo(() => classes, [classes.join(",")])
+
   return (
     <div
       className={`floating-window ${
@@ -181,7 +183,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       </div>
       <div className="h-80 overflow-auto">
         <div className="flex flex-wrap gap-1.5 mb-2">
-          {classes.map((cls) => (
+          {memoizedClasses.map((cls) => (
             <ClassTag
               key={cls}
               className={cls}

@@ -119,9 +119,8 @@ const App: React.FC = () => {
 
   const updateHighlightAndLines = useCallback(() => {
     if (highlightedElement) {
-      setAnimatedRect(null)
-      setHighlightedElement(null)
-      setTimeout(() => setHighlightedElement(highlightedElement), 0)
+      setAnimatedRect(highlightedElement.getBoundingClientRect())
+      setHighlightedElement((prev) => prev)
     }
   }, [highlightedElement])
 
