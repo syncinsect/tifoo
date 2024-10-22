@@ -124,6 +124,41 @@ const App: React.FC = () => {
     }
   }, [highlightedElement])
 
+  function handleExtensionError(error: Error) {
+    if (error.message.includes("Extension context invalidated")) {
+      console.warn("Extension context invalidated")
+
+      document.removeEventListener("mouseover", handleMouseOver)
+      document.removeEventListener("mouseout", handleMouseOut)
+      window.removeEventListener("scroll", handleScroll)
+      document.removeEventListener("mousemove", updateFloatingWindowPosition)
+      document.removeEventListener("click", handleClick, true)
+
+      setHighlightedElement(null)
+      setIsFloatingWindowFixed(false)
+
+      setIsActive(false)
+
+      try {
+        chrome.runtime.sendMessage({ action: "tailwareDeactivated" })
+      } catch (e) {
+        console.warn("Cannot send message to background script:", e)
+      }
+
+      const tailwareRoot = document.getElementById("tailware-root")
+      if (tailwareRoot) {
+        tailwareRoot.remove()
+      }
+    } else {
+      console.error("Unexpected error:", error)
+    }
+  }
+
+  window.addEventListener("error", (event) => handleExtensionError(event.error))
+  window.addEventListener("unhandledrejection", (event) =>
+    handleExtensionError(event.reason)
+  )
+
   return (
     <>
       {isActive && highlightedElement && (

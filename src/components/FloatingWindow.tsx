@@ -53,12 +53,14 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     }
   }, [query])
 
-  const handleAddClass = (newClass: string) => {
-    if (newClass.trim() === "") return
-    if (!classes.includes(newClass)) {
-      element.classList.add(newClass)
-      applyTailwindStyle(element, newClass)
-      setClasses([...classes, newClass])
+  const handleAddClass = (newClass: string | null) => {
+    if (!newClass) return
+    const trimmedClass = newClass.trim()
+    if (trimmedClass === "") return
+    if (!classes.includes(trimmedClass)) {
+      element.classList.add(trimmedClass)
+      applyTailwindStyle(element, trimmedClass)
+      setClasses([...classes, trimmedClass])
       onClassChange()
       refreshTailwind()
     }
@@ -203,7 +205,11 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       </div>
       <Combobox
         value={selectedClass}
-        onChange={handleAddClass}
+        onChange={(value: string | null) => {
+          if (value) {
+            handleAddClass(value)
+          }
+        }}
         virtual={{
           options: autocompleteResults.map(({ c }) => c)
         }}>
