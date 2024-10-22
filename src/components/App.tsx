@@ -36,9 +36,11 @@ const App: React.FC = () => {
   })
 
   useEffect(() => {
-    const handleMessage = (request: any) => {
+    const handleMessage = (request: any, sender: any, sendResponse: any) => {
       if (request.action === "toggleTailware") {
         setIsActive(request.isActive)
+      } else if (request.action === "getState") {
+        sendResponse({ isActive })
       }
     }
 
@@ -47,7 +49,7 @@ const App: React.FC = () => {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage)
     }
-  }, [])
+  }, [isActive])
 
   useEffect(() => {
     if (isActive) {
