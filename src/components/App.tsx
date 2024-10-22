@@ -1,6 +1,4 @@
-// src/content.tsx
 import React, { useCallback, useEffect, useState } from "react"
-import { createRoot } from "react-dom/client"
 
 import useTailware from "../hooks/useTailware"
 import { removeHighlight } from "../utils/domUtils"
