@@ -108,6 +108,13 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
 
   const memoizedClasses = useMemo(() => classes, [classes.join(",")])
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && query.trim() !== "") {
+      event.preventDefault()
+      handleAddClass(query.trim())
+    }
+  }
+
   return (
     <div
       className={`floating-window ${
@@ -204,6 +211,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           <ComboboxInput
             className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="add classes"
             autoComplete="off"
             spellCheck="false"
