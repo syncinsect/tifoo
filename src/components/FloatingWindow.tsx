@@ -5,7 +5,7 @@ import {
   ComboboxOption,
   ComboboxOptions
 } from "@headlessui/react"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 
 import {
   applyTailwindStyle,
@@ -39,6 +39,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     { c: string; p: string }[]
   >([])
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setClasses(identifyTailwindClasses(element))
@@ -64,8 +65,11 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       onClassChange()
       refreshTailwind()
     }
-    setQuery("")
     setSelectedClass(null)
+    setQuery("")
+    if (inputRef.current) {
+      inputRef.current.value = ""
+    }
   }
 
   const handleRemoveClass = (classToRemove: string) => {
@@ -215,6 +219,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
         }}>
         <div className="relative mt-1">
           <ComboboxInput
+            ref={inputRef}
             className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={handleKeyDown}
