@@ -49,13 +49,18 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     if (!newClass) return
     const trimmedClass = newClass.trim()
     if (trimmedClass === "") return
-    if (!classes.includes(trimmedClass)) {
-      element.classList.add(trimmedClass)
+
+    if (!element.classList.contains(trimmedClass)) {
       applyTailwindStyle(element, trimmedClass)
-      setClasses([...classes, trimmedClass])
+      setClasses((prevClasses) => {
+        if (!prevClasses.includes(trimmedClass)) {
+          return [...prevClasses, trimmedClass]
+        }
+        return prevClasses
+      })
       onClassChange()
-      refreshTailwind()
     }
+
     setSelectedClass(null)
     setQuery("")
     if (inputRef.current) {
@@ -73,10 +78,8 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
 
   const handleClassToggle = (className: string, isChecked: boolean) => {
     if (isChecked) {
-      element.classList.add(className)
       applyTailwindStyle(element, className)
     } else {
-      element.classList.remove(className)
       removeTailwindStyle(element, className)
     }
     onClassChange()

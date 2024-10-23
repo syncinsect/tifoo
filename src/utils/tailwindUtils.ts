@@ -5,6 +5,8 @@ import tailwindClassesData from "../../tailwind-classes.json"
 const tailwindClasses: TailwindClassData =
   tailwindClassesData as TailwindClassData
 
+let injectedStyles: Set<string> = new Set()
+
 export function identifyTailwindClasses(element: HTMLElement): string[] {
   const classNames = element.classList
     ? Array.from(element.classList)
@@ -41,7 +43,24 @@ export function applyTailwindStyle(
 ): void {
   if (!element.classList.contains(className)) {
     element.classList.add(className)
+    injectTailwindClass(className)
     refreshTailwind()
+  }
+}
+
+function injectTailwindClass(className: string): void {
+  if (injectedStyles.has(className)) return
+
+  const classData = tailwindClasses.find(({ c }) => c === className)
+  if (classData) {
+    let styleElement = document.getElementById("tailware-injected-styles")
+    if (!styleElement) {
+      styleElement = document.createElement("style")
+      styleElement.id = "tailware-injected-styles"
+      document.head.appendChild(styleElement)
+    }
+    styleElement.textContent += `.${className} { ${classData.p} }\n`
+    injectedStyles.add(className)
   }
 }
 

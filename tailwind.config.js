@@ -6,11 +6,6 @@ module.exports = {
     "./assets/**/*.{html,js}",
     "./*.{ts,tsx,html}"
   ],
-  // safelist: [
-  //   {
-  //     pattern: /.*/
-  //   }
-  // ],
   theme: {
     extend: {
       animation: {
