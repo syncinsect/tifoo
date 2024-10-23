@@ -110,6 +110,19 @@ const App: React.FC = () => {
     }
   }, [highlightedElement])
 
+  useEffect(() => {
+    if (isActive) {
+      const styleElement = document.createElement("style")
+      styleElement.id = "tailware-injected-styles"
+      document.head.appendChild(styleElement)
+    } else {
+      const styleElement = document.getElementById("tailware-injected-styles")
+      if (styleElement) {
+        styleElement.remove()
+      }
+    }
+  }, [isActive])
+
   const handleDeactivate = () => {
     setIsActive(false)
     chrome.runtime.sendMessage({ action: "tailwareDeactivated" })

@@ -6,11 +6,6 @@ module.exports = {
     "./assets/**/*.{html,js}",
     "./*.{ts,tsx,html}"
   ],
-  safelist: [
-    {
-      pattern: /.*/
-    }
-  ],
   theme: {
     extend: {
       animation: {
@@ -27,6 +22,11 @@ module.exports = {
       },
       borderStyle: {
         "dashed-large": "dashed 3px"
+      },
+      colors: {
+        "tailware-blue": "#1DA1F2",
+        "tailware-dark-blue": "#0C7ABF",
+        "tailware-light-blue": "#E8F5FE"
       }
     }
   },

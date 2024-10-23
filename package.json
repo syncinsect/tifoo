@@ -2,7 +2,7 @@
   "name": "tailware",
   "displayName": "Tailware",
   "version": "0.0.1",
-  "description": "A tailwind debug chrome extension",
+  "description": "A tailwind debug extension for chrome",
   "author": "actopas<hi@actopas.me>",
   "scripts": {
     "dev": "plasmo dev",
