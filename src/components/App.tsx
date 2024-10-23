@@ -94,7 +94,7 @@ const App: React.FC = () => {
         setAnimatedRect(currentRect)
       }
 
-      const duration = 150
+      const duration = 200
       const startTime = performance.now()
 
       const step = (currentTime: number) => {
