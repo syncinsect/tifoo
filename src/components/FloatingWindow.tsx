@@ -31,6 +31,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   >([])
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [focusedOptionIndex, setFocusedOptionIndex] = useState<number>(0)
 
   useEffect(() => {
     setClasses(identifyTailwindClasses(element))
@@ -44,6 +45,14 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       setAutocompleteResults(matches)
     }
   }, [query])
+
+  useEffect(() => {
+    if (autocompleteResults.length > 0) {
+      setFocusedOptionIndex(0)
+    } else {
+      setFocusedOptionIndex(-1)
+    }
+  }, [autocompleteResults])
 
   const handleAddClass = (newClass: string | null) => {
     if (!newClass) return
@@ -111,7 +120,21 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && query.trim() !== "") {
       event.preventDefault()
-      handleAddClass(query.trim())
+      if (focusedOptionIndex >= 0 && autocompleteResults.length > 0) {
+        handleAddClass(autocompleteResults[focusedOptionIndex].c)
+      } else {
+        handleAddClass(query.trim())
+      }
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault()
+      setFocusedOptionIndex((prev) =>
+        prev >= autocompleteResults.length - 1 ? 0 : prev + 1
+      )
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault()
+      setFocusedOptionIndex((prev) =>
+        prev <= 0 ? autocompleteResults.length - 1 : prev - 1
+      )
     }
   }
 
@@ -226,7 +249,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
               <ComboboxOptions className="combobox-options absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-white rounded-md shadow-lg max-h-60 ring-1 ring-[#1DA1F2] focus:outline-none">
                 {({ option: className }) => {
                   const classData = autocompleteResults.find(
-                    ({ c }) => c === className
+                    (item) => item.c === className
                   )
                   return (
                     <ComboboxOption
@@ -234,22 +257,29 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
                       value={className}
                       className={({ active }) =>
                         `group w-full cursor-default select-none relative py-1 px-2 flex items-center justify-between text-xs overflow-hidden ${
-                          active
+                          active ||
+                          autocompleteResults.findIndex(
+                            (item) => item.c === className
+                          ) === focusedOptionIndex
                             ? "bg-[#E8F5FE] text-[#1DA1F2]"
                             : "bg-white text-[#657786]"
                         }`
                       }>
-                      <span className="font-mono flex-shrink-0">
-                        {className}
-                      </span>
-                      {classData && (
-                        <span className="text-[#657786] flex-shrink-0 ml-2 overflow-hidden">
-                          <span className="block truncate group-hover:whitespace-nowrap">
-                            <span className="inline-block w-full group-hover:animate-marquee">
-                              {classData.p}
-                            </span>
+                      {({ selected, active }) => (
+                        <>
+                          <span className="font-mono flex-shrink-0">
+                            {className}
                           </span>
-                        </span>
+                          {classData && (
+                            <span className="text-[#657786] flex-shrink-0 ml-2 overflow-hidden">
+                              <span className="block truncate group-hover:whitespace-nowrap">
+                                <span className="inline-block w-full group-hover:animate-marquee">
+                                  {classData.p}
+                                </span>
+                              </span>
+                            </span>
+                          )}
+                        </>
                       )}
                     </ComboboxOption>
                   )
