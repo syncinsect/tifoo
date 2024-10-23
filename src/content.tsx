@@ -13,9 +13,8 @@ export const config: PlasmoCSConfig = {
 }
 
 export const getRootContainer: PlasmoGetRootContainer = () => {
-  const container = document.createElement("div")
-  container.id = "tailware-root"
-  document.body.appendChild(container)
+  const container = document.createElement("tailware-container")
+  document.documentElement.appendChild(container)
   return container
 }
 
