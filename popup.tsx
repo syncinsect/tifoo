@@ -32,6 +32,13 @@ function IndexPopup() {
     })
   }, [isActive])
 
+  const handleToggle = () => {
+    setIsActive(!isActive)
+    setTimeout(() => {
+      window.close()
+    }, 500)
+  }
+
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "updatePopupState") {
       updatePopupUI(request.isActive)
@@ -82,7 +89,7 @@ function IndexPopup() {
               ? "bg-red-500 hover:bg-red-600"
               : "bg-[#1DA1F2] hover:bg-[#0C7ABF]"
           } hover:shadow-md transform hover:-translate-y-0.5`}
-          onClick={() => setIsActive(!isActive)}>
+          onClick={handleToggle}>
           {isActive ? "Deactivate" : "Activate"}
         </button>
       </div>
