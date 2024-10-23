@@ -124,7 +124,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
         zIndex: 2147483647
       }}>
       <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-700">
-        <span className="font-bold text-sm">tailware</span>
+        <span className="font-semibold text-sm">Tailware</span>
         <div className="flex gap-2">
           <button
             onClick={handleCopyClasses}
