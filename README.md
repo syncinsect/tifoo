@@ -1,33 +1,85 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# Tailware
 
-## Getting Started
+Tailware is a powerful Chrome extension for real-time inspection and modification of Tailwind CSS classes on web pages.
 
-First, run the development server:
+## Features
 
-```bash
+- Real-time highlighting of Tailwind classes on page elements
+- Visual editing of Tailwind classes
+- Autocomplete for Tailwind class names
+- Copy Tailwind classes or entire HTML elements
+- Support for responsive design classes (sm:, md:, lg:, xl:, 2xl:)
+
+## Installation
+
+1. Clone this repository:
+
+   ```
+   git clone https://github.com/syncinsect/tailware.git
+   cd tailware
+   ```
+
+2. Install dependencies:
+
+   ```
+   pnpm install
+   ```
+
+3. Build the extension:
+
+   ```
+   pnpm build
+   ```
+
+   Or, if you want to run in development mode:
+
+   ```
+   pnpm dev
+   ```
+
+4. Open the Chrome extensions page (chrome://extensions/)
+
+5. Enable "Developer mode"
+
+6. Click "Load unpacked"
+
+7. Select the `tailware/build/chrome-mv3-prod` directory (if you ran `pnpm build`)
+   or `tailware/build/chrome-mv3-dev` directory (if you ran `pnpm dev`)
+
+## Development
+
+To run the extension in development mode:
+
+```
 pnpm dev
-# or
-npm run dev
 ```
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+This will start the development server and automatically rebuild the extension when files change.
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+Note: In development mode, load the `tailware/build/chrome-mv3-dev` directory in the Chrome extensions page.
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
+## Usage
 
-## Making production build
+1. Click the Tailware icon in the Chrome toolbar to activate the extension
+2. Hover over elements on the webpage to highlight them
+3. Use the floating window to view and edit Tailwind classes
 
-Run the following:
+## Contributing
 
-```bash
-pnpm build
-# or
-npm run build
-```
+We welcome and appreciate all contributions! Please see the [GitHub "How to Contribute" Guide](https://docs.github.com/en/get-started/quickstart/contributing-to-projects) for general guidelines on how to contribute to projects.
 
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
+<!-- Before contributing, please read our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## Submit to the webstores
+If you're looking for a place to start, check out our [issues labeled "good first issue"](GITHUB_ISSUES_URL?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+For more detailed information specific to this project, please refer to our [Contributing Guidelines](CONTRIBUTING.md) (if available). -->
+
+## Reporting Issues
+
+If you find a bug or have a feature request, please [submit an issue](https://github.com/syncinsect/tailware/issues/new).
+
+## License
+
+This project is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)](LICENSE).
+
+For more information, please see the full [license text](LICENSE).
