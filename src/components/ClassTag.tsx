@@ -1,4 +1,4 @@
-// src/components/ClassTag.tsx
+import type { ClassTagProps } from "@/types"
 import { Switch } from "@headlessui/react"
 import React, { useEffect, useState } from "react"
 
@@ -7,14 +7,6 @@ import {
   refreshTailwind,
   removeTailwindStyle
 } from "../utils/tailwindUtils"
-
-interface ClassTagProps {
-  className: string
-  element: HTMLElement
-  onToggle: (className: string, isChecked: boolean) => void
-  onRemove: (className: string) => void
-}
-
 const ClassTag: React.FC<ClassTagProps> = ({
   className,
   element,

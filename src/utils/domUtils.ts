@@ -1,18 +1,4 @@
-// src/utils/domUtils.ts
-export interface ComputedStyles {
-  padding: {
-    top: number
-    right: number
-    bottom: number
-    left: number
-  }
-  margin: {
-    top: number
-    right: number
-    bottom: number
-    left: number
-  }
-}
+import type { ComputedStyles } from "@/types"
 
 export function getElementStyles(element: HTMLElement): ComputedStyles {
   const styles = window.getComputedStyle(element)

@@ -1,10 +1,6 @@
-// src/utils/tailwindUtils.ts
-import tailwindClassesData from "../../tailwind-classes.json"
+import type { TailwindClassData } from "@/types"
 
-type TailwindClassData = {
-  c: string // className
-  p: string // properties
-}[]
+import tailwindClassesData from "../../tailwind-classes.json"
 
 const tailwindClasses: TailwindClassData =
   tailwindClassesData as TailwindClassData

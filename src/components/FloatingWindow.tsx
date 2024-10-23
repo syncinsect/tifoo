@@ -1,4 +1,13 @@
-// src/components/FloatingWindow.tsx
+import ClassTag from "@/components/ClassTag"
+import Toast from "@/components/Toast"
+import type { FloatingWindowProps } from "@/types"
+import {
+  applyTailwindStyle,
+  identifyTailwindClasses,
+  refreshTailwind,
+  removeTailwindStyle,
+  searchTailwindClasses
+} from "@/utils/tailwindUtils"
 import {
   Combobox,
   ComboboxInput,
@@ -6,24 +15,6 @@ import {
   ComboboxOptions
 } from "@headlessui/react"
 import React, { useEffect, useMemo, useRef, useState } from "react"
-
-import {
-  applyTailwindStyle,
-  identifyTailwindClasses,
-  refreshTailwind,
-  removeTailwindStyle,
-  searchTailwindClasses
-} from "../utils/tailwindUtils"
-import ClassTag from "./ClassTag"
-import Toast from "./Toast"
-
-interface FloatingWindowProps {
-  element: HTMLElement
-  position: { x: number; y: number }
-  isFixed: boolean
-  onDeactivate: () => void
-  onClassChange: () => void
-}
 
 const FloatingWindow: React.FC<FloatingWindowProps> = ({
   element,

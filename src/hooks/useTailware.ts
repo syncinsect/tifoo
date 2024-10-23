@@ -1,12 +1,7 @@
 // src/hooks/useTailware.ts
+import type { UseTailwareProps } from "@/types"
 import { useCallback, useRef, useState } from "react"
 
-interface UseTailwareProps {
-  isActive: boolean
-  setHighlightedElement: (element: HTMLElement | null) => void
-  setFloatingWindowPosition: (position: { x: number; y: number }) => void
-  setIsFloatingWindowFixed: (isFixed: boolean) => void
-}
 
 const useTailware = ({
   isActive,

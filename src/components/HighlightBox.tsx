@@ -1,13 +1,6 @@
-// src/components/HighlightBox.tsx
+import type { HighlightBoxProps } from "@/types"
+import { getElementStyles } from "@/utils/domUtils"
 import React, { useEffect, useRef, useState } from "react"
-
-import { getElementStyles } from "../utils/domUtils"
-
-interface HighlightBoxProps {
-  element: HTMLElement
-  isFixed: boolean
-  animatedRect: DOMRect | null
-}
 
 const HighlightBox: React.FC<HighlightBoxProps> = ({
   element,
