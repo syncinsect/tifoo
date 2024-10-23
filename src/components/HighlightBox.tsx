@@ -73,7 +73,7 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
         top: 0,
         left: 0,
         height: `${pageHeight}px`,
-        width: "100vw"
+        width: "100%"
       }
     : {
         position: "absolute" as const,
