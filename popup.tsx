@@ -85,14 +85,14 @@ function IndexPopup() {
       </div>
       <div className="bg-gray-100 p-3 flex justify-between text-xs text-gray-500">
         <a
-          href="https://github.com/actopas/tailware"
+          href={process.env.PLASMO_PUBLIC_GITHUB_REPO_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-blue-500 transition-colors duration-300">
           Learn more
         </a>
         <a
-          href="https://github.com/actopas/tailware/issues/new"
+          href={process.env.PLASMO_PUBLIC_GITHUB_ISSUES_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-blue-500 transition-colors duration-300">
