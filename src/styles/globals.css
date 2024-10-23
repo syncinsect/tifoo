@@ -7,29 +7,8 @@ body {
   @apply antialiased;
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-gray-900;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-gray-800 rounded;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-700;
-}
-
 .floating-window {
-  @apply bg-gray-900 border-2 border-gray-700 rounded-lg p-3 shadow-lg w-96 font-sans text-white;
-}
-
-.autocomplete-list {
-  @apply absolute top-full left-0 right-0 bg-gray-800 border border-gray-700 rounded-md mt-1 max-h-48 overflow-y-auto z-50;
-  font-size: 12px;
+  @apply bg-white border-2 p-0 rounded-lg shadow-lg w-96 font-sans text-black;
 }
 
 .autocomplete-item {
@@ -46,5 +25,24 @@ body {
 
 .autocomplete-properties {
   @apply text-gray-400 text-xs truncate ml-2;
-  max-width: 60%; /* 限制属性文本的最大宽度 */
+  max-width: 60%;
+}
+
+.combobox-options {
+  scrollbar-color: #1da1f2 #f1f1f1;
+  scrollbar-width: thin;
+}
+
+.combobox-options::-webkit-scrollbar {
+  width: 8px;
+}
+
+.combobox-options::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.combobox-options::-webkit-scrollbar-thumb {
+  background-color: #1da1f2;
+  border-radius: 20px;
+  border: 3px solid #f1f1f1;
 }

@@ -114,7 +114,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
 
   return (
     <div
-      className={`floating-window ${
+      className={`floating-window border-none bg-white shadow-lg ${
         isFixed ? "pointer-events-auto" : "pointer-events-none"
       }`}
       style={{
@@ -123,12 +123,12 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
         position: isFixed ? "absolute" : "fixed",
         zIndex: 2147483647
       }}>
-      <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-700">
+      <div className="flex px-3 pt-3 justify-between items-center mb-3 pb-2 border-b border-[#1DA1F2] bg-[#1DA1F2] text-white p-2 rounded-t-lg">
         <span className="font-semibold text-sm">Tailware</span>
         <div className="flex gap-2">
           <button
             onClick={handleCopyClasses}
-            className="bg-transparent border-none text-gray-300 cursor-pointer p-1 rounded hover:bg-gray-800"
+            className="bg-transparent border-none text-white cursor-pointer p-1 rounded hover:bg-[#0C7ABF]"
             title="Copy Classes">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -146,7 +146,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           </button>
           <button
             onClick={handleCopyElement}
-            className="bg-transparent border-none text-gray-300 cursor-pointer p-1 rounded hover:bg-gray-800"
+            className="bg-transparent border-none text-white cursor-pointer p-1 rounded hover:bg-[#0C7ABF]"
             title="Copy Element">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -164,7 +164,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           </button>
           <button
             onClick={onDeactivate}
-            className="bg-transparent border-none text-gray-300 cursor-pointer p-1 rounded hover:bg-gray-800"
+            className="bg-transparent border-none text-white cursor-pointer p-1 rounded hover:bg-[#0C7ABF]"
             title="Deactivate">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -182,76 +182,80 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           </button>
         </div>
       </div>
-      <div className="bg-gray-800 text-gray-300 p-1.5 rounded text-xs mb-2 font-bold">
-        {element.tagName.toLowerCase()}
-      </div>
-      <div className="h-80 overflow-auto">
-        <div className="flex flex-wrap gap-1.5 mb-2">
-          {memoizedClasses.map((cls) => (
-            <ClassTag
-              key={cls}
-              className={cls}
-              element={element}
-              onToggle={handleClassToggle}
-              onRemove={handleRemoveClass}
-            />
-          ))}
+      <div className="px-3 pb-3">
+        <div className="bg-[#E8F5FE] text-[#1DA1F2] p-1.5 rounded text-xs mb-2 font-bold">
+          {element.tagName.toLowerCase()}
         </div>
-      </div>
-      <Combobox
-        value={selectedClass}
-        onChange={(value: string | null) => {
-          if (value) {
-            handleAddClass(value)
-          }
-        }}
-        virtual={{
-          options: autocompleteResults.map(({ c }) => c)
-        }}>
-        <div className="relative mt-1">
-          <ComboboxInput
-            ref={inputRef}
-            className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
-            onChange={(event) => setQuery(event.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="add classes"
-            autoComplete="off"
-            spellCheck="false"
-          />
-          {autocompleteResults.length > 0 && (
-            <ComboboxOptions className="absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-gray-900 rounded-md shadow-lg max-h-60 ring-1 ring-gray-700 focus:outline-none">
-              {({ option: className }) => {
-                const classData = autocompleteResults.find(
-                  ({ c }) => c === className
-                )
-                return (
-                  <ComboboxOption
-                    key={className}
-                    value={className}
-                    className={({ active }) =>
-                      `group w-full cursor-default select-none relative py-1 px-2 flex items-center justify-between text-xs overflow-hidden ${
-                        active ? "bg-gray-700" : "bg-gray-900"
-                      }`
-                    }>
-                    <span className="font-mono text-gray-300 flex-shrink-0">
-                      {className}
-                    </span>
-                    {classData && (
-                      <span className="text-gray-500 flex-shrink-0 ml-2 overflow-hidden">
-                        <span className="block truncate group-hover:whitespace-nowrap">
-                          <span className="inline-block w-full group-hover:animate-marquee">
-                            {classData.p}
+        <div className="h-80 overflow-auto">
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {memoizedClasses.map((cls) => (
+              <ClassTag
+                key={cls}
+                className={cls}
+                element={element}
+                onToggle={handleClassToggle}
+                onRemove={handleRemoveClass}
+              />
+            ))}
+          </div>
+        </div>
+        <Combobox
+          value={selectedClass}
+          onChange={(value: string | null) => {
+            if (value) {
+              handleAddClass(value)
+            }
+          }}
+          virtual={{
+            options: autocompleteResults.map(({ c }) => c)
+          }}>
+          <div className="relative mt-1">
+            <ComboboxInput
+              ref={inputRef}
+              className="w-full bg-[#E8F5FE] !border-gray-300 outline-none shadow-lg p-1.5 rounded text-xs"
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="add classes"
+              autoComplete="off"
+              spellCheck="false"
+            />
+            {autocompleteResults.length > 0 && (
+              <ComboboxOptions className="combobox-options absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-white rounded-md shadow-lg max-h-60 ring-1 ring-[#1DA1F2] focus:outline-none">
+                {({ option: className }) => {
+                  const classData = autocompleteResults.find(
+                    ({ c }) => c === className
+                  )
+                  return (
+                    <ComboboxOption
+                      key={className}
+                      value={className}
+                      className={({ active }) =>
+                        `group w-full cursor-default select-none relative py-1 px-2 flex items-center justify-between text-xs overflow-hidden ${
+                          active
+                            ? "bg-[#E8F5FE] text-[#1DA1F2]"
+                            : "bg-white text-[#657786]"
+                        }`
+                      }>
+                      <span className="font-mono flex-shrink-0">
+                        {className}
+                      </span>
+                      {classData && (
+                        <span className="text-[#657786] flex-shrink-0 ml-2 overflow-hidden">
+                          <span className="block truncate group-hover:whitespace-nowrap">
+                            <span className="inline-block w-full group-hover:animate-marquee">
+                              {classData.p}
+                            </span>
                           </span>
                         </span>
-                      </span>
-                    )}
-                  </ComboboxOption>
-                )
-              }}
-            </ComboboxOptions>
-          )}
-        </div>
-      </Combobox>
+                      )}
+                    </ComboboxOption>
+                  )
+                }}
+              </ComboboxOptions>
+            )}
+          </div>
+        </Combobox>
+      </div>
       {toastMessage && (
         <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
       )}

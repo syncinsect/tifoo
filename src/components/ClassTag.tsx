@@ -21,21 +21,21 @@ const ClassTag: React.FC<ClassTagProps> = ({
   }
 
   return (
-    <div className="bg-gray-800 text-gray-300 px-2 py-1 rounded-md text-sm flex items-center mr-2 mb-2">
+    <div className="bg-white text-gray-300 px-2 py-1 rounded-md text-sm flex items-center mr-2 mb-2">
       <Switch
         checked={isChecked}
         onChange={handleChange}
         className={`${
-          isChecked ? "bg-blue-500" : "bg-gray-500"
+          isChecked ? "!bg-[#1DA1F2]" : "bg-gray-500"
         } relative inline-flex h-4 w-7 items-center rounded-full mr-2`}>
-        <span className="sr-only">{className}</span>
+        <span className="sr-only text-gray-700">{className}</span>
         <span
           className={`${
             isChecked ? "translate-x-3" : "translate-x-1"
           } inline-block h-3 w-3 transform rounded-full bg-white transition`}
         />
       </Switch>
-      <span>{className}</span>
+      <span className="text-gray-700">{className}</span>
       <button
         onClick={(e) => {
           e.preventDefault()
