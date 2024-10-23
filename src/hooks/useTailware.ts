@@ -1,18 +1,5 @@
-// src/hooks/useTailware.ts
+import type { UseTailwareProps } from "@/types"
 import { useCallback, useRef, useState } from "react"
-
-import {
-  removeHighlight,
-  throttledUpdateHighlight,
-  updateHighlight
-} from "../utils/domUtils"
-
-interface UseTailwareProps {
-  isActive: boolean
-  setHighlightedElement: (element: HTMLElement | null) => void
-  setFloatingWindowPosition: (position: { x: number; y: number }) => void
-  setIsFloatingWindowFixed: (isFixed: boolean) => void
-}
 
 const useTailware = ({
   isActive,
@@ -32,14 +19,12 @@ const useTailware = ({
       const target = e.target as HTMLElement
       setLastHighlightedElement(target)
       setHighlightedElement(target)
-      throttledUpdateHighlight(target, isFloatingWindowFixedRef.current)
     },
     [isActive, setHighlightedElement]
   )
 
   const handleMouseOut = useCallback(() => {
     if (!isActive || isFloatingWindowFixedRef.current) return
-    removeHighlight()
     setHighlightedElement(null)
   }, [isActive, setHighlightedElement])
 
@@ -77,10 +62,6 @@ const useTailware = ({
       const top = Math.round(floatingWindowPositionRef.current.y + scrollY)
 
       setFloatingWindowPosition({ x: left, y: top })
-
-      if (lastHighlightedElement) {
-        updateHighlight(lastHighlightedElement, null, true)
-      }
     },
     [
       setIsFloatingWindowFixed,
@@ -100,10 +81,6 @@ const useTailware = ({
     const top = Math.round(floatingWindowPositionRef.current.y - scrollY)
 
     setFloatingWindowPosition({ x: left, y: top })
-
-    if (lastHighlightedElement) {
-      updateHighlight(lastHighlightedElement, null, false)
-    }
 
     const mouseEvent = new MouseEvent("mousemove", {
       clientX: initialClickPositionRef.current.x,
@@ -145,10 +122,9 @@ const useTailware = ({
 
   const handleScroll = useCallback(() => {
     if (isFloatingWindowFixedRef.current && lastHighlightedElement) {
-      const rect = lastHighlightedElement.getBoundingClientRect()
-      updateHighlight(lastHighlightedElement, rect, true)
+      setHighlightedElement(lastHighlightedElement)
     }
-  }, [lastHighlightedElement])
+  }, [lastHighlightedElement, setHighlightedElement])
 
   return {
     handleMouseOver,

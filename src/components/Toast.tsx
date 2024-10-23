@@ -1,10 +1,5 @@
-// src/components/Toast.tsx
+import type { ToastProps } from "@/types"
 import React, { useEffect } from "react"
-
-interface ToastProps {
-  message: string
-  onClose: () => void
-}
 
 const Toast: React.FC<ToastProps> = ({ message, onClose }) => {
   useEffect(() => {

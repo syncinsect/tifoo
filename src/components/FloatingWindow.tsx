@@ -1,29 +1,20 @@
-// src/components/FloatingWindow.tsx
-import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions
-} from "@headlessui/react"
-import React, { useEffect, useState } from "react"
-
+import ClassTag from "@/components/ClassTag"
+import Toast from "@/components/Toast"
+import type { FloatingWindowProps } from "@/types"
 import {
   applyTailwindStyle,
   identifyTailwindClasses,
   refreshTailwind,
   removeTailwindStyle,
   searchTailwindClasses
-} from "../utils/tailwindUtils"
-import ClassTag from "./ClassTag"
-import Toast from "./Toast"
-
-interface FloatingWindowProps {
-  element: HTMLElement
-  position: { x: number; y: number }
-  isFixed: boolean
-  onDeactivate: () => void
-  onClassChange: () => void
-}
+} from "@/utils/tailwindUtils"
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions
+} from "@headlessui/react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 
 const FloatingWindow: React.FC<FloatingWindowProps> = ({
   element,
@@ -39,6 +30,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     { c: string; p: string }[]
   >([])
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setClasses(identifyTailwindClasses(element))
@@ -53,17 +45,22 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     }
   }, [query])
 
-  const handleAddClass = (newClass: string) => {
-    if (newClass.trim() === "") return
-    if (!classes.includes(newClass)) {
-      element.classList.add(newClass)
-      applyTailwindStyle(element, newClass)
-      setClasses([...classes, newClass])
+  const handleAddClass = (newClass: string | null) => {
+    if (!newClass) return
+    const trimmedClass = newClass.trim()
+    if (trimmedClass === "") return
+    if (!classes.includes(trimmedClass)) {
+      element.classList.add(trimmedClass)
+      applyTailwindStyle(element, trimmedClass)
+      setClasses([...classes, trimmedClass])
       onClassChange()
       refreshTailwind()
     }
-    setQuery("")
     setSelectedClass(null)
+    setQuery("")
+    if (inputRef.current) {
+      inputRef.current.value = ""
+    }
   }
 
   const handleRemoveClass = (classToRemove: string) => {
@@ -104,6 +101,15 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
         setToastMessage("Element copied to clipboard!")
       })
       .catch(() => setToastMessage("Failed to copy element"))
+  }
+
+  const memoizedClasses = useMemo(() => classes, [classes.join(",")])
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && query.trim() !== "") {
+      event.preventDefault()
+      handleAddClass(query.trim())
+    }
   }
 
   return (
@@ -181,7 +187,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       </div>
       <div className="h-80 overflow-auto">
         <div className="flex flex-wrap gap-1.5 mb-2">
-          {classes.map((cls) => (
+          {memoizedClasses.map((cls) => (
             <ClassTag
               key={cls}
               className={cls}
@@ -194,14 +200,20 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
       </div>
       <Combobox
         value={selectedClass}
-        onChange={handleAddClass}
+        onChange={(value: string | null) => {
+          if (value) {
+            handleAddClass(value)
+          }
+        }}
         virtual={{
           options: autocompleteResults.map(({ c }) => c)
         }}>
         <div className="relative mt-1">
           <ComboboxInput
+            ref={inputRef}
             className="w-full bg-gray-800 text-gray-300 p-1.5 rounded text-xs"
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="add classes"
             autoComplete="off"
             spellCheck="false"

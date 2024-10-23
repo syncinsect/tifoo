@@ -1,41 +1,33 @@
-import Icon from "data-base64:~assets/icon.png"
 import React, { useEffect, useState } from "react"
 
-import { Storage } from "@plasmohq/storage"
-
 import "./style.css"
-
-const storage = new Storage()
 
 function IndexPopup() {
   const [isActive, setIsActive] = useState(false)
 
   useEffect(() => {
-    storage.get("isActive").then((value) => {
-      setIsActive(Boolean(value))
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]?.id) {
+        chrome.tabs.sendMessage(
+          tabs[0].id,
+          { action: "getState" },
+          (response) => {
+            if (response && response.isActive !== undefined) {
+              setIsActive(response.isActive)
+            }
+          }
+        )
+      }
     })
   }, [])
 
   useEffect(() => {
-    storage
-      .set("isActive", isActive)
-      .catch((error) => console.error("Error setting state:", error))
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
-        chrome.tabs
-          .sendMessage(tabs[0].id, {
-            action: "toggleTailware",
-            isActive
-          })
-          .catch((error) => {
-            if (error.message.includes("Could not establish connection")) {
-              console.log(
-                "Content script not ready or not injected in this tab."
-              )
-            } else {
-              console.error("Error sending message:", error)
-            }
-          })
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: "toggleTailware",
+          isActive
+        })
       }
     })
   }, [isActive])
@@ -71,7 +63,6 @@ function IndexPopup() {
       className={`w-80 ${isActive ? "bg-blue-50" : "bg-white"} transition-colors duration-300`}>
       <div className="bg-slate-900 text-white p-4 flex justify-between items-center">
         <div className="flex items-center">
-          <img src={Icon} alt="Tailware icon" className="w-6 h-6 mr-2" />
           <h1 className="text-xl font-semibold">tailware</h1>
         </div>
         <div className="flex items-center">
@@ -94,14 +85,14 @@ function IndexPopup() {
       </div>
       <div className="bg-gray-100 p-3 flex justify-between text-xs text-gray-500">
         <a
-          href="https://github.com/actopas/tailware"
+          href={process.env.PLASMO_PUBLIC_GITHUB_REPO_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-blue-500 transition-colors duration-300">
           Learn more
         </a>
         <a
-          href="https://github.com/actopas/tailware/issues/new"
+          href={process.env.PLASMO_PUBLIC_GITHUB_ISSUES_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-blue-500 transition-colors duration-300">
