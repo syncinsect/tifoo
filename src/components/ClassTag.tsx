@@ -2,11 +2,6 @@ import type { ClassTagProps } from "@/types"
 import { Switch } from "@headlessui/react"
 import React, { useEffect, useState } from "react"
 
-import {
-  applyTailwindStyle,
-  refreshTailwind,
-  removeTailwindStyle
-} from "../utils/tailwindUtils"
 const ClassTag: React.FC<ClassTagProps> = ({
   className,
   element,

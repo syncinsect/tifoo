@@ -1,7 +1,5 @@
-// src/hooks/useTailware.ts
 import type { UseTailwareProps } from "@/types"
 import { useCallback, useRef, useState } from "react"
-
 
 const useTailware = ({
   isActive,

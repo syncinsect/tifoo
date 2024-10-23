@@ -1,4 +1,3 @@
-// src/content.tsx
 import type {
   PlasmoCSConfig,
   PlasmoGetRootContainer,

@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { Storage } from "@plasmohq/storage"
-
 import "./style.css"
-
-const storage = new Storage()
 
 function IndexPopup() {
   const [isActive, setIsActive] = useState(false)
