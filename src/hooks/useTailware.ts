@@ -1,12 +1,6 @@
 // src/hooks/useTailware.ts
 import { useCallback, useRef, useState } from "react"
 
-import {
-  removeHighlight,
-  throttledUpdateHighlight,
-  updateHighlight
-} from "../utils/domUtils"
-
 interface UseTailwareProps {
   isActive: boolean
   setHighlightedElement: (element: HTMLElement | null) => void
@@ -38,7 +32,6 @@ const useTailware = ({
 
   const handleMouseOut = useCallback(() => {
     if (!isActive || isFloatingWindowFixedRef.current) return
-    removeHighlight()
     setHighlightedElement(null)
   }, [isActive, setHighlightedElement])
 
@@ -76,10 +69,6 @@ const useTailware = ({
       const top = Math.round(floatingWindowPositionRef.current.y + scrollY)
 
       setFloatingWindowPosition({ x: left, y: top })
-
-      if (lastHighlightedElement) {
-        updateHighlight(lastHighlightedElement, null, true)
-      }
     },
     [
       setIsFloatingWindowFixed,
@@ -99,10 +88,6 @@ const useTailware = ({
     const top = Math.round(floatingWindowPositionRef.current.y - scrollY)
 
     setFloatingWindowPosition({ x: left, y: top })
-
-    if (lastHighlightedElement) {
-      updateHighlight(lastHighlightedElement, null, false)
-    }
 
     const mouseEvent = new MouseEvent("mousemove", {
       clientX: initialClickPositionRef.current.x,

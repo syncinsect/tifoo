@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react"
 
 import useTailware from "../hooks/useTailware"
-import { removeHighlight } from "../utils/domUtils"
 import FloatingWindow from "./FloatingWindow"
 import HighlightBox from "./HighlightBox"
 import Toast from "./Toast"
@@ -62,7 +61,6 @@ const App: React.FC = () => {
       window.removeEventListener("scroll", handleScroll)
       document.removeEventListener("mousemove", updateFloatingWindowPosition)
       document.removeEventListener("click", handleClick, true)
-      removeHighlight()
       setHighlightedElement(null)
       setIsFloatingWindowFixed(false)
     }
