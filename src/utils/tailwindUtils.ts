@@ -7,28 +7,57 @@ const tailwindClasses: TailwindClassData =
 
 let injectedStyles: Set<string> = new Set()
 
+const mediaQueryPrefixes = ["sm", "md", "lg", "xl", "2xl"]
+const pseudoClasses = [
+  "hover",
+  "focus",
+  "active",
+  "visited",
+  "first",
+  "last",
+  "odd",
+  "even",
+  "disabled",
+  "checked",
+  "focus-within",
+  "focus-visible"
+]
+const pseudoElements = ["before", "after"]
+const specialPrefixes = [
+  "group-hover",
+  "group-focus",
+  "motion-safe",
+  "motion-reduce",
+  "dark"
+]
+
+const allPrefixes = [
+  ...mediaQueryPrefixes,
+  ...pseudoClasses,
+  ...pseudoElements,
+  ...specialPrefixes
+]
+
 export function identifyTailwindClasses(element: HTMLElement): string[] {
   const classNames = element.classList
     ? Array.from(element.classList)
     : element.className.split(/\s+/)
 
   return classNames.filter((cls) => {
-    const baseClass = cls.split(/[:]/).pop() || cls
+    const parts = cls.split(":")
+    const baseClass = parts[parts.length - 1]
 
     if (tailwindClasses.some(({ c }) => c === baseClass)) {
       return true
     }
 
-    const parts = cls.split(":")
     if (parts.length > 1) {
       const prefix = parts[0]
       const restOfClass = parts.slice(1).join(":")
-      if (
-        ["sm", "md", "lg", "xl", "2xl"].includes(prefix) &&
+      return (
+        allPrefixes.includes(prefix) &&
         tailwindClasses.some(({ c }) => c === restOfClass)
-      ) {
-        return true
-      }
+      )
     }
 
     return false
@@ -59,15 +88,34 @@ function injectTailwindClass(className: string): void {
   if (parts.length > 1) {
     const prefix = parts[0]
     const restOfClass = parts.slice(1).join(":")
-    if (["sm", "md", "lg", "xl", "2xl"].includes(prefix)) {
-      classData = tailwindClasses.find(({ c }) => c === restOfClass)
-      if (classData) {
-        const mediaQuery = getMediaQuery(prefix)
-        const escapedClassName = className.replace(/:/g, "\\:")
-        injectStyle(
-          `@media ${mediaQuery} { .${escapedClassName} { ${classData.p} } }`
-        )
+    classData = tailwindClasses.find(({ c }) => c === restOfClass)
+    if (classData) {
+      const escapedClassName = className.replace(/:/g, "\\:")
+      let styleContent = ""
+
+      switch (true) {
+        case mediaQueryPrefixes.includes(prefix):
+          const mediaQuery = getMediaQuery(prefix)
+          styleContent = `@media ${mediaQuery} { .${escapedClassName} { ${classData.p} } }`
+          break
+        case pseudoClasses.includes(prefix):
+          styleContent = `.${escapedClassName}:${prefix} { ${classData.p} }`
+          break
+        case pseudoElements.includes(prefix):
+          styleContent = `.${escapedClassName}::${prefix} { ${classData.p} }`
+          break
+        case prefix === "dark":
+          styleContent = `@media (prefers-color-scheme: dark) { .${escapedClassName} { ${classData.p} } }`
+          break
+        case prefix.startsWith("group"):
+          const groupPrefix = prefix.replace("group-", "")
+          styleContent = `.group:${groupPrefix} .${escapedClassName} { ${classData.p} }`
+          break
+        default:
+          styleContent = `.${escapedClassName} { ${classData.p} }`
       }
+
+      injectStyle(styleContent)
     }
   } else {
     classData = tailwindClasses.find(({ c }) => c === className)
@@ -124,6 +172,7 @@ export function refreshTailwind(): void {
     window.Tailwind.refresh()
   }
 }
+
 declare global {
   interface Window {
     Tailwind?: {
