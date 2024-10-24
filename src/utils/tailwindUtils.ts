@@ -13,7 +13,9 @@ export function identifyTailwindClasses(element: HTMLElement): string[] {
     : element.className.split(/\s+/)
 
   return classNames.filter((cls) => {
-    if (tailwindClasses.some(({ c }) => c === cls)) {
+    const baseClass = cls.split(/[:]/).pop() || cls
+
+    if (tailwindClasses.some(({ c }) => c === baseClass)) {
       return true
     }
 
