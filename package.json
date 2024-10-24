@@ -1,9 +1,9 @@
 {
   "name": "tailware",
-  "displayName": "Tailware",
+  "displayName": "Tailware – Easyuse Tailwind Devtools",
   "version": "0.0.1",
-  "description": "A tailwind debug extension for chrome",
-  "author": "actopas<hi@actopas.me>",
+  "description": "Effortless Tailwind Styling at Your Fingertips",
+  "author": "syncinsect<syncinsect@gmail.com>",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
