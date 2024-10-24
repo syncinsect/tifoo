@@ -80,6 +80,6 @@ If you find a bug or have a feature request, please [submit an issue](https://gi
 
 ## License
 
-This project is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
 
 For more information, please see the full [license text](LICENSE).
