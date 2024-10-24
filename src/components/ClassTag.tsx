@@ -25,17 +25,10 @@ const ClassTag: React.FC<ClassTagProps> = ({
       <Switch
         checked={isChecked}
         onChange={handleChange}
-        className={`${
-          isChecked ? "!bg-[#1DA1F2]" : "bg-gray-500"
-        } relative inline-flex h-4 w-7 items-center rounded-full mr-2`}>
-        <span className="sr-only text-gray-700">{className}</span>
-        <span
-          className={`${
-            isChecked ? "translate-x-3" : "translate-x-1"
-          } inline-block h-3 w-3 transform rounded-full bg-white transition`}
-        />
+        className="group inline-flex h-4 w-7 items-center rounded-full bg-gray-500 transition data-[checked]:bg-[#1DA1F2]">
+        <span className="translate-x-1 h-3 w-3 rounded-full bg-white transition-transform duration-200 ease-in-out group-data-[checked]:translate-x-3" />
       </Switch>
-      <span className="text-gray-700">{className}</span>
+      <span className="ml-1 text-gray-700">{className}</span>
       <button
         onClick={(e) => {
           e.preventDefault()
