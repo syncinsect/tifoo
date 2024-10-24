@@ -51,17 +51,60 @@ export function applyTailwindStyle(
 function injectTailwindClass(className: string): void {
   if (injectedStyles.has(className)) return
 
-  const classData = tailwindClasses.find(({ c }) => c === className)
-  if (classData) {
-    let styleElement = document.getElementById("tailware-injected-styles")
-    if (!styleElement) {
-      styleElement = document.createElement("style")
-      styleElement.id = "tailware-injected-styles"
-      document.head.appendChild(styleElement)
+  const parts = className.split(":")
+  let classData
+
+  if (parts.length > 1) {
+    const prefix = parts[0]
+    const restOfClass = parts.slice(1).join(":")
+    if (["sm", "md", "lg", "xl", "2xl"].includes(prefix)) {
+      classData = tailwindClasses.find(({ c }) => c === restOfClass)
+      if (classData) {
+        const mediaQuery = getMediaQuery(prefix)
+        const escapedClassName = className.replace(/:/g, "\\:")
+        injectStyle(
+          `@media ${mediaQuery} { .${escapedClassName} { ${classData.p} } }`
+        )
+      }
     }
-    styleElement.textContent += `.${className} { ${classData.p} }\n`
+  } else {
+    classData = tailwindClasses.find(({ c }) => c === className)
+    if (classData) {
+      const escapedClassName = className.replace(/:/g, "\\:")
+      injectStyle(`.${escapedClassName} { ${classData.p} }`)
+    }
+  }
+
+  if (classData) {
     injectedStyles.add(className)
   }
+}
+
+function getMediaQuery(prefix: string): string {
+  switch (prefix) {
+    case "sm":
+      return "(min-width: 640px)"
+    case "md":
+      return "(min-width: 768px)"
+    case "lg":
+      return "(min-width: 1024px)"
+    case "xl":
+      return "(min-width: 1280px)"
+    case "2xl":
+      return "(min-width: 1536px)"
+    default:
+      return ""
+  }
+}
+
+function injectStyle(styleContent: string): void {
+  let styleElement = document.getElementById("tailware-injected-styles")
+  if (!styleElement) {
+    styleElement = document.createElement("style")
+    styleElement.id = "tailware-injected-styles"
+    document.head.appendChild(styleElement)
+  }
+  styleElement.textContent += styleContent + "\n"
 }
 
 export function removeTailwindStyle(
