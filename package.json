@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "description": "Effortless Tailwind Styling at Your Fingertips",
   "author": "syncinsect<syncinsect@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
