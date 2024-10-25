@@ -48,14 +48,14 @@ function IndexPopup() {
         <div className="flex items-center space-x-2">
           <span
             className={`w-3 h-3 rounded-full ${isActive ? "bg-green-400" : "bg-gray-400"}`}></span>
-          <span className="text-sm font-medium">
+          <span className="text-sm font-mono">
             {isActive ? "Active" : "Inactive"}
           </span>
         </div>
       </div>
       <div className="p-4 space-y-4">
-        <p className="text-[#657786] text-sm">
-          Effortless Tailwind Styling at Your Fingertips
+        <p className="text-[#657786] text-sm font-mono text-center">
+          Effortless Tailwind Stylings, Now!
         </p>
         <button
           className={`w-full py-2 px-4 rounded-full text-white font-medium transition-all duration-300 ${
