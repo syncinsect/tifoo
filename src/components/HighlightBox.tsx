@@ -91,11 +91,15 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
     }
   }
 
+  const transitionStyle = "transition-all duration-200 ease-in-out"
+
   return (
-    <div className="pointer-events-none z-[9997]" style={containerStyle}>
+    <div
+      className={`pointer-events-none z-[9997] ${transitionStyle}`}
+      style={containerStyle}>
       <div
         ref={boxRef}
-        className="absolute pointer-events-none z-[9998]"
+        className={`absolute pointer-events-none z-[9998] ${transitionStyle}`}
         style={{
           left: `${getAdjustedPosition(currentRect.left, "x")}px`,
           top: `${getAdjustedPosition(currentRect.top, "y")}px`,
@@ -103,7 +107,7 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
           height: `${currentRect.height}px`
         }}>
         <div
-          className="absolute inset-0"
+          className={`absolute inset-0 ${transitionStyle}`}
           style={{
             left: `-${styles.margin.left}px`,
             top: `-${styles.margin.top}px`,
@@ -113,13 +117,13 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
           }}
         />
         <div
-          className="absolute inset-0"
+          className={`absolute inset-0 ${transitionStyle}`}
           style={{
             backgroundColor: "rgba(147, 196, 125, 0.3)"
           }}
         />
         <div
-          className="absolute"
+          className={`absolute ${transitionStyle}`}
           style={{
             left: `${styles.padding.left}px`,
             top: `${styles.padding.top}px`,
@@ -131,19 +135,19 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
         />
       </div>
       <div
-        className={`absolute left-0 right-0 ${lineStyle} border-t-2`}
+        className={`absolute left-0 right-0 ${lineStyle} border-t-2 ${transitionStyle}`}
         style={{ top: `${getAdjustedPosition(currentRect.top, "y")}px` }}
       />
       <div
-        className={`absolute left-0 right-0 ${lineStyle} border-t-2`}
+        className={`absolute left-0 right-0 ${lineStyle} border-t-2 ${transitionStyle}`}
         style={{ top: `${getAdjustedPosition(currentRect.bottom, "y")}px` }}
       />
       <div
-        className={`absolute top-0 bottom-0 ${lineStyle} border-l-2`}
+        className={`absolute top-0 bottom-0 ${lineStyle} border-l-2 ${transitionStyle}`}
         style={{ left: `${getAdjustedPosition(currentRect.left, "x")}px` }}
       />
       <div
-        className={`absolute top-0 bottom-0 ${lineStyle} border-l-2`}
+        className={`absolute top-0 bottom-0 ${lineStyle} border-l-2 ${transitionStyle}`}
         style={{ left: `${getAdjustedPosition(currentRect.right, "x")}px` }}
       />
     </div>
