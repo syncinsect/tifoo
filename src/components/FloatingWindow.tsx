@@ -14,7 +14,7 @@ import {
   ComboboxOption,
   ComboboxOptions
 } from "@headlessui/react"
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 const FloatingWindow: React.FC<FloatingWindowProps> = ({
   element,
@@ -25,7 +25,6 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
 }) => {
   const [classes, setClasses] = useState<string[]>([])
   const [query, setQuery] = useState("")
-  const [selectedClass, setSelectedClass] = useState<string | null>(null)
   const [autocompleteResults, setAutocompleteResults] = useState<
     { c: string; p: string }[]
   >([])
@@ -54,28 +53,27 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     }
   }, [autocompleteResults])
 
-  const handleAddClass = (newClass: string | null) => {
-    if (!newClass) return
-    const trimmedClass = newClass.trim()
-    if (trimmedClass === "") return
+  const handleAddClass = useCallback(
+    (newClass: string | null) => {
+      if (!newClass) return
+      const trimmedClass = newClass.trim()
+      if (trimmedClass === "") return
 
-    if (!element.classList.contains(trimmedClass)) {
-      applyTailwindStyle(element, trimmedClass)
-      setClasses((prevClasses) => {
-        if (!prevClasses.includes(trimmedClass)) {
-          return [...prevClasses, trimmedClass]
-        }
-        return prevClasses
-      })
-      onClassChange()
-    }
+      if (!element.classList.contains(trimmedClass)) {
+        applyTailwindStyle(element, trimmedClass)
+        setClasses((prevClasses) => {
+          if (!prevClasses.includes(trimmedClass)) {
+            return [...prevClasses, trimmedClass]
+          }
+          return prevClasses
+        })
+        onClassChange()
+      }
 
-    setSelectedClass(null)
-    setQuery("")
-    if (inputRef.current) {
-      inputRef.current.value = ""
-    }
-  }
+      setQuery("")
+    },
+    [element, onClassChange]
+  )
 
   const handleRemoveClass = (classToRemove: string) => {
     element.classList.remove(classToRemove)
@@ -276,22 +274,17 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           </div>
         </div>
         <Combobox
-          value={selectedClass}
-          onChange={(value: string | null) => {
-            if (value) {
-              handleAddClass(value)
-            }
-          }}
+          value={null}
+          onChange={handleAddClass}
           virtual={{
             options: autocompleteResults.map(({ c }) => c)
           }}>
           <div className="relative mt-1">
             <ComboboxInput
-              ref={inputRef}
               className="w-full bg-[#E8F5FE] !border-gray-300 border-[1px] focus:border-[#1DA1F2] focus:outline-none shadow-lg p-1.5 rounded text-xs"
+              displayValue={() => query}
               onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="add classes"
+              placeholder="Add classes"
               autoComplete="off"
               spellCheck="false"
             />
@@ -307,10 +300,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
                       value={className}
                       className={({ active }) =>
                         `group w-full cursor-default select-none relative py-1 px-2 flex items-center justify-between text-xs overflow-hidden ${
-                          active ||
-                          autocompleteResults.findIndex(
-                            (item) => item.c === className
-                          ) === focusedOptionIndex
+                          active
                             ? "bg-[#E8F5FE] text-[#1DA1F2]"
                             : "bg-white text-[#657786]"
                         }`
