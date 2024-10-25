@@ -83,12 +83,23 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
         width: "100%"
       }
 
-  const getAdjustedPosition = (pos: number, axis: "x" | "y") => {
+  const getAdjustedPosition = (
+    pos: number,
+    axis: "x" | "y",
+    isRightBorder: boolean = false
+  ) => {
+    let adjustedPos = pos
     if (isFixed) {
-      return pos + fixedScrollPositionRef.current[axis]
+      adjustedPos += fixedScrollPositionRef.current[axis]
     } else {
-      return pos + scrollPosition[axis]
+      adjustedPos += scrollPosition[axis]
     }
+
+    if (isRightBorder && axis === "x") {
+      adjustedPos -= 2
+    }
+
+    return adjustedPos
   }
 
   const transitionStyle = "transition-all duration-200 ease-in-out"
@@ -148,7 +159,9 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
       />
       <div
         className={`absolute top-0 bottom-0 ${lineStyle} border-l-2 ${transitionStyle}`}
-        style={{ left: `${getAdjustedPosition(currentRect.right, "x")}px` }}
+        style={{
+          left: `${getAdjustedPosition(currentRect.right, "x", true)}px`
+        }}
       />
     </div>
   )

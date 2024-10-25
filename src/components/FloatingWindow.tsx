@@ -138,14 +138,64 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     }
   }
 
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  })
+  const floatingWindowRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      })
+    }
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  const adjustedPosition = useMemo(() => {
+    if (!floatingWindowRef.current) return position
+
+    const floatingWindowRect = floatingWindowRef.current.getBoundingClientRect()
+    const safetyMargin = 20
+
+    let adjustedX = position.x
+    let adjustedY = position.y
+
+    if (
+      adjustedX + floatingWindowRect.width >
+      windowDimensions.width - safetyMargin
+    ) {
+      adjustedX =
+        windowDimensions.width - floatingWindowRect.width - safetyMargin
+    }
+
+    adjustedX = Math.max(safetyMargin, adjustedX)
+
+    if (
+      adjustedY + floatingWindowRect.height >
+      windowDimensions.height - safetyMargin
+    ) {
+      adjustedY =
+        windowDimensions.height - floatingWindowRect.height - safetyMargin
+    }
+
+    adjustedY = Math.max(safetyMargin, adjustedY)
+
+    return { x: adjustedX, y: adjustedY }
+  }, [position, windowDimensions])
+
   return (
     <div
+      ref={floatingWindowRef}
       className={`floating-window border-none bg-white shadow-lg ${
         isFixed ? "pointer-events-auto" : "pointer-events-none"
       }`}
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
+        left: `${adjustedPosition.x}px`,
+        top: `${adjustedPosition.y}px`,
         position: isFixed ? "absolute" : "fixed",
         zIndex: 2147483647
       }}>
