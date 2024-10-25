@@ -95,10 +95,6 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
       adjustedPos += scrollPosition[axis]
     }
 
-    if (isRightBorder && axis === "x") {
-      adjustedPos -= 2
-    }
-
     return adjustedPos
   }
 
@@ -147,20 +143,28 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
       </div>
       <div
         className={`absolute left-0 right-0 ${lineStyle} border-t-2 ${transitionStyle}`}
-        style={{ top: `${getAdjustedPosition(currentRect.top, "y")}px` }}
+        style={{
+          top: `${getAdjustedPosition(currentRect.top, "y")}px`
+        }}
       />
       <div
         className={`absolute left-0 right-0 ${lineStyle} border-t-2 ${transitionStyle}`}
-        style={{ top: `${getAdjustedPosition(currentRect.bottom, "y")}px` }}
-      />
-      <div
-        className={`absolute top-0 bottom-0 ${lineStyle} border-l-2 ${transitionStyle}`}
-        style={{ left: `${getAdjustedPosition(currentRect.left, "x")}px` }}
+        style={{
+          top: `${getAdjustedPosition(currentRect.bottom, "y")}px`,
+          transform: "translateY(-100%)"
+        }}
       />
       <div
         className={`absolute top-0 bottom-0 ${lineStyle} border-l-2 ${transitionStyle}`}
         style={{
-          left: `${getAdjustedPosition(currentRect.right, "x", true)}px`
+          left: `${getAdjustedPosition(currentRect.left, "x")}px`
+        }}
+      />
+      <div
+        className={`absolute top-0 bottom-0 ${lineStyle} border-l-2 ${transitionStyle}`}
+        style={{
+          left: `${getAdjustedPosition(currentRect.right, "x")}px`,
+          transform: "translateX(-100%)"
         }}
       />
     </div>
