@@ -38,7 +38,7 @@ const allPrefixes = [
   ...specialPrefixes
 ]
 
-export function identifyTailwindClasses(element: HTMLElement): string[] {
+export const identifyTailwindClasses = (element: HTMLElement): string[] => {
   const classNames = element.classList
     ? Array.from(element.classList)
     : element.className.split(/\s+/)
@@ -64,14 +64,13 @@ export function identifyTailwindClasses(element: HTMLElement): string[] {
   })
 }
 
-export function searchTailwindClasses(prefix: string): TailwindClassData {
-  return tailwindClasses.filter(({ c }) => c.startsWith(prefix))
-}
+export const searchTailwindClasses = (prefix: string): TailwindClassData =>
+  tailwindClasses.filter(({ c }) => c.startsWith(prefix))
 
-export function applyTailwindStyle(
+export const applyTailwindStyle = (
   element: HTMLElement,
   className: string
-): void {
+): void => {
   if (!element.classList.contains(className)) {
     element.classList.add(className)
     injectTailwindClass(className)
@@ -79,7 +78,7 @@ export function applyTailwindStyle(
   }
 }
 
-function injectTailwindClass(className: string): void {
+const injectTailwindClass = (className: string): void => {
   if (injectedStyles.has(className)) return
 
   const parts = className.split(":")
@@ -131,7 +130,7 @@ function injectTailwindClass(className: string): void {
   }
 }
 
-function getMediaQuery(prefix: string): string {
+const getMediaQuery = (prefix: string): string => {
   switch (prefix) {
     case "sm":
       return "(min-width: 640px)"
@@ -148,7 +147,7 @@ function getMediaQuery(prefix: string): string {
   }
 }
 
-function injectStyle(styleContent: string): void {
+const injectStyle = (styleContent: string): void => {
   let styleElement = document.getElementById("tailware-injected-styles")
   if (!styleElement) {
     styleElement = document.createElement("style")
@@ -158,17 +157,17 @@ function injectStyle(styleContent: string): void {
   styleElement.textContent += styleContent + "\n"
 }
 
-export function removeTailwindStyle(
+export const removeTailwindStyle = (
   element: HTMLElement,
   className: string
-): void {
+): void => {
   if (element.classList.contains(className)) {
     element.classList.remove(className)
     refreshTailwind()
   }
 }
 
-export function refreshTailwind(): void {
+export const refreshTailwind = (): void => {
   if (window.Tailwind && typeof window.Tailwind.refresh === "function") {
     window.Tailwind.refresh()
   }

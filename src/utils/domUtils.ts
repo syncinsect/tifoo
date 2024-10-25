@@ -1,6 +1,6 @@
 import type { ComputedStyles } from "@/types"
 
-export function getElementStyles(element: HTMLElement): ComputedStyles {
+export const getElementStyles = (element: HTMLElement): ComputedStyles => {
   const styles = window.getComputedStyle(element)
   const getIntValue = (prop: string) =>
     parseInt(styles.getPropertyValue(prop), 10)

@@ -135,7 +135,7 @@ const App: React.FC = () => {
     }
   }, [highlightedElement])
 
-  function handleExtensionError(error: Error) {
+  const handleExtensionError = (error: Error) => {
     if (error.message.includes("Extension context invalidated")) {
       console.warn("Extension context invalidated")
 
