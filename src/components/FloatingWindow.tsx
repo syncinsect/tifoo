@@ -238,7 +238,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           <div className="relative mt-1">
             <ComboboxInput
               ref={inputRef}
-              className="w-full bg-[#E8F5FE] border-gray-300 border-[1px] focus:border-[#1DA1F2] focus:outline-none shadow-lg p-1.5 rounded text-xs"
+              className="w-full bg-[#E8F5FE] !border-gray-300 border-[1px] focus:border-[#1DA1F2] focus:outline-none shadow-lg p-1.5 rounded text-xs"
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="add classes"
