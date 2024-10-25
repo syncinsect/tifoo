@@ -112,7 +112,7 @@ function injectTailwindClass(className: string): void {
           styleContent = `.group:${groupPrefix} .${escapedClassName} { ${classData.p} }`
           break
         default:
-          styleContent = `body .${escapedClassName}:not([class*="sm:"]):not([class*="md:"]):not([class*="lg:"]):not([class*="xl:"]):not([class*="2xl:"]) { ${classData.p} }`
+          styleContent = `.${escapedClassName} { ${classData.p} }`
       }
 
       injectStyle(styleContent)
@@ -121,7 +121,7 @@ function injectTailwindClass(className: string): void {
     classData = tailwindClasses.find(({ c }) => c === className)
     if (classData) {
       const escapedClassName = className.replace(/:/g, "\\:")
-      const styleContent = `body .${escapedClassName}:not([class*="sm:"]):not([class*="md:"]):not([class*="lg:"]):not([class*="xl:"]):not([class*="2xl:"]) { ${classData.p} }`
+      const styleContent = `.${escapedClassName} { ${classData.p} }`
       injectStyle(styleContent)
     }
   }
