@@ -21,7 +21,8 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   position,
   isFixed,
   onDeactivate,
-  onClassChange
+  onClassChange,
+  setPosition
 }) => {
   const [classes, setClasses] = useState<string[]>([])
   const [query, setQuery] = useState("")
@@ -31,6 +32,10 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [focusedOptionIndex, setFocusedOptionIndex] = useState<number>(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const headerRef = useRef<HTMLDivElement>(null)
+  const floatingWindowRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setClasses(identifyTailwindClasses(element))
@@ -136,54 +141,47 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     }
   }
 
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight
-  })
-  const floatingWindowRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight
-      })
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isFixed && headerRef.current?.contains(e.target as Node)) {
+      setIsDragging(true)
+      setDragStart({ x: e.clientX, y: e.clientY })
     }
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
+  }
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (isDragging && floatingWindowRef.current) {
+        const deltaX = e.clientX - dragStart.x
+        const deltaY = e.clientY - dragStart.y
+
+        const windowRect = floatingWindowRef.current.getBoundingClientRect()
+        const safetyMargin = 20
+        const maxX = window.innerWidth - windowRect.width - safetyMargin
+
+        const newX = Math.max(0, Math.min(position.x + deltaX, maxX))
+        const newY = position.y + deltaY
+
+        setPosition({ x: newX, y: newY })
+        setDragStart({ x: e.clientX, y: e.clientY })
+      }
+    },
+    [isDragging, dragStart, position, setPosition]
+  )
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
   }, [])
 
-  const adjustedPosition = useMemo(() => {
-    if (!floatingWindowRef.current) return position
-
-    const floatingWindowRect = floatingWindowRef.current.getBoundingClientRect()
-    const safetyMargin = 20
-
-    let adjustedX = position.x
-    let adjustedY = position.y
-
-    if (
-      adjustedX + floatingWindowRect.width >
-      windowDimensions.width - safetyMargin
-    ) {
-      adjustedX =
-        windowDimensions.width - floatingWindowRect.width - safetyMargin
+  useEffect(() => {
+    if (isFixed) {
+      window.addEventListener("mousemove", handleMouseMove)
+      window.addEventListener("mouseup", handleMouseUp)
     }
-
-    adjustedX = Math.max(safetyMargin, adjustedX)
-
-    if (
-      adjustedY + floatingWindowRect.height >
-      windowDimensions.height - safetyMargin
-    ) {
-      adjustedY =
-        windowDimensions.height - floatingWindowRect.height - safetyMargin
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("mouseup", handleMouseUp)
     }
-
-    adjustedY = Math.max(safetyMargin, adjustedY)
-
-    return { x: adjustedX, y: adjustedY }
-  }, [position, windowDimensions])
+  }, [isFixed, handleMouseMove, handleMouseUp])
 
   return (
     <div
@@ -192,12 +190,17 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
         isFixed ? "pointer-events-auto" : "pointer-events-none"
       }`}
       style={{
-        left: `${adjustedPosition.x}px`,
-        top: `${adjustedPosition.y}px`,
+        left: `${position.x}px`,
+        top: `${position.y}px`,
         position: isFixed ? "absolute" : "fixed",
         zIndex: 2147483647
-      }}>
-      <div className="flex px-3 pt-3 justify-between items-center mb-3 pb-2 border-b border-[#1DA1F2] bg-[#1DA1F2] text-white p-2 rounded-t-lg">
+      }}
+      onMouseDown={handleMouseDown}>
+      <div
+        ref={headerRef}
+        className={`flex px-3 pt-3 justify-between items-center mb-3 pb-2 border-b border-[#1DA1F2] bg-[#1DA1F2] text-white p-2 rounded-t-lg ${
+          isFixed ? (isDragging ? "cursor-grabbing" : "cursor-grab") : ""
+        }`}>
         <span className="font-righteous text-sm">Tailware</span>
         <div className="flex gap-2">
           <button

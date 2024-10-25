@@ -185,6 +185,7 @@ const App: React.FC = () => {
             isFixed={isFloatingWindowFixed}
             onDeactivate={handleDeactivate}
             onClassChange={updateHighlightAndLines}
+            setPosition={setFloatingWindowPosition}
           />
         </>
       )}
