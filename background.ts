@@ -30,9 +30,3 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
   }
 })
-
-function updateExtensionState(isActive: boolean) {
-  chrome.action.setIcon({
-    path: isActive ? "icon-active.png" : "icon-inactive.png"
-  })
-}
