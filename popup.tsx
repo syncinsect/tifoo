@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import "./style.css"
+import "@/styles/globals.css"
 
 function IndexPopup() {
   const [isActive, setIsActive] = useState(false)
@@ -39,49 +39,23 @@ function IndexPopup() {
     }, 500)
   }
 
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "updatePopupState") {
-      updatePopupUI(request.isActive)
-    }
-  })
-
-  function updatePopupUI(isActive: boolean) {
-    const statusElement = document.getElementById("status")
-    const toggleButton = document.getElementById("toggleButton")
-
-    if (statusElement) {
-      statusElement.textContent = isActive ? "Active" : "Inactive"
-      statusElement.style.color = isActive ? "green" : "red"
-    }
-
-    if (toggleButton) {
-      toggleButton.textContent = isActive ? "Deactivate" : "Activate"
-    }
-  }
-
-  chrome.runtime.sendMessage({ action: "getState" }, (response) => {
-    if (response && response.isActive !== undefined) {
-      updatePopupUI(response.isActive)
-    }
-  })
-
   return (
     <div className="w-80 bg-white shadow-lg overflow-hidden">
       <div className="bg-[#1DA1F2] text-white p-4 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl font-semibold">Tailware</h1>
+          <h1 className="text-xl font-righteous">Tailware</h1>
         </div>
         <div className="flex items-center space-x-2">
           <span
             className={`w-3 h-3 rounded-full ${isActive ? "bg-green-400" : "bg-gray-400"}`}></span>
-          <span className="text-sm font-medium">
+          <span className="text-sm font-mono">
             {isActive ? "Active" : "Inactive"}
           </span>
         </div>
       </div>
       <div className="p-4 space-y-4">
-        <p className="text-[#657786] text-sm">
-          Tailwind CSS inspector and editor
+        <p className="text-[#657786] text-sm font-mono text-center">
+          Effortless Tailwind Stylings, Now!
         </p>
         <button
           className={`w-full py-2 px-4 rounded-full text-white font-medium transition-all duration-300 ${

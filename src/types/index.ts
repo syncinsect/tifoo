@@ -19,6 +19,7 @@ export interface FloatingWindowProps {
   isFixed: boolean
   onDeactivate: () => void
   onClassChange: () => void
+  setPosition: (position: { x: number; y: number }) => void
 }
 
 export interface HighlightBoxProps {

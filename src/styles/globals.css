@@ -1,4 +1,5 @@
-/* src/styles/globals.css */
+@import url("https://fonts.googleapis.com/css2?family=Righteous&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,6 +8,11 @@ body {
   @apply antialiased;
 }
 
+@layer base {
+  .font-righteous {
+    font-family: "Righteous", cursive;
+  }
+}
 .floating-window {
   @apply bg-white border-2 p-0 rounded-lg shadow-lg w-96 font-sans text-black;
 }
