@@ -27,6 +27,9 @@ module.exports = {
         "tailware-blue": "#1DA1F2",
         "tailware-dark-blue": "#0C7ABF",
         "tailware-light-blue": "#E8F5FE"
+      },
+      fontFamily: {
+        righteous: ["Righteous", "cursive"]
       }
     }
   },

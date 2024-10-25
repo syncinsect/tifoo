@@ -69,7 +69,7 @@ function IndexPopup() {
     <div className="w-80 bg-white shadow-lg overflow-hidden">
       <div className="bg-[#1DA1F2] text-white p-4 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl font-semibold">Tailware</h1>
+          <h1 className="text-xl font-righteous">Tailware</h1>
         </div>
         <div className="flex items-center space-x-2">
           <span
