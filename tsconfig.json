@@ -9,6 +9,12 @@
     "src/**/*.test.tsx"
   ],
   "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "verbatimModuleSyntax": false,
     "paths": {
       "@/*": ["src/*"]
     },

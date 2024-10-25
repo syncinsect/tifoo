@@ -1,7 +1,9 @@
+import type { Config } from "prettier";
+
 /**
  * @type {import('prettier').Options}
  */
-export default {
+const config: Config = {
   printWidth: 80,
   tabWidth: 2,
   useTabs: false,
@@ -21,6 +23,13 @@ export default {
     "",
     "^~(.*)$",
     "",
-    "^[./]"
-  ]
-}
+    "^[./]",
+  ],
+  endOfLine: "lf",
+  embeddedLanguageFormatting: "auto",
+  quoteProps: "as-needed",
+  proseWrap: "preserve",
+  htmlWhitespaceSensitivity: "css",
+};
+
+export default config;
