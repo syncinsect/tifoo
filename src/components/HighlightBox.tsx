@@ -1,6 +1,9 @@
 import type { HighlightBoxProps } from "@/types";
 import { getElementStyles } from "@/utils/domUtils";
+import { getAdjustedPosition } from "@/utils/positionUtils";
+import { useElementInfo } from "@/hooks/useElementInfo";
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import BorderLine from "./BorderLine";
 
 const HighlightBox: React.FC<HighlightBoxProps> = ({
   element,
@@ -11,18 +14,7 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
   const [, forceUpdate] = useState({});
   const mutationObserverRef = useRef<MutationObserver | null>(null);
 
-  const getElementInfo = useCallback(() => {
-    if (!element) return null;
-    const rect = element.getBoundingClientRect();
-    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
-    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-    return {
-      rect,
-      scrollPosition: { x: scrollX, y: scrollY },
-      elementOffset: { top: rect.top + scrollY, left: rect.left + scrollX },
-      pageHeight: Math.max(document.body.scrollHeight, window.innerHeight),
-    };
-  }, [element]);
+  const getElementInfo = useElementInfo(element);
 
   const updateBox = useCallback(() => {
     if (element) {
@@ -94,23 +86,6 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
     width: "100%",
   };
 
-  const getAdjustedPosition = (
-    pos: number,
-    axis: "x" | "y",
-    isEnd: boolean = false
-  ) => {
-    let adjustedPos;
-    if (isFixed) {
-      adjustedPos = axis === "y" ? elementOffset.top : elementOffset.left;
-      if (isEnd) {
-        adjustedPos += axis === "y" ? currentRect.height : currentRect.width;
-      }
-    } else {
-      adjustedPos = pos + (axis === "y" ? scrollPosition.y : scrollPosition.x);
-    }
-    return adjustedPos;
-  };
-
   const transitionStyle = "transition-all duration-200 ease-in-out";
 
   return (
@@ -122,8 +97,8 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
         ref={boxRef}
         className={`absolute pointer-events-none z-[9998] ${transitionStyle}`}
         style={{
-          left: `${getAdjustedPosition(currentRect.left, "x")}px`,
-          top: `${getAdjustedPosition(currentRect.top, "y")}px`,
+          left: `${getAdjustedPosition(currentRect.left, "x", false, isFixed, elementOffset, currentRect, scrollPosition)}px`,
+          top: `${getAdjustedPosition(currentRect.top, "y", false, isFixed, elementOffset, currentRect, scrollPosition)}px`,
           width: `${currentRect.width}px`,
           height: `${currentRect.height}px`,
         }}
@@ -156,31 +131,33 @@ const HighlightBox: React.FC<HighlightBoxProps> = ({
           }}
         />
       </div>
-      <div
-        className={`absolute left-0 right-0 ${lineStyle} border-t-2 ${transitionStyle}`}
+      <BorderLine
+        position="top"
         style={{
-          top: `${getAdjustedPosition(currentRect.top, "y")}px`,
+          top: `${getAdjustedPosition(currentRect.top, "y", false, isFixed, elementOffset, currentRect, scrollPosition)}px`,
         }}
+        lineStyle={lineStyle}
       />
-      <div
-        className={`absolute left-0 right-0 ${lineStyle} border-t-2 ${transitionStyle}`}
+      <BorderLine
+        position="bottom"
         style={{
-          top: `${getAdjustedPosition(currentRect.bottom, "y", true)}px`,
-          transform: "translateY(-100%)",
+          top: `${getAdjustedPosition(currentRect.bottom, "y", true, isFixed, elementOffset, currentRect, scrollPosition)}px`,
         }}
+        lineStyle={lineStyle}
       />
-      <div
-        className={`absolute top-0 bottom-0 ${lineStyle} border-l-2 ${transitionStyle}`}
+      <BorderLine
+        position="left"
         style={{
-          left: `${getAdjustedPosition(currentRect.left, "x")}px`,
+          left: `${getAdjustedPosition(currentRect.left, "x", false, isFixed, elementOffset, currentRect, scrollPosition)}px`,
         }}
+        lineStyle={lineStyle}
       />
-      <div
-        className={`absolute top-0 bottom-0 ${lineStyle} border-l-2 ${transitionStyle}`}
+      <BorderLine
+        position="right"
         style={{
-          left: `${getAdjustedPosition(currentRect.right, "x", true)}px`,
-          transform: "translateX(-100%)",
+          left: `${getAdjustedPosition(currentRect.right, "x", true, isFixed, elementOffset, currentRect, scrollPosition)}px`,
         }}
+        lineStyle={lineStyle}
       />
     </div>
   );
