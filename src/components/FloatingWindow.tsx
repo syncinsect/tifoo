@@ -21,6 +21,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import AutoComplete from "./AutoComplete";
 
 const FloatingWindow: React.FC<FloatingWindowProps> = ({
   element,
@@ -36,8 +37,9 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     { c: string; p: string }[]
   >([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [focusedOptionIndex, setFocusedOptionIndex] = useState<number>(0);
+  const [activeOptionClass, setActiveOptionClass] = useState<string | null>(
+    null
+  );
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const headerRef = useRef<HTMLDivElement>(null);
@@ -56,30 +58,20 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     }
   }, [query]);
 
-  useEffect(() => {
-    if (autocompleteResults.length > 0) {
-      setFocusedOptionIndex(0);
-    } else {
-      setFocusedOptionIndex(-1);
-    }
-  }, [autocompleteResults]);
-
   const handleAddClass = useCallback(
     (newClass: string | null) => {
       if (!newClass) return;
       const trimmedClass = newClass.trim();
       if (trimmedClass === "") return;
 
-      if (!element.classList.contains(trimmedClass)) {
-        applyTailwindStyle(element, trimmedClass);
-        setClasses((prevClasses) => {
-          if (!prevClasses.includes(trimmedClass)) {
-            return [...prevClasses, trimmedClass];
-          }
-          return prevClasses;
-        });
-        onClassChange();
-      }
+      applyTailwindStyle(element, trimmedClass);
+      setClasses((prevClasses) => {
+        if (!prevClasses.includes(trimmedClass)) {
+          return [...prevClasses, trimmedClass];
+        }
+        return prevClasses;
+      });
+      onClassChange();
 
       setQuery("");
     },
@@ -129,21 +121,12 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && query.trim() !== "") {
       event.preventDefault();
-      if (focusedOptionIndex >= 0 && autocompleteResults.length > 0) {
-        handleAddClass(autocompleteResults[focusedOptionIndex].c);
+      if (activeOptionClass) {
+        handleAddClass(activeOptionClass);
+        setActiveOptionClass(null);
       } else {
         handleAddClass(query.trim());
       }
-    } else if (event.key === "ArrowDown") {
-      event.preventDefault();
-      setFocusedOptionIndex((prev) =>
-        prev >= autocompleteResults.length - 1 ? 0 : prev + 1
-      );
-    } else if (event.key === "ArrowUp") {
-      event.preventDefault();
-      setFocusedOptionIndex((prev) =>
-        prev <= 0 ? autocompleteResults.length - 1 : prev - 1
-      );
     }
   };
 
@@ -290,62 +273,16 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
             ))}
           </div>
         </div>
-        {/* TODO - any is not good here, fix it soon later */}
-        <Combobox
-          value={null}
-          onChange={handleAddClass}
-          virtual={{ options: autocompleteResults.map(({ c }) => c) } as any}
-        >
-          <div className="relative mt-1">
-            <ComboboxInput
-              className="w-full bg-[#E8F5FE] !border-gray-300 border-[1px] focus:border-[#1DA1F2] focus:outline-none shadow-lg p-1.5 rounded text-xs"
-              displayValue={() => query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Add classes"
-              autoComplete="off"
-              spellCheck="false"
-            />
-            {autocompleteResults.length > 0 && (
-              <ComboboxOptions className="combobox-options absolute bottom-full w-full py-1 mb-1 overflow-auto text-xs bg-white rounded-md shadow-lg max-h-60 ring-1 ring-[#1DA1F2] focus:outline-none">
-                {({ option: className }) => {
-                  const classData = autocompleteResults.find(
-                    (item) => item.c === className
-                  );
-                  return (
-                    <ComboboxOption
-                      key={className}
-                      value={className}
-                      className={({ active }) =>
-                        `group w-full cursor-default select-none relative py-1 px-2 flex items-center justify-between text-xs overflow-hidden ${
-                          active
-                            ? "bg-[#E8F5FE] text-[#1DA1F2]"
-                            : "bg-white text-[#657786]"
-                        }`
-                      }
-                    >
-                      {({ selected, active }) => (
-                        <>
-                          <span className="font-mono flex-shrink-0">
-                            {className}
-                          </span>
-                          {classData && (
-                            <span className="text-[#657786] flex-shrink-0 ml-2 overflow-hidden">
-                              <span className="block truncate group-hover:whitespace-nowrap">
-                                <span className="inline-block w-full group-hover:animate-marquee">
-                                  {classData.p}
-                                </span>
-                              </span>
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </ComboboxOption>
-                  );
-                }}
-              </ComboboxOptions>
-            )}
-          </div>
-        </Combobox>
+        <AutoComplete
+          options={autocompleteResults}
+          onSelect={handleAddClass}
+          onInputChange={(value) => {
+            setQuery(value);
+            const matches = searchTailwindClasses(value);
+            setAutocompleteResults(matches);
+          }}
+          inputValue={query}
+        />
       </div>
       {toastMessage && (
         <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
