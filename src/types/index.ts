@@ -1,4 +1,3 @@
-import { useClassManagement } from "@/hooks/useClassManagement";
 // Used in: src/utils/domUtils.ts
 export interface ComputedStyles {
   padding: {
@@ -23,7 +22,6 @@ export interface FloatingWindowProps {
   onDeactivate: () => void;
   onClassChange: () => void;
   setPosition: (position: { x: number; y: number }) => void;
-  classManagementHook: ReturnType<typeof useClassManagement>;
 }
 
 // Used in: src/components/HighlightBox.tsx

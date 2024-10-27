@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTailware, useClassManagement } from "@/hooks";
 import FloatingWindow from "./FloatingWindow";
@@ -26,25 +26,24 @@ const App: React.FC = () => {
     }
   }, [highlightedElement]);
 
-  const tailwareHook = useTailware({
-    isActive,
-    setHighlightedElement,
-    setFloatingWindowPosition,
-    setIsFloatingWindowFixed,
-  });
-
-  const classManagementHook = useClassManagement(
-    highlightedElement,
-    updateHighlightAndLines
-  );
-
   const {
     handleMouseOver,
     handleMouseOut,
     handleClick,
     handleScroll,
     updateFloatingWindowPosition,
-  } = tailwareHook;
+    resetTailwareState,
+  } = useTailware({
+    isActive,
+    setHighlightedElement,
+    setFloatingWindowPosition,
+    setIsFloatingWindowFixed,
+  });
+
+  const { resetClassManagement } = useClassManagement(
+    highlightedElement,
+    updateHighlightAndLines
+  );
 
   const resetAllState = useCallback(() => {
     setHighlightedElement(null);
@@ -53,9 +52,9 @@ const App: React.FC = () => {
     setIsFloatingWindowFixed(false);
     setToastMessage("");
 
-    tailwareHook.resetTailwareState();
-    classManagementHook.resetClassManagement();
-  }, [tailwareHook, classManagementHook]);
+    resetTailwareState();
+    resetClassManagement();
+  }, []);
 
   const handleDeactivate = useCallback(() => {
     setIsActive(false);
@@ -77,7 +76,7 @@ const App: React.FC = () => {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage);
     };
-  }, [isActive]);
+  }, []);
 
   useEffect(() => {
     if (isActive) {
@@ -103,8 +102,19 @@ const App: React.FC = () => {
       document.removeEventListener("mousemove", updateFloatingWindowPosition);
       document.removeEventListener("click", handleClick, true);
     };
-  }, [isActive]);
-
+  }, [
+    isActive,
+    handleMouseOver,
+    handleMouseOut,
+    handleScroll,
+    updateFloatingWindowPosition,
+    handleClick,
+  ]);
+  useEffect(() => {
+    if (!isActive) {
+      resetAllState();
+    }
+  }, [isActive, resetAllState]);
   useEffect(() => {
     if (highlightedElement) {
       const startRect =
@@ -213,7 +223,6 @@ const App: React.FC = () => {
             onDeactivate={handleDeactivate}
             onClassChange={updateHighlightAndLines}
             setPosition={setFloatingWindowPosition}
-            classManagementHook={classManagementHook}
           />
         </>
       )}
