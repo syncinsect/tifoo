@@ -1,84 +1,84 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react";
 
-import useTailware from "../hooks/useTailware"
-import FloatingWindow from "./FloatingWindow"
-import HighlightBox from "./HighlightBox"
-import Toast from "./Toast"
+import { useTailware } from "@/hooks";
+import FloatingWindow from "./FloatingWindow";
+import HighlightBox from "./HighlightBox";
+import Toast from "./Toast";
 
-import "../styles/globals.css"
+import "../styles/globals.css";
 
 const App: React.FC = () => {
-  const [isActive, setIsActive] = useState(false)
+  const [isActive, setIsActive] = useState(false);
   const [highlightedElement, setHighlightedElement] =
-    useState<HTMLElement | null>(null)
-  const [animatedRect, setAnimatedRect] = useState<DOMRect | null>(null)
+    useState<HTMLElement | null>(null);
+  const [animatedRect, setAnimatedRect] = useState<DOMRect | null>(null);
   const [floatingWindowPosition, setFloatingWindowPosition] = useState({
     x: 0,
-    y: 0
-  })
-  const [isFloatingWindowFixed, setIsFloatingWindowFixed] = useState(false)
-  const [toastMessage, setToastMessage] = useState("")
+    y: 0,
+  });
+  const [isFloatingWindowFixed, setIsFloatingWindowFixed] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const {
     handleMouseOver,
     handleMouseOut,
     handleClick,
     handleScroll,
-    updateFloatingWindowPosition
+    updateFloatingWindowPosition,
   } = useTailware({
     isActive,
     setHighlightedElement,
     setFloatingWindowPosition,
-    setIsFloatingWindowFixed
-  })
+    setIsFloatingWindowFixed,
+  });
 
   useEffect(() => {
     const handleMessage = (request: any, sender: any, sendResponse: any) => {
       if (request.action === "toggleTailware") {
-        setIsActive(request.isActive)
+        setIsActive(request.isActive);
       } else if (request.action === "getState") {
-        sendResponse({ isActive })
+        sendResponse({ isActive });
       }
-    }
+    };
 
-    chrome.runtime.onMessage.addListener(handleMessage)
+    chrome.runtime.onMessage.addListener(handleMessage);
 
     return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage)
-    }
-  }, [isActive])
+      chrome.runtime.onMessage.removeListener(handleMessage);
+    };
+  }, [isActive]);
 
   useEffect(() => {
     if (isActive) {
-      document.addEventListener("mouseover", handleMouseOver)
-      document.addEventListener("mouseout", handleMouseOut)
-      window.addEventListener("scroll", handleScroll, { passive: true })
-      document.addEventListener("mousemove", updateFloatingWindowPosition)
-      document.addEventListener("click", handleClick, true)
+      document.addEventListener("mouseover", handleMouseOver);
+      document.addEventListener("mouseout", handleMouseOut);
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      document.addEventListener("mousemove", updateFloatingWindowPosition);
+      document.addEventListener("click", handleClick, true);
     } else {
-      document.removeEventListener("mouseover", handleMouseOver)
-      document.removeEventListener("mouseout", handleMouseOut)
-      window.removeEventListener("scroll", handleScroll)
-      document.removeEventListener("mousemove", updateFloatingWindowPosition)
-      document.removeEventListener("click", handleClick, true)
-      setHighlightedElement(null)
-      setIsFloatingWindowFixed(false)
+      document.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseout", handleMouseOut);
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousemove", updateFloatingWindowPosition);
+      document.removeEventListener("click", handleClick, true);
+      setHighlightedElement(null);
+      setIsFloatingWindowFixed(false);
     }
 
     return () => {
-      document.removeEventListener("mouseover", handleMouseOver)
-      document.removeEventListener("mouseout", handleMouseOut)
-      window.removeEventListener("scroll", handleScroll)
-      document.removeEventListener("mousemove", updateFloatingWindowPosition)
-      document.removeEventListener("click", handleClick, true)
-    }
-  }, [isActive])
+      document.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseout", handleMouseOut);
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousemove", updateFloatingWindowPosition);
+      document.removeEventListener("click", handleClick, true);
+    };
+  }, [isActive]);
 
   useEffect(() => {
     if (highlightedElement) {
       const startRect =
-        animatedRect || highlightedElement.getBoundingClientRect()
-      const endRect = highlightedElement.getBoundingClientRect()
+        animatedRect || highlightedElement.getBoundingClientRect();
+      const endRect = highlightedElement.getBoundingClientRect();
 
       const animate = (progress: number) => {
         const currentRect = {
@@ -89,86 +89,88 @@ const App: React.FC = () => {
             startRect.height + (endRect.height - startRect.height) * progress,
           right: startRect.right + (endRect.right - startRect.right) * progress,
           bottom:
-            startRect.bottom + (endRect.bottom - startRect.bottom) * progress
-        } as DOMRect
-        setAnimatedRect(currentRect)
-      }
+            startRect.bottom + (endRect.bottom - startRect.bottom) * progress,
+        } as DOMRect;
+        setAnimatedRect(currentRect);
+      };
 
-      const duration = 200
-      const startTime = performance.now()
+      const duration = 200;
+      const startTime = performance.now();
 
       const step = (currentTime: number) => {
-        const elapsed = currentTime - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        animate(progress)
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        animate(progress);
         if (progress < 1) {
-          requestAnimationFrame(step)
+          requestAnimationFrame(step);
         }
-      }
+      };
 
-      requestAnimationFrame(step)
+      requestAnimationFrame(step);
     }
-  }, [highlightedElement])
+  }, [highlightedElement]);
 
   useEffect(() => {
     if (isActive) {
-      const styleElement = document.createElement("style")
-      styleElement.id = "tailware-injected-styles"
-      document.head.appendChild(styleElement)
+      const styleElement = document.createElement("style");
+      styleElement.id = "tailware-injected-styles";
+      document.head.appendChild(styleElement);
     } else {
-      const styleElement = document.getElementById("tailware-injected-styles")
+      const styleElement = document.getElementById("tailware-injected-styles");
       if (styleElement) {
-        styleElement.remove()
+        styleElement.remove();
       }
     }
-  }, [isActive])
+  }, [isActive]);
 
   const handleDeactivate = () => {
-    setIsActive(false)
-    chrome.runtime.sendMessage({ action: "tailwareDeactivated" })
-  }
+    setIsActive(false);
+    chrome.runtime.sendMessage({ action: "tailwareDeactivated" });
+  };
 
   const updateHighlightAndLines = useCallback(() => {
     if (highlightedElement) {
-      setAnimatedRect(highlightedElement.getBoundingClientRect())
-      setHighlightedElement((prev) => prev)
+      setAnimatedRect(highlightedElement.getBoundingClientRect());
+      setHighlightedElement((prev) => prev);
     }
-  }, [highlightedElement])
+  }, [highlightedElement]);
 
   const handleExtensionError = (error: Error) => {
     if (error.message.includes("Extension context invalidated")) {
-      console.warn("Extension context invalidated")
+      console.warn("Extension context invalidated");
 
-      document.removeEventListener("mouseover", handleMouseOver)
-      document.removeEventListener("mouseout", handleMouseOut)
-      window.removeEventListener("scroll", handleScroll)
-      document.removeEventListener("mousemove", updateFloatingWindowPosition)
-      document.removeEventListener("click", handleClick, true)
+      document.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseout", handleMouseOut);
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousemove", updateFloatingWindowPosition);
+      document.removeEventListener("click", handleClick, true);
 
-      setHighlightedElement(null)
-      setIsFloatingWindowFixed(false)
+      setHighlightedElement(null);
+      setIsFloatingWindowFixed(false);
 
-      setIsActive(false)
+      setIsActive(false);
 
       try {
-        chrome.runtime.sendMessage({ action: "tailwareDeactivated" })
+        chrome.runtime.sendMessage({ action: "tailwareDeactivated" });
       } catch (e) {
-        console.warn("Cannot send message to background script:", e)
+        console.warn("Cannot send message to background script:", e);
       }
 
-      const tailwareRoot = document.getElementById("tailware-root")
+      const tailwareRoot = document.getElementById("tailware-root");
       if (tailwareRoot) {
-        tailwareRoot.remove()
+        tailwareRoot.remove();
       }
     } else {
-      console.error("Unexpected error:", error)
+      console.error("Unexpected error:", error);
     }
-  }
+  };
 
-  window.addEventListener("error", (event) => handleExtensionError(event.error))
+  window.addEventListener("error", (event) =>
+    handleExtensionError(event.error)
+  );
   window.addEventListener("unhandledrejection", (event) =>
     handleExtensionError(event.reason)
-  )
+  );
 
   return (
     <>
@@ -193,7 +195,7 @@ const App: React.FC = () => {
         <Toast message={toastMessage} onClose={() => setToastMessage("")} />
       )}
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;

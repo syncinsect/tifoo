@@ -1,7 +1,6 @@
 import type { HighlightBoxProps } from "@/types";
-import { getElementStyles } from "@/utils/domUtils";
-import { getAdjustedPosition } from "@/utils/positionUtils";
-import { useElementInfo } from "@/hooks/useElementInfo";
+import { getElementStyles, getAdjustedPosition } from "@/utils";
+import { useElementInfo } from "@/hooks";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import BorderLine from "./BorderLine";
 

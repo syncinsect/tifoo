@@ -1,12 +1,7 @@
 import React from "react";
 import ClassTag from "./ClassTag";
 
-interface ClassListProps {
-  classes: string[];
-  element: HTMLElement;
-  onToggle: (className: string, isChecked: boolean) => void;
-  onRemove: (className: string) => void;
-}
+import { ClassListProps } from "@/types";
 
 const ClassList: React.FC<ClassListProps> = ({
   classes,

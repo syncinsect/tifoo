@@ -1,10 +1,6 @@
 import React from "react";
 
-interface BorderLineProps {
-  position: "top" | "bottom" | "left" | "right";
-  style: React.CSSProperties;
-  lineStyle: string;
-}
+import { BorderLineProps } from "@/types";
 
 const BorderLine: React.FC<BorderLineProps> = ({
   position,

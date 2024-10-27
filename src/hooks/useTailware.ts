@@ -1,7 +1,7 @@
 import type { UseTailwareProps } from "@/types";
 import { useCallback, useRef, useState } from "react";
 
-const useTailware = ({
+export const useTailware = ({
   isActive,
   setHighlightedElement,
   setFloatingWindowPosition,
@@ -137,5 +137,3 @@ const useTailware = ({
     handleScroll,
   };
 };
-
-export default useTailware;

@@ -5,7 +5,7 @@ import {
   refreshTailwind,
   removeTailwindStyle,
   searchTailwindClasses,
-} from "@/utils/tailwindUtils";
+} from "@/utils";
 
 export const useClassManagement = (
   element: HTMLElement,

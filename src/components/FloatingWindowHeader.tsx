@@ -1,12 +1,5 @@
 import React, { forwardRef } from "react";
-
-interface FloatingWindowHeaderProps {
-  isFixed: boolean;
-  isDragging: boolean;
-  onCopyClasses: () => void;
-  onCopyElement: () => void;
-  onDeactivate: () => void;
-}
+import type { FloatingWindowHeaderProps } from "@/types";
 
 const FloatingWindowHeader = forwardRef<
   HTMLDivElement,

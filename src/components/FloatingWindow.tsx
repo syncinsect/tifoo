@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import type { FloatingWindowProps } from "@/types";
-import { useFloatingWindowLogic } from "@/hooks/useFloatingWindowLogic";
-import { useClassManagement } from "@/hooks/useClassManagement";
-import { useDraggable } from "@/hooks/useDraggable";
+import {
+  useFloatingWindowLogic,
+  useClassManagement,
+  useDraggable,
+} from "@/hooks";
 import FloatingWindowHeader from "./FloatingWindowHeader";
 import ClassList from "./ClassList";
 import AutoComplete from "./AutoComplete";

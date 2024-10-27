@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { FixedSizeList as List } from "react-window";
 
-import { AutoCompleteProps } from "../types";
+import { AutoCompleteProps } from "@/types";
 import OptionRow from "./OptionRow";
-import { useHighlightedIndex } from "../hooks/useHighlightedIndex";
+import { useHighlightedIndex } from "@/hooks";
 
 const AutoComplete: React.FC<AutoCompleteProps> = ({
   options,
