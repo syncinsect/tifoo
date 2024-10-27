@@ -1,6 +1,6 @@
 import type { TailwindClassData } from "@/types";
 
-import tailwindClassesData from "../../tailwind-classes.json";
+import tailwindClassesData from "../../assets/tailwind-classes.json";
 
 const tailwindClasses: TailwindClassData =
   tailwindClassesData as TailwindClassData;

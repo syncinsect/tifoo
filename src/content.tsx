@@ -6,7 +6,7 @@ import type {
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-import App from "./components/App";
+import App from "./App";
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],

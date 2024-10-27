@@ -1,5 +1,5 @@
 import React from "react";
-import ClassTag from "./ClassTag";
+import { ClassTag } from "@/components";
 
 import { ClassListProps } from "@/types";
 

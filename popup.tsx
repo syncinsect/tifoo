@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react";
 
-import "@/styles/globals.css"
+import "@/styles";
 
 function IndexPopup() {
-  const [isActive, setIsActive] = useState(false)
+  const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -13,31 +13,31 @@ function IndexPopup() {
           { action: "getState" },
           (response) => {
             if (response && response.isActive !== undefined) {
-              setIsActive(response.isActive)
+              setIsActive(response.isActive);
             }
           }
-        )
+        );
       }
-    })
-  }, [])
+    });
+  }, []);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(tabs[0].id, {
           action: "toggleTailware",
-          isActive
-        })
+          isActive,
+        });
       }
-    })
-  }, [isActive])
+    });
+  }, [isActive]);
 
   const handleToggle = () => {
-    setIsActive(!isActive)
+    setIsActive(!isActive);
     setTimeout(() => {
-      window.close()
-    }, 500)
-  }
+      window.close();
+    }, 500);
+  };
 
   return (
     <div className="w-80 bg-white shadow-lg overflow-hidden">
@@ -47,7 +47,8 @@ function IndexPopup() {
         </div>
         <div className="flex items-center space-x-2">
           <span
-            className={`w-3 h-3 rounded-full ${isActive ? "bg-green-400" : "bg-gray-400"}`}></span>
+            className={`w-3 h-3 rounded-full ${isActive ? "bg-green-400" : "bg-gray-400"}`}
+          ></span>
           <span className="text-sm font-mono">
             {isActive ? "Active" : "Inactive"}
           </span>
@@ -63,7 +64,8 @@ function IndexPopup() {
               ? "bg-red-500 hover:bg-red-600"
               : "bg-[#1DA1F2] hover:bg-[#0C7ABF]"
           } hover:shadow-md transform hover:-translate-y-0.5`}
-          onClick={handleToggle}>
+          onClick={handleToggle}
+        >
           {isActive ? "Deactivate" : "Activate"}
         </button>
       </div>
@@ -72,19 +74,21 @@ function IndexPopup() {
           href={process.env.PLASMO_PUBLIC_GITHUB_REPO_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-[#1DA1F2] transition-colors duration-300">
+          className="hover:text-[#1DA1F2] transition-colors duration-300"
+        >
           Learn more
         </a>
         <a
           href={process.env.PLASMO_PUBLIC_GITHUB_ISSUES_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-[#1DA1F2] transition-colors duration-300">
+          className="hover:text-[#1DA1F2] transition-colors duration-300"
+        >
           Report an issue
         </a>
       </div>
     </div>
-  )
+  );
 }
 
-export default IndexPopup
+export default IndexPopup;

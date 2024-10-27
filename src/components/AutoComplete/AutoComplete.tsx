@@ -2,7 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from "react";
 import { FixedSizeList as List } from "react-window";
 
 import { AutoCompleteProps } from "@/types";
-import OptionRow from "./OptionRow";
+import { OptionRow } from "@/components";
 import { useHighlightedIndex } from "@/hooks";
 
 const AutoComplete: React.FC<AutoCompleteProps> = ({
@@ -109,7 +109,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
         onKeyDown={handleKeyDown}
         onFocus={() => setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-        className="custom-autocomplete-input w-full bg-[#E8F5FE] !border !border-gray-300 focus:border-[#1DA1F2] focus:ring-1 focus:ring-[#1DA1F2] focus:outline-none shadow-sm p-1.5 rounded text-xs placeholder-[#657786] transition duration-150 ease-in-out"
+        className="w-full !border !border-gray-300 focus:border-[#1DA1F2] focus:ring-1 focus:ring-[#1DA1F2] focus:outline-none shadow-sm p-1.5 rounded text-xs placeholder-[#657786] transition duration-150 ease-in-out"
         placeholder="Add classes"
         autoComplete="off"
         spellCheck="false"
