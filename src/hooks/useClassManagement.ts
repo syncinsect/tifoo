@@ -8,7 +8,7 @@ import {
 } from "@/utils";
 
 export const useClassManagement = (
-  element: HTMLElement,
+  element: HTMLElement | null,
   onClassChange: () => void
 ) => {
   const [classes, setClasses] = useState<string[]>([]);
@@ -18,7 +18,11 @@ export const useClassManagement = (
   >([]);
 
   useEffect(() => {
-    setClasses(identifyTailwindClasses(element));
+    if (element) {
+      setClasses(identifyTailwindClasses(element));
+    } else {
+      setClasses([]);
+    }
   }, [element]);
 
   useEffect(() => {
@@ -32,7 +36,7 @@ export const useClassManagement = (
 
   const handleAddClass = useCallback(
     (newClass: string | null) => {
-      if (!newClass) return;
+      if (!newClass || !element) return;
       const trimmedClass = newClass.trim();
       if (trimmedClass === "") return;
 
@@ -52,6 +56,7 @@ export const useClassManagement = (
 
   const handleRemoveClass = useCallback(
     (classToRemove: string) => {
+      if (!element) return;
       element.classList.remove(classToRemove);
       removeTailwindStyle(element, classToRemove);
       setClasses((classes) => classes.filter((c) => c !== classToRemove));
@@ -63,6 +68,7 @@ export const useClassManagement = (
 
   const handleClassToggle = useCallback(
     (className: string, isChecked: boolean) => {
+      if (!element) return;
       if (isChecked) {
         applyTailwindStyle(element, className);
       } else {
@@ -80,6 +86,12 @@ export const useClassManagement = (
     setAutocompleteResults(matches);
   }, []);
 
+  const resetClassManagement = useCallback(() => {
+    setClasses([]);
+    setQuery("");
+    setAutocompleteResults([]);
+  }, []);
+
   return {
     classes,
     query,
@@ -88,5 +100,6 @@ export const useClassManagement = (
     handleRemoveClass,
     handleClassToggle,
     handleInputChange,
+    resetClassManagement,
   };
 };

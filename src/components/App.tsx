@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { useTailware } from "@/hooks";
+import { useTailware, useClassManagement } from "@/hooks";
 import FloatingWindow from "./FloatingWindow";
 import HighlightBox from "./HighlightBox";
 import Toast from "./Toast";
@@ -19,18 +19,49 @@ const App: React.FC = () => {
   const [isFloatingWindowFixed, setIsFloatingWindowFixed] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
+  const updateHighlightAndLines = useCallback(() => {
+    if (highlightedElement) {
+      setAnimatedRect(highlightedElement.getBoundingClientRect());
+      setHighlightedElement((prev) => prev);
+    }
+  }, [highlightedElement]);
+
+  const tailwareHook = useTailware({
+    isActive,
+    setHighlightedElement,
+    setFloatingWindowPosition,
+    setIsFloatingWindowFixed,
+  });
+
+  const classManagementHook = useClassManagement(
+    highlightedElement,
+    updateHighlightAndLines
+  );
+
   const {
     handleMouseOver,
     handleMouseOut,
     handleClick,
     handleScroll,
     updateFloatingWindowPosition,
-  } = useTailware({
-    isActive,
-    setHighlightedElement,
-    setFloatingWindowPosition,
-    setIsFloatingWindowFixed,
-  });
+  } = tailwareHook;
+
+  const resetAllState = useCallback(() => {
+    setHighlightedElement(null);
+    setAnimatedRect(null);
+    setFloatingWindowPosition({ x: 0, y: 0 });
+    setIsFloatingWindowFixed(false);
+    setToastMessage("");
+
+    tailwareHook.resetTailwareState();
+    classManagementHook.resetClassManagement();
+  }, [tailwareHook, classManagementHook]);
+
+  const handleDeactivate = useCallback(() => {
+    setIsActive(false);
+    resetAllState();
+    chrome.runtime.sendMessage({ action: "tailwareDeactivated" });
+  }, [resetAllState]);
 
   useEffect(() => {
     const handleMessage = (request: any, sender: any, sendResponse: any) => {
@@ -123,17 +154,11 @@ const App: React.FC = () => {
     }
   }, [isActive]);
 
-  const handleDeactivate = () => {
-    setIsActive(false);
-    chrome.runtime.sendMessage({ action: "tailwareDeactivated" });
-  };
-
-  const updateHighlightAndLines = useCallback(() => {
-    if (highlightedElement) {
-      setAnimatedRect(highlightedElement.getBoundingClientRect());
-      setHighlightedElement((prev) => prev);
+  useEffect(() => {
+    if (!isActive) {
+      resetAllState();
     }
-  }, [highlightedElement]);
+  }, [isActive, resetAllState]);
 
   const handleExtensionError = (error: Error) => {
     if (error.message.includes("Extension context invalidated")) {
@@ -188,6 +213,7 @@ const App: React.FC = () => {
             onDeactivate={handleDeactivate}
             onClassChange={updateHighlightAndLines}
             setPosition={setFloatingWindowPosition}
+            classManagementHook={classManagementHook}
           />
         </>
       )}

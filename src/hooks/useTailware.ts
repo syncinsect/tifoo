@@ -128,6 +128,13 @@ export const useTailware = ({
     }
   }, [lastHighlightedElement, setHighlightedElement]);
 
+  const resetTailwareState = useCallback(() => {
+    setLastHighlightedElement(null);
+    isFloatingWindowFixedRef.current = false;
+    initialClickPositionRef.current = { x: 0, y: 0 };
+    floatingWindowPositionRef.current = { x: 0, y: 0 };
+  }, []);
+
   return {
     handleMouseOver,
     handleMouseOut,
@@ -135,5 +142,6 @@ export const useTailware = ({
     updateFloatingWindowPosition,
     isFloatingWindowFixed: isFloatingWindowFixedRef.current,
     handleScroll,
+    resetTailwareState,
   };
 };
