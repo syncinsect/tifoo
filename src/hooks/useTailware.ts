@@ -1,7 +1,7 @@
 import type { UseTailwareProps } from "@/types";
 import { useCallback, useRef, useState } from "react";
 
-const useTailware = ({
+export const useTailware = ({
   isActive,
   setHighlightedElement,
   setFloatingWindowPosition,
@@ -70,29 +70,6 @@ const useTailware = ({
     ]
   );
 
-  const unfixFloatingWindow = useCallback(() => {
-    isFloatingWindowFixedRef.current = false;
-    setIsFloatingWindowFixed(false);
-
-    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
-    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-
-    const left = Math.round(floatingWindowPositionRef.current.x - scrollX);
-    const top = Math.round(floatingWindowPositionRef.current.y - scrollY);
-
-    setFloatingWindowPosition({ x: left, y: top });
-
-    const mouseEvent = new MouseEvent("mousemove", {
-      clientX: initialClickPositionRef.current.x,
-      clientY: initialClickPositionRef.current.y,
-    });
-    updateFloatingWindowPosition(mouseEvent);
-  }, [
-    setIsFloatingWindowFixed,
-    lastHighlightedElement,
-    setFloatingWindowPosition,
-  ]);
-
   const updateFloatingWindowPosition = useCallback(
     (e: MouseEvent) => {
       if (!isActive || isFloatingWindowFixedRef.current) return;
@@ -120,11 +97,43 @@ const useTailware = ({
     [isActive, setFloatingWindowPosition]
   );
 
+  const unfixFloatingWindow = useCallback(() => {
+    isFloatingWindowFixedRef.current = false;
+    setIsFloatingWindowFixed(false);
+
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+    const left = Math.round(floatingWindowPositionRef.current.x - scrollX);
+    const top = Math.round(floatingWindowPositionRef.current.y - scrollY);
+
+    setFloatingWindowPosition({ x: left, y: top });
+
+    floatingWindowPositionRef.current = { x: left, y: top };
+
+    const mouseEvent = new MouseEvent("mousemove", {
+      clientX: initialClickPositionRef.current.x,
+      clientY: initialClickPositionRef.current.y,
+    });
+    updateFloatingWindowPosition(mouseEvent);
+  }, [
+    setIsFloatingWindowFixed,
+    lastHighlightedElement,
+    setFloatingWindowPosition,
+    updateFloatingWindowPosition,
+  ]);
   const handleScroll = useCallback(() => {
     if (isFloatingWindowFixedRef.current && lastHighlightedElement) {
       setHighlightedElement(lastHighlightedElement);
     }
   }, [lastHighlightedElement, setHighlightedElement]);
+
+  const resetTailwareState = useCallback(() => {
+    setLastHighlightedElement(null);
+    isFloatingWindowFixedRef.current = false;
+    initialClickPositionRef.current = { x: 0, y: 0 };
+    floatingWindowPositionRef.current = { x: 0, y: 0 };
+  }, []);
 
   return {
     handleMouseOver,
@@ -133,7 +142,6 @@ const useTailware = ({
     updateFloatingWindowPosition,
     isFloatingWindowFixed: isFloatingWindowFixedRef.current,
     handleScroll,
+    resetTailwareState,
   };
 };
-
-export default useTailware;

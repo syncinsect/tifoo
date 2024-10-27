@@ -1,13 +1,9 @@
-// src/pages/index.tsx
-import Head from "next/head"
-import React from "react"
+import React from "react";
 
 const Home: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
-      <Head>
-        <title>Tailware</title>
-      </Head>
+      <title>Tailware</title>
 
       <main className="text-center">
         <h1 className="text-4xl font-bold mb-4">Welcome to Tailware</h1>
@@ -31,7 +27,7 @@ const Home: React.FC = () => {
         <p>© 2023 Tailware. All rights reserved.</p>
       </footer>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
