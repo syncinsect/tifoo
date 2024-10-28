@@ -2,15 +2,20 @@ import { useEffect } from "react";
 
 export const useStyleInjection = (isActive: boolean) => {
   useEffect(() => {
-    if (isActive) {
-      const styleElement = document.createElement("style");
-      styleElement.id = "tailware-injected-styles";
+    const styleId = "tailware-injected-styles";
+    let styleElement = document.getElementById(styleId);
+
+    if (!styleElement) {
+      styleElement = document.createElement("style");
+      styleElement.id = styleId;
       document.head.appendChild(styleElement);
-    } else {
-      const styleElement = document.getElementById("tailware-injected-styles");
-      if (styleElement) {
-        styleElement.remove();
-      }
     }
-  }, [isActive]);
+
+    return () => {
+      const existingStyle = document.getElementById(styleId);
+      if (existingStyle && !document.querySelector("[data-tw-ext]")) {
+        existingStyle.remove();
+      }
+    };
+  }, []);
 };

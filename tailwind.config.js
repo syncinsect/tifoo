@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require("tailwindcss/plugin");
+
 module.exports = {
+  prefix: "",
   mode: "jit",
   content: [
     "./src/**/*.{ts,tsx,css,html}",
@@ -45,5 +48,10 @@ module.exports = {
       borderColor: ["focus"],
     },
   },
-  plugins: [require("tailwind-scrollbar")({ nocompatible: true })],
+  plugins: [
+    require("tailwind-scrollbar")({ nocompatible: true }),
+    plugin(function ({ addVariant }) {
+      addVariant("tw", ["&.tw", ".tw &"]);
+    }),
+  ],
 };
