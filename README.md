@@ -1,6 +1,6 @@
 # [![Tailware](public/banner.png)](https://github.com/syncinsect/tailware)
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/syncinsect/tailware/blob/main/LICENSE) [![GitHub issues](https://img.shields.io/github/issues/syncinsect/tailware.svg)](https://github.com/syncinsect/tailware/issues) [![GitHub stars](https://img.shields.io/github/stars/syncinsect/tailware.svg)](https://github.com/syncinsect/tailware/stargazers)
+[![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](https://github.com/syncinsect/tailware/blob/main/LICENSE) [![GitHub issues](https://img.shields.io/github/issues/syncinsect/tailware.svg)](https://github.com/syncinsect/tailware/issues) [![GitHub stars](https://img.shields.io/github/stars/syncinsect/tailware.svg)](https://github.com/syncinsect/tailware/stargazers)
 
 <!-- [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nimelepbpejjlbmoobocpfnjhihnpked.svg)](https://chrome.google.com/webstore/detail/tailware/nimelepbpejjlbmoobocpfnjhihnpked) -->
 <!-- [![Chrome Web Store](https://img.shields.io/chrome-web-store/users/nimelepbpejjlbmoobocpfnjhihnpked.svg)](https://chrome.google.com/webstore/detail/tailware/nimelepbpejjlbmoobocpfnjhihnpked) -->
@@ -11,7 +11,7 @@ Tailware is a powerful Chrome extension for real-time inspection and modificatio
 
 ## Free and Open Source
 
-Tailware is committed to remaining free and open source. Here's why we chose to go open source:
+Tailware is committed to remaining free and open source under the GNU General Public License v3.0. Here's why we chose to go open source:
 
 1. Serving the Developer Community: Tailware aims to serve developers, designers, and beginners. Open sourcing allows the tech community to better understand and improve this tool, fostering positive project development.
 
@@ -111,7 +111,12 @@ For simple problems or any feature request, feel free to [open an issue](https:/
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the GNU General Public License v3.0 with Additional Terms - see the [LICENSE](LICENSE) file for details. This means:
+
+- You are free to use, modify, and distribute this software
+- Any modifications must also be open source under GPL-3.0
+- Distribution through browser extension stores requires permission
+- The Tailware name and branding are protected
 
 ## Acknowledgements
 
