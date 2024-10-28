@@ -69,11 +69,22 @@ export const useClassManagement = (
   const handleClassToggle = useCallback(
     (className: string, isChecked: boolean) => {
       if (!element) return;
+
+      const currentClasses = element.className.split(" ").filter(Boolean);
+
       if (isChecked) {
-        applyTailwindStyle(element, className);
+        if (!currentClasses.includes(className)) {
+          currentClasses.push(className);
+        }
       } else {
-        removeTailwindStyle(element, className);
+        const index = currentClasses.indexOf(className);
+        if (index !== -1) {
+          currentClasses.splice(index, 1);
+        }
       }
+
+      element.className = currentClasses.join(" ");
+
       onClassChange();
       refreshTailwind();
     },
