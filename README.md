@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/syncinsect/tailware">
-    <img src="public/tw-logo.png" alt="Tailware Logo" width="40%">
+    <img src="/public/tw_logo.png" alt="Tailware Logo" width="40%">
   </a>
 </p>
 
@@ -72,7 +72,13 @@ Install Tailware directly from the [Chrome Web Store](https://chrome.google.com/
 
 ## 🔧 Development
 
-To run and use the Tailware extension in development mode, follow these steps:
+### Prerequisites
+
+| Requirement | Version |
+| ----------- | ------- |
+| 📦 Node.js  | >= 16.x |
+| 🔄 pnpm     | Latest  |
+| 🌐 Chrome   | Latest  |
 
 ### Install Dependencies
 
@@ -101,6 +107,20 @@ pnpm dev
 ```
 
 This will start the development server and automatically rebuild the extension when files change.
+
+### Testing
+
+Run the test suite with:
+
+```bash
+pnpm test
+```
+
+For watch mode during development:
+
+```bash
+pnpm test:watch
+```
 
 ## 🤲 Contributing
 
