@@ -5,10 +5,12 @@ import {
   useClassManagement,
   useDraggable,
 } from "@/hooks";
-import FloatingWindowHeader from "./FloatingWindowHeader";
-import ClassList from "./ClassList";
-import AutoComplete from "./AutoComplete";
-import Toast from "./Toast";
+import {
+  FloatingWindowHeader,
+  ClassList,
+  AutoComplete,
+  Toast,
+} from "@/components";
 
 const FloatingWindow: React.FC<FloatingWindowProps> = ({
   element,

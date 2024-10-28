@@ -2,7 +2,7 @@ import type { HighlightBoxProps } from "@/types";
 import { getElementStyles, getAdjustedPosition } from "@/utils";
 import { useElementInfo } from "@/hooks";
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import BorderLine from "./BorderLine";
+import { BorderLine } from "@/components";
 
 const HighlightBox: React.FC<HighlightBoxProps> = ({
   element,
