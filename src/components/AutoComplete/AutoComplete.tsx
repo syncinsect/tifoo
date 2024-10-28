@@ -86,7 +86,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
   return (
     <div className="relative">
       {isOpen && options.length > 0 && (
-        <div className="absolute bottom-full left-0 right-0 z-10 mb-1 !bg-white !rounded-md !shadow-lg !border !border-[#1DA1F2] !overflow-hidden">
+        <div className="tw tw:absolute tw:bottom-full tw:left-0 tw:right-0 tw:z-10 tw:mb-1 tw:bg-white tw:rounded-md tw:shadow-lg tw:border tw:border-[#1DA1F2] tw:overflow-hidden">
           <div className="max-w-full">
             <List
               ref={listRef}
@@ -94,7 +94,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
               itemCount={options.length}
               itemSize={24}
               width="100%"
-              className="!scrollbar-thin !scrollbar-thumb-[#7ebbe0] !scrollbar-track-[#E8F5FE]"
+              className="scrollbar-thin scrollbar-thumb-[#7ebbe0] scrollbar-track-[#E8F5FE]"
             >
               {Row}
             </List>
@@ -109,7 +109,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
         onKeyDown={handleKeyDown}
         onFocus={() => setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-        className="w-full !bg-white !border !border-gray-300 focus:ring-1 focus:ring-[#1DA1F2] focus:outline-none shadow-sm p-1.5 rounded text-xs placeholder-[#657786] transition duration-150 ease-in-out"
+        className="tw tw:w-full tw:mt-2 tw:bg-white tw:border tw:border-gray-300 tw:focus:ring-1 tw:focus:ring-[#1DA1F2] tw:focus:outline-none tw:shadow-sm tw:p-1.5 tw:rounded tw:text-xs tw:placeholder-[#657786] tw:transition tw:duration-150 tw:ease-in-out"
         placeholder="Add classes"
         autoComplete="off"
         spellCheck="false"
