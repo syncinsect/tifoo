@@ -6,18 +6,20 @@
     "./**/*.ts",
     "./**/*.tsx",
     "src/**/*.test.ts",
-    "src/**/*.test.tsx"
+    "src/**/*.test.tsx",
   ],
   "compilerOptions": {
     "target": "es2018",
     "module": "commonjs",
+    "jsx": "react-jsx",
     "esModuleInterop": true,
     "moduleResolution": "node",
     "strict": true,
     "verbatimModuleSyntax": false,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
     },
-    "baseUrl": "."
-  }
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
+  },
 }

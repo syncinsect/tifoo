@@ -1,4 +1,3 @@
-export { default as App } from "../App";
 export { default as AutoComplete } from "./AutoComplete/AutoComplete";
 export { default as OptionRow } from "./AutoComplete/OptionRow";
 export { default as BorderLine } from "./HighlightBox/BorderLine";
