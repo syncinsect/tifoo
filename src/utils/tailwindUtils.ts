@@ -1,4 +1,4 @@
-import type { TailwindClassData } from "@/types";
+import type { StyleGroups, TailwindClassData } from "@/types";
 
 import tailwindClassesData from "../../assets/tailwind-classes.json";
 
@@ -44,23 +44,32 @@ export const identifyTailwindClasses = (element: HTMLElement): string[] => {
     : element.className.split(/\s+/);
 
   return classNames.filter((cls) => {
+    // skip empty class names
+    if (!cls) return false;
+
     const parts = cls.split(":");
     const baseClass = parts[parts.length - 1];
 
+    // check if it is a known Tailwind class
     if (tailwindClasses.some(({ c }) => c === baseClass)) {
       return true;
     }
 
+    // check prefixed classes
     if (parts.length > 1) {
       const prefix = parts[0];
       const restOfClass = parts.slice(1).join(":");
-      return (
+      if (
         allPrefixes.includes(prefix) &&
         tailwindClasses.some(({ c }) => c === restOfClass)
-      );
+      ) {
+        return true;
+      }
     }
 
-    return false;
+    // check if it matches the Tailwind class name pattern
+    const tailwindPattern = /^[a-z0-9-]+(?:-[a-z0-9-]+)*$/;
+    return tailwindPattern.test(cls);
   });
 };
 
@@ -71,6 +80,9 @@ export const applyTailwindStyle = (
   element: HTMLElement,
   className: string
 ): void => {
+  // only initialize once
+  initialize(element);
+
   element.classList.add(className);
   injectTailwindClass(className);
   refreshTailwind();
@@ -149,6 +161,81 @@ const getMediaQuery = (prefix: string): string => {
   }
 };
 
+let styleGroups: StyleGroups = {
+  base: new Set(),
+  sm: new Set(),
+  md: new Set(),
+  lg: new Set(),
+  xl: new Set(),
+  "2xl": new Set(),
+};
+
+let initialized = false;
+
+// init function
+const initialize = (element: HTMLElement): void => {
+  if (initialized) return;
+
+  getAllComputedMediaQueries(element);
+  initialized = true;
+};
+
+// get all computed media queries
+const getAllComputedMediaQueries = (element: HTMLElement): void => {
+  const styles = document.styleSheets;
+
+  for (const sheet of styles) {
+    try {
+      const rules = sheet.cssRules || sheet.rules;
+      for (const rule of rules) {
+        if (rule instanceof CSSMediaRule) {
+          const mediaText = rule.conditionText || rule.media.mediaText;
+          const prefix = mediaQueryPrefixes.find(
+            (p) => mediaText === getMediaQuery(p)
+          );
+
+          if (prefix) {
+            for (const styleRule of rule.cssRules) {
+              if (
+                styleRule instanceof CSSStyleRule &&
+                element.matches(styleRule.selectorText)
+              ) {
+                // check if the selector already contains the media query prefix
+                const selectorHasPrefix = styleRule.selectorText.includes(
+                  `\\:${prefix}\\:`
+                );
+                if (!selectorHasPrefix) {
+                  // only add the original style without prefix
+                  styleGroups[prefix as keyof StyleGroups].add(
+                    `@media ${mediaText} { ${styleRule.cssText} }`
+                  );
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // cross-origin style sheets will throw an error, ignore
+      continue;
+    }
+  }
+};
+
+const extractBaseStyle = (mediaQueryStyle: string): string | null => {
+  // extract selector and style from media query
+  const matches = mediaQueryStyle.match(/@media[^{]+{([^}]+)}/);
+  if (matches) {
+    const innerContent = matches[1];
+    const selectorAndStyle = innerContent.match(/(\.[^{]+){([^}]+)}/);
+    if (selectorAndStyle) {
+      const [, selector, styles] = selectorAndStyle;
+      return `${selector.trim()}{${styles.trim()}}`;
+    }
+  }
+  return null;
+};
+
 const injectStyle = (styleContent: string): void => {
   let styleElement = document.getElementById("tailware-injected-styles");
   if (!styleElement) {
@@ -156,7 +243,58 @@ const injectStyle = (styleContent: string): void => {
     styleElement.id = "tailware-injected-styles";
     document.head.appendChild(styleElement);
   }
-  styleElement.textContent += styleContent + "\n";
+
+  // generate unique identifier for style content
+  const styleKey = styleContent.replace(/\s+/g, "");
+
+  // check if it is a media query style
+  if (styleContent.includes("@media")) {
+    const prefix = mediaQueryPrefixes.find((p) =>
+      styleContent.includes(`@media ${getMediaQuery(p)}`)
+    );
+    if (prefix) {
+      const mediaQueryGroup = styleGroups[prefix as keyof StyleGroups];
+      // check if it already exists
+      const exists = [...mediaQueryGroup].some(
+        (style) => style.replace(/\s+/g, "") === styleKey
+      );
+
+      if (!exists) {
+        mediaQueryGroup.add(styleContent);
+      }
+    }
+  } else {
+    // check if the base style already exists
+    const exists = [...styleGroups.base].some(
+      (style) => style.replace(/\s+/g, "") === styleKey
+    );
+
+    if (!exists) {
+      styleGroups.base.add(styleContent);
+    }
+  }
+
+  // combine all styles in priority order
+  styleElement.textContent = [
+    ...[...styleGroups.base],
+    ...[...styleGroups.sm],
+    ...[...styleGroups.md],
+    ...[...styleGroups.lg],
+    ...[...styleGroups.xl],
+    ...[...styleGroups["2xl"]],
+  ].join("\n");
+};
+
+// clear style groups
+export const clearStyleGroups = (): void => {
+  styleGroups = {
+    base: new Set(),
+    sm: new Set(),
+    md: new Set(),
+    lg: new Set(),
+    xl: new Set(),
+    "2xl": new Set(),
+  };
 };
 
 export const removeTailwindStyle = (

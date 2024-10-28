@@ -96,3 +96,12 @@ export type TailwindClassData = {
   c: string; // className
   p: string; // properties
 }[];
+
+export interface StyleGroups {
+  base: Set<string>;
+  sm: Set<string>;
+  md: Set<string>;
+  lg: Set<string>;
+  xl: Set<string>;
+  "2xl": Set<string>;
+}
