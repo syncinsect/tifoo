@@ -64,7 +64,13 @@ const App: React.FC = () => {
     chrome.runtime.sendMessage({ action: "tailwareDeactivated" });
   }, [resetAllState, setIsActive, resetTailwareState, resetClassManagement]);
 
-  useMessageListener(setIsActive, isActive);
+  useMessageListener(
+    setIsActive,
+    isActive,
+    resetAllState,
+    resetTailwareState,
+    resetClassManagement
+  );
 
   useEventListeners(
     isActive,
