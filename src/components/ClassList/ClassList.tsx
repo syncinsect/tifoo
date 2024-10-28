@@ -10,7 +10,7 @@ const ClassList: React.FC<ClassListProps> = ({
   onRemove,
 }) => {
   return (
-    <div className="h-80 overflow-auto">
+    <div className="h-80 overflow-auto !scrollbar-thin !scrollbar-thumb-[#1DA1F2] !scrollbar-track-[#E8F5FE]">
       <div className="flex flex-wrap gap-1.5 mb-2">
         {classes.map((cls) => (
           <ClassTag

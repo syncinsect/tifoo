@@ -1,5 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Righteous&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -51,4 +50,17 @@ body {
   background-color: #1da1f2;
   border-radius: 20px;
   border: 3px solid #f1f1f1;
+}
+
+.tw-ext {
+  all: initial;
+}
+
+.tw-ext * {
+  all: unset;
+  box-sizing: border-box;
+}
+
+.tw-ext .relative {
+  position: relative;
 }

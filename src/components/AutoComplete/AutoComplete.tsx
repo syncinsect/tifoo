@@ -86,7 +86,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
   return (
     <div className="relative">
       {isOpen && options.length > 0 && (
-        <div className="absolute bottom-full left-0 right-0 z-10 mb-1 bg-white rounded-md shadow-lg border border-[#1DA1F2] overflow-hidden">
+        <div className="absolute bottom-full left-0 right-0 z-10 mb-1 !bg-white !rounded-md !shadow-lg !border !border-[#1DA1F2] !overflow-hidden">
           <div className="max-w-full">
             <List
               ref={listRef}
@@ -94,7 +94,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
               itemCount={options.length}
               itemSize={24}
               width="100%"
-              className="scrollbar-thin scrollbar-thumb-[#1DA1F2] scrollbar-track-[#E8F5FE]"
+              className="!scrollbar-thin !scrollbar-thumb-[#1DA1F2] !scrollbar-track-[#E8F5FE]"
             >
               {Row}
             </List>
@@ -109,7 +109,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
         onKeyDown={handleKeyDown}
         onFocus={() => setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-        className="w-full !border !border-gray-300 focus:border-[#1DA1F2] focus:ring-1 focus:ring-[#1DA1F2] focus:outline-none shadow-sm p-1.5 rounded text-xs placeholder-[#657786] transition duration-150 ease-in-out"
+        className="w-full !bg-white !border !border-gray-300 focus:!border-[#1DA1F2] focus:ring-1 focus:ring-[#1DA1F2] focus:outline-none shadow-sm p-1.5 rounded text-xs placeholder-[#657786] transition duration-150 ease-in-out"
         placeholder="Add classes"
         autoComplete="off"
         spellCheck="false"
