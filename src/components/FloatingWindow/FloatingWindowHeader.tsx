@@ -12,7 +12,7 @@ const FloatingWindowHeader = forwardRef<
     return (
       <div
         ref={ref}
-        className={`flex justify-between items-center mb-3 border-b border-[#1DA1F2] bg-[#1DA1F2] text-white p-2 rounded-t-lg ${
+        className={`flex p-3 justify-between items-center mb-3 pb-2 border-b border-[#1DA1F2] bg-[#1DA1F2] text-white rounded-t-lg ${
           isFixed ? (isDragging ? "cursor-grabbing" : "cursor-grab") : ""
         }`}
       >

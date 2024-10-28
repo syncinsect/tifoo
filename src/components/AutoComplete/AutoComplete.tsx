@@ -94,7 +94,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
               itemCount={options.length}
               itemSize={24}
               width="100%"
-              className="!scrollbar-thin !scrollbar-thumb-[#1DA1F2] !scrollbar-track-[#E8F5FE]"
+              className="!scrollbar-thin !scrollbar-thumb-[#7ebbe0] !scrollbar-track-[#E8F5FE]"
             >
               {Row}
             </List>
@@ -109,7 +109,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
         onKeyDown={handleKeyDown}
         onFocus={() => setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-        className="w-full !bg-white !border !border-gray-300 focus:!border-[#1DA1F2] focus:ring-1 focus:ring-[#1DA1F2] focus:outline-none shadow-sm p-1.5 rounded text-xs placeholder-[#657786] transition duration-150 ease-in-out"
+        className="w-full !bg-white !border !border-gray-300 focus:ring-1 focus:ring-[#1DA1F2] focus:outline-none shadow-sm p-1.5 rounded text-xs placeholder-[#657786] transition duration-150 ease-in-out"
         placeholder="Add classes"
         autoComplete="off"
         spellCheck="false"
