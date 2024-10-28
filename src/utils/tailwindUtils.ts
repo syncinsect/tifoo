@@ -44,23 +44,32 @@ export const identifyTailwindClasses = (element: HTMLElement): string[] => {
     : element.className.split(/\s+/);
 
   return classNames.filter((cls) => {
+    // skip empty class names
+    if (!cls) return false;
+
     const parts = cls.split(":");
     const baseClass = parts[parts.length - 1];
 
+    // check if it is a known Tailwind class
     if (tailwindClasses.some(({ c }) => c === baseClass)) {
       return true;
     }
 
+    // check prefixed classes
     if (parts.length > 1) {
       const prefix = parts[0];
       const restOfClass = parts.slice(1).join(":");
-      return (
+      if (
         allPrefixes.includes(prefix) &&
         tailwindClasses.some(({ c }) => c === restOfClass)
-      );
+      ) {
+        return true;
+      }
     }
 
-    return false;
+    // check if it matches the Tailwind class name pattern
+    const tailwindPattern = /^[a-z0-9-]+(?:-[a-z0-9-]+)*$/;
+    return tailwindPattern.test(cls);
   });
 };
 
