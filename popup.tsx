@@ -5,38 +5,45 @@ import "@/styles";
 function IndexPopup() {
   const [isActive, setIsActive] = useState(false);
 
-  useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(
-          tabs[0].id,
-          { action: "getState" },
-          (response) => {
-            if (response && response.isActive !== undefined) {
-              setIsActive(response.isActive);
-            }
-          }
-        );
-      }
+  const sendMessageToActiveTab = async (message: any) => {
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
     });
+    if (tab.id) {
+      return chrome.tabs.sendMessage(tab.id, message);
+    }
+  };
+
+  useEffect(() => {
+    const initState = async () => {
+      try {
+        const response = await sendMessageToActiveTab({ action: "getState" });
+        if (response?.isActive !== undefined) {
+          setIsActive(response.isActive);
+        }
+      } catch (error) {
+        console.error("Failed to get initial state:", error);
+      }
+    };
+
+    initState();
   }, []);
 
-  useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          action: "toggleTailware",
-          isActive,
-        });
-      }
-    });
-  }, [isActive]);
-
-  const handleToggle = () => {
-    setIsActive(!isActive);
-    setTimeout(() => {
-      window.close();
-    }, 500);
+  const handleToggle = async () => {
+    try {
+      const newState = !isActive;
+      await sendMessageToActiveTab({
+        action: "toggleTailware",
+        isActive: newState,
+      });
+      setIsActive(newState);
+      setTimeout(() => {
+        window.close();
+      }, 500);
+    } catch (error) {
+      console.error("Failed to toggle state:", error);
+    }
   };
 
   return (

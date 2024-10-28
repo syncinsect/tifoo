@@ -49,9 +49,7 @@
       "https://*/*"
     ],
     "permissions": [
-      "activeTab",
-      "storage",
-      "tabs"
+      "activeTab"
     ],
     "action": {
       "default_popup": "popup.html"
