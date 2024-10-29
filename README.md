@@ -5,13 +5,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/syncinsect/tailware/blob/main/LICENSE">
+  <a href="https://github.com/syncinsect/tailware/blob/main/LICENSE" style="text-decoration: none;">
     <img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" alt="License">
   </a>
-  <a href="https://github.com/syncinsect/tailware/issues">
+  <a href="https://github.com/syncinsect/tailware/issues" style="text-decoration: none;">
     <img src="https://img.shields.io/github/issues/syncinsect/tailware.svg" alt="GitHub issues">
   </a>
-  <a href="https://github.com/syncinsect/tailware/stargazers">
+  <a href="https://github.com/syncinsect/tailware/stargazers" style="text-decoration: none;">
     <img src="https://img.shields.io/github/stars/syncinsect/tailware.svg" alt="GitHub stars">
   </a>
 </p>
@@ -32,23 +32,17 @@
 
 Tailware is a free and open-source Chrome extension designed to enhance the Tailwind CSS development experience. It provides real-time inspection and modification capabilities directly in your browser, making development faster and more intuitive.
 
-We aim to:
-
-- 🌱 Serve developers of all skill levels in the Tailwind ecosystem
-- 🤝 Build better tools through community collaboration
-- 🚀 Advance Tailwind CSS development workflows
-
-Whether through bug reports, feature suggestions, or code contributions - we welcome everyone to help make Tailware better for the community.
+We aim to make Tailwind CSS development more efficient and enjoyable for developers of all skill levels.
 
 ## 🌟 Features
 
-- 🔮 Real-time class inspection
-- ✨ Visual class editing interface
-- 📝 Intelligent class suggestions
-- 📱 Responsive design support
-- ⚡ Zero-config setup
-- 🎯 One-click class copying
-- 🔄 Cross-page persistence
+- 🔮 Real-time Element Inspection - Hover to view Tailwind classes
+- ✨ Visual Class Editor - Intuitive interface for adding/removing classes
+- 📝 Basic Class Autocompletion - Get Tailwind class suggestions while typing
+- 🎯 One-click Copy - Quickly copy elements or their classes
+- 🖱️ Draggable Interface - Flexibly adjust tool window position
+- ⚡ Zero Configuration - Start using immediately after installation
+- 📑 Multi-tab Debugging - Inspect multiple pages simultaneously in different tabs
 
 ## 📥 Installation
 
@@ -124,9 +118,26 @@ pnpm test:watch
 
 ## 🤲 Contributing
 
-We welcome contributions to Tailware! Please see our [Contributing Guide](CONTRIBUTING.md) for more details on how to get started.
+Tailware is and will always be free and open source - built by developers, for developers. This decision stems from our core beliefs:
 
-For simple problems or any feature request, feel free to [open an issue](https://github.com/syncinsect/tailware/issues) or submit a [pull request](https://github.com/syncinsect/tailware/pulls).
+- 🌱 We serve developers, designers, and beginners in the Tailwind ecosystem
+- 🔄 Our users can provide more professional and practical insights, creating a virtuous cycle of improvement
+- 🌍 Open source enriches the entire Tailwind ecosystem
+
+We believe that the capabilities of a small team are limited, but through community collaboration, we can create something truly remarkable. Whether you're:
+
+- 🐛 Reporting bugs
+- 💭 Suggesting features or sharing ideas
+- 💻 Contributing code
+- 📝 Improving documentation
+- 🎨 Enhancing UI/UX
+- 🌐 Helping with translations
+
+Every contribution makes Tailware better for everyone. Feel free to [open an issue](https://github.com/syncinsect/tailware/issues) for any suggestions or problems, or submit a [pull request](https://github.com/syncinsect/tailware/pulls) to contribute directly.
+
+See our [Contributing Guide](CONTRIBUTING.md) for detailed information on how to get started.
+
+Thank you to everyone who helps make Tailware better! ❤️
 
 ## ⚖️ License
 
