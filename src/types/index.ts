@@ -1,3 +1,9 @@
+// Used in Common
+export interface ClassItem {
+  name: string;
+  active: boolean;
+}
+
 // Used in: src/utils/domUtils.ts
 export interface ComputedStyles {
   padding: {
@@ -64,7 +70,7 @@ export interface FloatingWindowHeaderProps {
 
 // Used in: src/components/ClassList.tsx
 export interface ClassListProps {
-  classes: string[];
+  classes: ClassItem[];
   element: HTMLElement;
   onToggle: (className: string, isChecked: boolean) => void;
   onRemove: (className: string) => void;

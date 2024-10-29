@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import type { FloatingWindowProps } from "@/types";
+import type { FloatingWindowProps, ClassItem } from "@/types";
 import {
   useFloatingWindowLogic,
   useClassManagement,
