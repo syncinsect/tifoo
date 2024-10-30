@@ -8,7 +8,6 @@ export const useFloatingWindowLogic = (
   const [toast, setToast] = useState<ToastProps | null>(null);
 
   useEffect(() => {
-    console.log("toast", toast);
     if (toast) {
       const timer = setTimeout(() => {
         setToast(null);
