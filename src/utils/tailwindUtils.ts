@@ -73,8 +73,27 @@ export const identifyTailwindClasses = (element: HTMLElement): string[] => {
   });
 };
 
-export const searchTailwindClasses = (prefix: string): TailwindClassData =>
-  tailwindClasses.filter(({ c }) => c.startsWith(prefix));
+export const searchTailwindClasses = (query: string): TailwindClassData => {
+  // if the query is empty, return an empty array
+  if (!query.trim()) return [];
+
+  // convert the query string to lowercase and split it into keywords
+  const keywords = query.toLowerCase().split(/\s+/);
+
+  return tailwindClasses.filter(({ c }) => {
+    const className = c.toLowerCase();
+    // all keywords must match
+    return keywords.every(
+      (keyword) =>
+        // check if it is a complete class name prefix
+        className.startsWith(keyword) ||
+        // check if it matches any part of the class name
+        className.includes(`-${keyword}`) ||
+        // check if the keyword is directly included in the class name
+        className.includes(keyword)
+    );
+  });
+};
 
 export const applyTailwindStyle = (
   element: HTMLElement,
