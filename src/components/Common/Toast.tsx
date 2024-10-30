@@ -1,7 +1,11 @@
-import type { ToastProps } from "@/types";
+import type { ToastProps, ToastType } from "@/types";
 import React, { useEffect } from "react";
 
-const Toast: React.FC<ToastProps> = ({ message, onClose }) => {
+const Toast: React.FC<ToastProps> = ({
+  message,
+  type = "success",
+  onClose,
+}) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
@@ -10,8 +14,16 @@ const Toast: React.FC<ToastProps> = ({ message, onClose }) => {
     return () => clearTimeout(timer);
   }, [onClose]);
 
+  const bgColorMap: Record<ToastType, string> = {
+    success: "bg-[#1DA1F2]",
+    warning: "bg-[#F59E0B]",
+    error: "bg-[#EF4444]",
+  };
+
   return (
-    <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-[#1DA1F2] text-white px-4 py-2 rounded-full text-sm z-[10002] shadow-lg flex items-center">
+    <div
+      className={`fixed bottom-5 left-1/2 transform -translate-x-1/2 ${bgColorMap[type]} text-white px-4 py-2 rounded-full text-sm z-[10002] shadow-lg flex items-center`}
+    >
       <svg
         className="w-4 h-4 mr-2 fill-current"
         viewBox="0 0 20 20"

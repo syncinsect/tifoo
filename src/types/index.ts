@@ -46,8 +46,10 @@ export interface ClassTagProps {
 }
 
 // Used in: src/components/Toast.tsx
+export type ToastType = "success" | "warning" | "error";
 export interface ToastProps {
   message: string;
+  type: ToastType;
   onClose: () => void;
 }
 

@@ -1,11 +1,11 @@
 import { useState, useCallback } from "react";
-import { ClassItem } from "@/types";
+import { ClassItem, ToastProps } from "@/types";
 
 export const useFloatingWindowLogic = (
   classes: ClassItem[],
   element: HTMLElement
 ) => {
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastProps | null>(null);
 
   const handleCopyClasses = () => {
     const activeClasses = classes
@@ -13,7 +13,11 @@ export const useFloatingWindowLogic = (
       .map((cls) => cls.name);
 
     if (activeClasses.length === 0) {
-      setToastMessage("No classes to copy");
+      setToast({
+        message: "No classes to copy",
+        type: "warning",
+        onClose: () => setToast(null),
+      });
       return;
     }
 
@@ -22,10 +26,18 @@ export const useFloatingWindowLogic = (
     navigator.clipboard
       .writeText(classString)
       .then(() => {
-        setToastMessage("Classes copied to clipboard!");
+        setToast({
+          message: "Classes copied to clipboard!",
+          type: "success",
+          onClose: () => setToast(null),
+        });
       })
       .catch(() => {
-        setToastMessage("Failed to copy classes");
+        setToast({
+          message: "Failed to copy classes",
+          type: "error",
+          onClose: () => setToast(null),
+        });
       });
   };
 
@@ -34,14 +46,24 @@ export const useFloatingWindowLogic = (
     navigator.clipboard
       .writeText(elementString)
       .then(() => {
-        setToastMessage("Element copied to clipboard!");
+        setToast({
+          message: "Element copied to clipboard!",
+          type: "success",
+          onClose: () => setToast(null),
+        });
       })
-      .catch(() => setToastMessage("Failed to copy element"));
+      .catch(() => {
+        setToast({
+          message: "Failed to copy element",
+          type: "error",
+          onClose: () => setToast(null),
+        });
+      });
   }, [element]);
 
   return {
-    toastMessage,
-    setToastMessage,
+    toast,
+    setToast,
     handleCopyClasses,
     handleCopyElement,
   };

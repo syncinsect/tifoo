@@ -33,12 +33,8 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
     handleInputChange,
   } = useClassManagement(element, onClassChange);
 
-  const {
-    toastMessage,
-    setToastMessage,
-    handleCopyClasses,
-    handleCopyElement,
-  } = useFloatingWindowLogic(classes, element);
+  const { toast, setToast, handleCopyClasses, handleCopyElement } =
+    useFloatingWindowLogic(classes, element);
 
   const { isDragging, handleMouseDown, handleMouseMove, handleMouseUp } =
     useDraggable(isFixed, headerRef, floatingWindowRef, position, setPosition);
@@ -97,8 +93,12 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           inputValue={query}
         />
       </div>
-      {toastMessage && (
-        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );
