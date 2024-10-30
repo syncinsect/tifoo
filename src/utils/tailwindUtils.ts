@@ -76,15 +76,26 @@ export const identifyTailwindClasses = (element: HTMLElement): string[] => {
 export const searchTailwindClasses = (query: string): TailwindClassData => {
   if (!query.trim()) return [];
 
-  const keywords = query.toLowerCase().split(/\s+/);
+  // deal with prefix search
+  const parts = query.toLowerCase().split(":");
+  const prefix = parts.length > 1 ? parts[0] : "";
+  const searchText = parts[parts.length - 1];
+  const keywords = searchText.split(/\s+/);
+
+  // if only prefix and colon are entered, return all available base classes
+  if (prefix && !searchText) {
+    return tailwindClasses;
+  }
 
   // weighted results array
   const weightedResults = tailwindClasses.map((classData) => {
     const className = classData.c.toLowerCase();
     let weight = 0;
 
-    // Calculate the weight for each keyword
+    // calculate weight
     for (const keyword of keywords) {
+      if (!keyword) continue;
+
       // Exact match of the class name (highest weight)
       if (className === keyword) {
         weight += 100;
@@ -115,7 +126,11 @@ export const searchTailwindClasses = (query: string): TailwindClassData => {
     }
 
     return {
-      classData,
+      classData: {
+        ...classData,
+        // if there is a prefix, add the prefix to the result
+        c: prefix ? `${prefix}:${classData.c}` : classData.c,
+      },
       weight,
     };
   });
