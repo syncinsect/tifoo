@@ -23,21 +23,21 @@ const FloatingWindowHeader = forwardRef<
             className="bg-transparent border-none text-white cursor-pointer p-1 rounded hover:bg-[#0C7ABF]"
             title="Copy Classes"
           >
-            <CopyClassesIcon className="size-[1.25rem]" />
+            <CopyClassesIcon className="size-4" />
           </button>
           <button
             onClick={onCopyElement}
             className="bg-transparent border-none text-white cursor-pointer p-1 rounded hover:bg-[#0C7ABF]"
             title="Copy Element"
           >
-            <CopyElementIcon className="size-[1.25rem]" />
+            <CopyElementIcon className="size-4" />
           </button>
           <button
             onClick={onDeactivate}
             className="bg-transparent border-none text-white cursor-pointer p-1 rounded hover:bg-[#0C7ABF]"
             title="Deactivate"
           >
-            <CloseMarkIcon className="size-[1.25rem]" />
+            <CloseMarkIcon className="size-4" />
           </button>
         </div>
       </div>
