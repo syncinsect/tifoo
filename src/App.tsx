@@ -25,8 +25,6 @@ const App: React.FC = () => {
     setFloatingWindowPosition,
     isFloatingWindowFixed,
     setIsFloatingWindowFixed,
-    toastMessage,
-    setToastMessage,
     resetAllState,
   } = useTailwareState();
 
@@ -105,9 +103,6 @@ const App: React.FC = () => {
             setPosition={setFloatingWindowPosition}
           />
         </>
-      )}
-      {toastMessage && (
-        <Toast message={toastMessage} onClose={() => setToastMessage("")} />
       )}
     </>
   );
