@@ -112,3 +112,8 @@ export interface StyleGroups {
   xl: Set<string>;
   "2xl": Set<string>;
 }
+
+// Used in: src/components/icons
+export interface IconProps {
+  className?: string;
+}
