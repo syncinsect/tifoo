@@ -76,16 +76,22 @@ export const identifyTailwindClasses = (element: HTMLElement): string[] => {
 export const searchTailwindClasses = (query: string): TailwindClassData => {
   if (!query.trim()) return [];
 
-  // deal with prefix search
+  // check if the query starts with a valid prefix
+  const isValidPrefixStart = allPrefixes.some((prefix) =>
+    query.toLowerCase().startsWith(`${prefix}:`)
+  );
+
+  // handle prefix search
   const parts = query.toLowerCase().split(":");
+
+  // if the query contains a colon but does not start with a valid prefix, return empty result
+  if (parts.length > 1 && !isValidPrefixStart) {
+    return [];
+  }
+
   const prefix = parts.length > 1 ? parts[0] : "";
   const searchText = parts[parts.length - 1];
   const keywords = searchText.split(/\s+/);
-
-  // if only prefix and colon are entered, return all available base classes
-  if (prefix && !searchText) {
-    return tailwindClasses;
-  }
 
   // weighted results array
   const weightedResults = tailwindClasses.map((classData) => {
