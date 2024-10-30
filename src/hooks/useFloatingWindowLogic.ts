@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ClassItem, ToastProps } from "@/types";
 
 export const useFloatingWindowLogic = (
@@ -6,6 +6,17 @@ export const useFloatingWindowLogic = (
   element: HTMLElement
 ) => {
   const [toast, setToast] = useState<ToastProps | null>(null);
+
+  useEffect(() => {
+    console.log("toast", toast);
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const handleCopyClasses = () => {
     const activeClasses = classes
@@ -16,7 +27,6 @@ export const useFloatingWindowLogic = (
       setToast({
         message: "No classes to copy",
         type: "warning",
-        onClose: () => setToast(null),
       });
       return;
     }
@@ -29,14 +39,12 @@ export const useFloatingWindowLogic = (
         setToast({
           message: "Classes copied to clipboard!",
           type: "success",
-          onClose: () => setToast(null),
         });
       })
       .catch(() => {
         setToast({
           message: "Failed to copy classes",
           type: "error",
-          onClose: () => setToast(null),
         });
       });
   };
@@ -49,14 +57,12 @@ export const useFloatingWindowLogic = (
         setToast({
           message: "Element copied to clipboard!",
           type: "success",
-          onClose: () => setToast(null),
         });
       })
       .catch(() => {
         setToast({
           message: "Failed to copy element",
           type: "error",
-          onClose: () => setToast(null),
         });
       });
   }, [element]);

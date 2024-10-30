@@ -50,7 +50,6 @@ export type ToastType = "success" | "warning" | "error";
 export interface ToastProps {
   message: string;
   type: ToastType;
-  onClose: () => void;
 }
 
 // Used in: src/hooks/useTailware.ts
