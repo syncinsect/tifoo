@@ -7,3 +7,4 @@ export { default as FloatingWindow } from "./FloatingWindow/FloatingWindow";
 export { default as FloatingWindowHeader } from "./FloatingWindow/FloatingWindowHeader";
 export { default as ClassList } from "./ClassList/ClassList";
 export { default as HighlightBox } from "./HighlightBox/HighlightBox";
+export * from "./icons";

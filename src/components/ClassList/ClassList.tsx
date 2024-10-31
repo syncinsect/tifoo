@@ -14,8 +14,8 @@ const ClassList: React.FC<ClassListProps> = ({
       <div className="flex flex-wrap gap-1.5 mb-2">
         {classes.map((cls) => (
           <ClassTag
-            key={cls}
-            className={cls}
+            key={cls.name}
+            className={cls.name}
             element={element}
             onToggle={onToggle}
             onRemove={onRemove}

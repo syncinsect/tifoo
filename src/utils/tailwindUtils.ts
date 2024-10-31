@@ -73,8 +73,80 @@ export const identifyTailwindClasses = (element: HTMLElement): string[] => {
   });
 };
 
-export const searchTailwindClasses = (prefix: string): TailwindClassData =>
-  tailwindClasses.filter(({ c }) => c.startsWith(prefix));
+export const searchTailwindClasses = (query: string): TailwindClassData => {
+  if (!query.trim()) return [];
+
+  // check if the query starts with a valid prefix
+  const isValidPrefixStart = allPrefixes.some((prefix) =>
+    query.toLowerCase().startsWith(`${prefix}:`)
+  );
+
+  // handle prefix search
+  const parts = query.toLowerCase().split(":");
+
+  // if the query contains a colon but does not start with a valid prefix, return empty result
+  if (parts.length > 1 && !isValidPrefixStart) {
+    return [];
+  }
+
+  const prefix = parts.length > 1 ? parts[0] : "";
+  const searchText = parts[parts.length - 1];
+  const keywords = searchText.split(/\s+/);
+
+  // weighted results array
+  const weightedResults = tailwindClasses.map((classData) => {
+    const className = classData.c.toLowerCase();
+    let weight = 0;
+
+    // calculate weight
+    for (const keyword of keywords) {
+      if (!keyword) continue;
+
+      // Exact match of the class name (highest weight)
+      if (className === keyword) {
+        weight += 100;
+        continue;
+      }
+
+      // Class name starts with keyword (high weight)
+      if (className.startsWith(keyword)) {
+        weight += 50;
+        continue;
+      }
+
+      // Keyword appears after a dash (medium weight)
+      if (className.includes(`-${keyword}`)) {
+        weight += 30;
+        continue;
+      }
+
+      // Keyword appears anywhere in the class name (lowest weight)
+      if (className.includes(keyword)) {
+        weight += 10;
+        continue;
+      }
+
+      // If any keyword does not match, exclude the class
+      weight = -1;
+      break;
+    }
+
+    return {
+      classData: {
+        ...classData,
+        // if there is a prefix, add the prefix to the result
+        c: prefix ? `${prefix}:${classData.c}` : classData.c,
+      },
+      weight,
+    };
+  });
+
+  // Filter out classes that don't match and sort by weight
+  return weightedResults
+    .filter((result) => result.weight > 0)
+    .sort((a, b) => b.weight - a.weight)
+    .map((result) => result.classData);
+};
 
 export const applyTailwindStyle = (
   element: HTMLElement,

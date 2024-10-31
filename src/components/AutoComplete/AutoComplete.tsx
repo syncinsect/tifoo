@@ -2,7 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from "react";
 import { FixedSizeList as List } from "react-window";
 
 import { AutoCompleteProps } from "@/types";
-import { OptionRow } from "@/components";
+import { OptionRow, CloseCircleIcon } from "@/components";
 import { useHighlightedIndex } from "@/hooks";
 
 const AutoComplete: React.FC<AutoCompleteProps> = ({
@@ -83,6 +83,15 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
     [options, highlightedIndex, onSelect]
   );
 
+  const handleClear = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onInputChange("");
+      inputRef.current?.focus();
+    },
+    [onInputChange]
+  );
+
   return (
     <div className="relative">
       {isOpen && options.length > 0 && (
@@ -101,19 +110,30 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
           </div>
         </div>
       )}
-      <input
-        ref={inputRef}
-        type="text"
-        value={inputValue}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        onFocus={() => setIsOpen(true)}
-        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-        className="tw tw:w-full tw:mt-2 tw:bg-white tw:border tw:border-gray-300 tw:focus:ring-1 tw:focus:ring-[#1DA1F2] tw:focus:outline-none tw:shadow-sm tw:p-1.5 tw:rounded tw:text-xs tw:placeholder-[#657786] tw:transition tw:duration-150 tw:ease-in-out"
-        placeholder="Add classes"
-        autoComplete="off"
-        spellCheck="false"
-      />
+      <div className="relative">
+        <input
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setIsOpen(true)}
+          onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+          className="tw tw:w-full tw:mt-2 tw:bg-white tw:border tw:border-gray-300 tw:focus:ring-1 tw:focus:ring-[#1DA1F2] tw:focus:outline-none tw:shadow-sm tw:p-1.5 tw:pr-6 tw:rounded tw:text-xs tw:placeholder-[#657786] tw:transition tw:duration-150 tw:ease-in-out"
+          placeholder="Add classes"
+          autoComplete="off"
+          spellCheck="false"
+        />
+        {inputValue && isOpen && (
+          <button
+            onClick={handleClear}
+            className="tw tw:absolute tw:right-1.5 tw:top-1/2 tw:mt-1 tw:transform tw:-translate-y-1/2 tw:text-gray-400 hover:tw:text-gray-600 tw:transition-colors tw:duration-150 tw:ease-in-out"
+            type="button"
+          >
+            <CloseCircleIcon className="size-4" />
+          </button>
+        )}
+      </div>
     </div>
   );
 };

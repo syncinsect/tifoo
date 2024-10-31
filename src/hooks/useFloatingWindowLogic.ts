@@ -1,34 +1,74 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { ClassItem, ToastProps } from "@/types";
 
 export const useFloatingWindowLogic = (
-  classes: string[],
+  classes: ClassItem[],
   element: HTMLElement
 ) => {
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastProps | null>(null);
 
-  const handleCopyClasses = useCallback(() => {
-    const classesString = classes.join(" ");
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  const handleCopyClasses = () => {
+    const activeClasses = classes
+      .filter((cls) => cls.active)
+      .map((cls) => cls.name);
+
+    if (activeClasses.length === 0) {
+      setToast({
+        message: "No classes to copy",
+        type: "warning",
+      });
+      return;
+    }
+
+    const classString = activeClasses.join(" ");
+
     navigator.clipboard
-      .writeText(classesString)
+      .writeText(classString)
       .then(() => {
-        setToastMessage("Classes copied to clipboard!");
+        setToast({
+          message: "Classes copied to clipboard!",
+          type: "success",
+        });
       })
-      .catch(() => setToastMessage("Failed to copy classes"));
-  }, [classes]);
+      .catch(() => {
+        setToast({
+          message: "Failed to copy classes",
+          type: "error",
+        });
+      });
+  };
 
   const handleCopyElement = useCallback(() => {
     const elementString = element.outerHTML;
     navigator.clipboard
       .writeText(elementString)
       .then(() => {
-        setToastMessage("Element copied to clipboard!");
+        setToast({
+          message: "Element copied to clipboard!",
+          type: "success",
+        });
       })
-      .catch(() => setToastMessage("Failed to copy element"));
+      .catch(() => {
+        setToast({
+          message: "Failed to copy element",
+          type: "error",
+        });
+      });
   }, [element]);
 
   return {
-    toastMessage,
-    setToastMessage,
+    toast,
+    setToast,
     handleCopyClasses,
     handleCopyElement,
   };

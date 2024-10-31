@@ -10,14 +10,12 @@ export const useTailwareState = () => {
     y: 0,
   });
   const [isFloatingWindowFixed, setIsFloatingWindowFixed] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
 
   const resetAllState = useCallback(() => {
     setHighlightedElement(null);
     setAnimatedRect(null);
     setFloatingWindowPosition({ x: 0, y: 0 });
     setIsFloatingWindowFixed(false);
-    setToastMessage("");
   }, []);
 
   return {
@@ -31,8 +29,6 @@ export const useTailwareState = () => {
     setFloatingWindowPosition,
     isFloatingWindowFixed,
     setIsFloatingWindowFixed,
-    toastMessage,
-    setToastMessage,
     resetAllState,
   };
 };

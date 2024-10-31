@@ -1,3 +1,9 @@
+// Used in Common
+export interface ClassItem {
+  name: string;
+  active: boolean;
+}
+
 // Used in: src/utils/domUtils.ts
 export interface ComputedStyles {
   padding: {
@@ -40,9 +46,10 @@ export interface ClassTagProps {
 }
 
 // Used in: src/components/Toast.tsx
+export type ToastType = "success" | "warning" | "error";
 export interface ToastProps {
   message: string;
-  onClose: () => void;
+  type: ToastType;
 }
 
 // Used in: src/hooks/useTailware.ts
@@ -64,7 +71,7 @@ export interface FloatingWindowHeaderProps {
 
 // Used in: src/components/ClassList.tsx
 export interface ClassListProps {
-  classes: string[];
+  classes: ClassItem[];
   element: HTMLElement;
   onToggle: (className: string, isChecked: boolean) => void;
   onRemove: (className: string) => void;
@@ -104,4 +111,9 @@ export interface StyleGroups {
   lg: Set<string>;
   xl: Set<string>;
   "2xl": Set<string>;
+}
+
+// Used in: src/components/icons
+export interface IconProps {
+  className?: string;
 }

@@ -21,21 +21,23 @@ const ClassTag: React.FC<ClassTagProps> = ({
   };
 
   return (
-    <div className="tw tw:bg-gray-50 tw:text-gray-300 tw:px-2.5 tw:py-1.5 tw:rounded-lg tw:text-sm tw:flex tw:items-center tw:mr-2 tw:mb-2 tw:shadow-sm tw:hover:shadow tw:transition-all tw:duration-200 tw:border tw:border-gray-100">
-      <Switch
-        checked={isChecked}
-        onChange={handleChange}
-        className="group inline-flex h-4 w-7 items-center rounded-full !bg-gray-200 transition data-[checked]:!bg-[#1DA1F2]"
-      >
-        <span className="translate-x-1 h-3 w-3 rounded-full bg-white transition-transform duration-200 ease-in-out group-data-[checked]:translate-x-3 shadow-sm" />
-      </Switch>
-      <span className="ml-2 text-gray-600 font-medium">{className}</span>
+    <div className="tw tw:bg-gray-50/50 tw:px-2 tw:py-1 tw:rounded-lg tw:text-xs tw:flex tw:items-center tw:justify-between tw:shadow-sm tw:transition-all tw:duration-200 tw:border tw:border-gray-100">
+      <div className="tw:flex tw:items-center tw:gap-1.5">
+        <Switch
+          checked={isChecked}
+          onChange={handleChange}
+          className="group inline-flex h-3.5 w-6 items-center rounded-full !bg-gray-200 transition data-[checked]:!bg-[#1DA1F2]"
+        >
+          <span className="translate-x-0.5 h-2.5 w-2.5 rounded-full bg-white transition-transform duration-200 ease-in-out group-data-[checked]:translate-x-2.5 shadow-sm" />
+        </Switch>
+        <span className="text-gray-600 font-medium">{className}</span>
+      </div>
       <button
         onClick={(e) => {
           e.preventDefault();
           onRemove(className);
         }}
-        className="ml-2 text-gray-400 hover:text-gray-500 focus:outline-none transition-colors duration-200"
+        className="text-gray-400 hover:text-gray-500 focus:outline-none transition-colors duration-200 w-4 h-4 flex items-center justify-center"
       >
         ×
       </button>

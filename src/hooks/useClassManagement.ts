@@ -7,11 +7,16 @@ import {
   searchTailwindClasses,
 } from "@/utils";
 
+interface ClassItem {
+  name: string;
+  active: boolean;
+}
+
 export const useClassManagement = (
   element: HTMLElement | null,
   onClassChange: () => void
 ) => {
-  const [classes, setClasses] = useState<string[]>([]);
+  const [classes, setClasses] = useState<ClassItem[]>([]);
   const [query, setQuery] = useState("");
   const [autocompleteResults, setAutocompleteResults] = useState<
     { c: string; p: string }[]
@@ -19,7 +24,12 @@ export const useClassManagement = (
 
   useEffect(() => {
     if (element) {
-      setClasses(identifyTailwindClasses(element));
+      const identifiedClasses = identifyTailwindClasses(element);
+      const classItems = identifiedClasses.map((cls) => ({
+        name: cls,
+        active: element.classList.contains(cls),
+      }));
+      setClasses(classItems);
     } else {
       setClasses([]);
     }
@@ -42,8 +52,8 @@ export const useClassManagement = (
 
       applyTailwindStyle(element, trimmedClass);
       setClasses((prevClasses) => {
-        if (!prevClasses.includes(trimmedClass)) {
-          return [...prevClasses, trimmedClass];
+        if (!prevClasses.some((cls) => cls.name === trimmedClass)) {
+          return [...prevClasses, { name: trimmedClass, active: true }];
         }
         return prevClasses;
       });
@@ -59,7 +69,7 @@ export const useClassManagement = (
       if (!element) return;
       element.classList.remove(classToRemove);
       removeTailwindStyle(element, classToRemove);
-      setClasses((classes) => classes.filter((c) => c !== classToRemove));
+      setClasses((classes) => classes.filter((c) => c.name !== classToRemove));
       onClassChange();
       refreshTailwind();
     },
@@ -70,20 +80,17 @@ export const useClassManagement = (
     (className: string, isChecked: boolean) => {
       if (!element) return;
 
-      const currentClasses = element.className.split(" ").filter(Boolean);
+      setClasses((prevClasses) =>
+        prevClasses.map((cls) =>
+          cls.name === className ? { ...cls, active: isChecked } : cls
+        )
+      );
 
       if (isChecked) {
-        if (!currentClasses.includes(className)) {
-          currentClasses.push(className);
-        }
+        element.classList.add(className);
       } else {
-        const index = currentClasses.indexOf(className);
-        if (index !== -1) {
-          currentClasses.splice(index, 1);
-        }
+        element.classList.remove(className);
       }
-
-      element.className = currentClasses.join(" ");
 
       onClassChange();
       refreshTailwind();
