@@ -2,7 +2,7 @@
   "name": "tailware",
   "displayName": "Tailware – Effortless Tailwind Styling",
   "version": "0.0.2",
-  "description": "Effortless Tailwind Styling at Your Fingertips",
+  "description": "Effortless Tailwind CSS styling at your fingertips. Inspect, edit and manage Tailwind classes in real-time.",
   "author": "syncinsect<syncinsect@gmail.com>",
   "license": "MIT",
   "scripts": {
