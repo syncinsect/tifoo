@@ -1,8 +1,8 @@
 {
   "name": "tailware",
-  "displayName": "Tailware – Easyuse Tailwind DevTools",
-  "version": "0.0.1",
-  "description": "Effortless Tailwind Styling at Your Fingertips",
+  "displayName": "Tailware – Effortless Tailwind Styling",
+  "version": "0.0.2",
+  "description": "Effortless Tailwind CSS styling at your fingertips. Inspect, edit and manage Tailwind classes in real-time.",
   "author": "syncinsect<syncinsect@gmail.com>",
   "license": "MIT",
   "scripts": {
