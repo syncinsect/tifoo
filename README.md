@@ -67,7 +67,7 @@ We aim to make Tailwind CSS development more efficient and enjoyable for develop
 
 ### Chrome Web Store (Recommended)
 
-Install Tailware directly from the [Chrome Web Store](https://chrome.google.com/webstore/detail/tailware/your-extension-id).
+Install Tailware directly from the [Chrome Web Store](https://chrome.google.com/webstore/detail/tailware/fccohfilddfaljiionagbbjelbliokll).
 
 ### Manual Installation
 
