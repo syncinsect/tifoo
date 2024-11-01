@@ -5,24 +5,24 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/syncinsect/tailware/blob/main/LICENSE" style="text-decoration: none;">
-    <img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" alt="License">
-  </a>
-  <a href="https://github.com/syncinsect/tailware/releases" style="text-decoration: none;">
-    <img src="https://img.shields.io/github/v/release/syncinsect/tailware" alt="GitHub release">
-  </a>
-  <a href="https://github.com/syncinsect/tailware/issues" style="text-decoration: none;">
-    <img src="https://img.shields.io/github/issues/syncinsect/tailware.svg" alt="GitHub issues">
-  </a>
-  <a href="https://github.com/syncinsect/tailware/stargazers" style="text-decoration: none;">
-    <img src="https://img.shields.io/github/stars/syncinsect/tailware.svg" alt="GitHub stars">
-  </a>
-  <a href="https://github.com/syncinsect/tailware/network/members" style="text-decoration: none;">
-    <img src="https://img.shields.io/github/forks/syncinsect/tailware.svg" alt="GitHub forks">
-  </a>
-  <a href="https://github.com/syncinsect/tailware/commits/main" style="text-decoration: none;">
-    <img src="https://img.shields.io/github/last-commit/syncinsect/tailware" alt="GitHub last commit">
-  </a>
+    <a href="https://github.com/syncinsect/tailware/blob/main/LICENSE">
+        <img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" alt="License">
+    </a>
+    <a href="https://github.com/syncinsect/tailware/releases">
+        <img src="https://img.shields.io/github/v/release/syncinsect/tailware" alt="GitHub release">
+    </a>
+    <a href="https://github.com/syncinsect/tailware/issues">
+        <img src="https://img.shields.io/github/issues/syncinsect/tailware.svg" alt="GitHub issues">
+    </a>
+    <a href="https://github.com/syncinsect/tailware/stargazers">
+        <img src="https://img.shields.io/github/stars/syncinsect/tailware.svg" alt="GitHub stars">
+    </a>
+    <a href="https://github.com/syncinsect/tailware/network/members">
+        <img src="https://img.shields.io/github/forks/syncinsect/tailware.svg" alt="GitHub forks">
+    </a>
+    <a href="https://github.com/syncinsect/tailware/commits/main">
+        <img src="https://img.shields.io/github/last-commit/syncinsect/tailware" alt="GitHub last commit">
+    </a>
 </p>
 
 <h3 align="center">🖲️ Effortless Tailwind Styling at Your Fingertips</h3>
