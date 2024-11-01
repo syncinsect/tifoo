@@ -8,15 +8,30 @@
   <a href="https://github.com/syncinsect/tailware/blob/main/LICENSE" style="text-decoration: none;">
     <img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" alt="License">
   </a>
+  <a href="https://github.com/syncinsect/tailware/releases" style="text-decoration: none;">
+    <img src="https://img.shields.io/github/v/release/syncinsect/tailware" alt="GitHub release">
+  </a>
   <a href="https://github.com/syncinsect/tailware/issues" style="text-decoration: none;">
     <img src="https://img.shields.io/github/issues/syncinsect/tailware.svg" alt="GitHub issues">
   </a>
   <a href="https://github.com/syncinsect/tailware/stargazers" style="text-decoration: none;">
     <img src="https://img.shields.io/github/stars/syncinsect/tailware.svg" alt="GitHub stars">
   </a>
+  <a href="https://github.com/syncinsect/tailware/network/members" style="text-decoration: none;">
+    <img src="https://img.shields.io/github/forks/syncinsect/tailware.svg" alt="GitHub forks">
+  </a>
+  <a href="https://github.com/syncinsect/tailware/commits/main" style="text-decoration: none;">
+    <img src="https://img.shields.io/github/last-commit/syncinsect/tailware" alt="GitHub last commit">
+  </a>
 </p>
 
 <h3 align="center">🖲️ Effortless Tailwind Styling at Your Fingertips</h3>
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=uD4_m2jM7l8" target="_blank">
+    <img src="https://img.youtube.com/vi/uD4_m2jM7l8/maxresdefault.jpg" alt="Tailware Demo Video" width="80%">
+  </a>
+</p>
 
 ## 🏠 Getting Started
 
@@ -42,7 +57,11 @@ We aim to make Tailwind CSS development more efficient and enjoyable for develop
 - 🎯 One-click Copy - Quickly copy elements or their classes
 - 🖱️ Draggable Interface - Flexibly adjust tool window position
 - ⚡ Zero Configuration - Start using immediately after installation
-- 📑 Multi-tab Debugging - Inspect multiple pages simultaneously in different tabs
+- 📑 Multi-tab Support - Work with multiple pages simultaneously
+- 📚 Comprehensive Library - Access to 140,000+ ready-to-use Tailwind classes
+- 🎭 Smooth Animations - Fluid transitions and visual feedback
+- 🔄 Regular Updates - Stay current with latest Tailwind CSS features
+- 🌍 Active Community - Growing ecosystem with worldwide developer support
 
 ## 📥 Installation
 
