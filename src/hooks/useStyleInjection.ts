@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 export const useStyleInjection = (isActive: boolean) => {
   useEffect(() => {
-    const styleId = "tailware-injected-styles";
+    const styleId = "tifoo-injected-styles";
     let styleElement = document.getElementById(styleId);
 
     if (!styleElement) {

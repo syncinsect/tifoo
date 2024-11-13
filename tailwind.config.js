@@ -35,18 +35,18 @@ module.exports = {
         "dashed-large": "dashed 3px",
       },
       colors: {
-        "tailware-blue": "#1DA1F2",
-        "tailware-dark-blue": "#0C7ABF",
-        "tailware-light-blue": "#E8F5FE",
+        "tifoo-blue": "#1DA1F2",
+        "tifoo-dark-blue": "#0C7ABF",
+        "tifoo-light-blue": "#E8F5FE",
       },
       fontFamily: {
         righteous: ["Righteous", "cursive"],
       },
       ringColor: {
-        "tailware-blue": "#1DA1F2",
+        "tifoo-blue": "#1DA1F2",
       },
       borderColor: {
-        "tailware-blue": "#1DA1F2",
+        "tifoo-blue": "#1DA1F2",
       },
     },
   },

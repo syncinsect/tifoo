@@ -1,6 +1,6 @@
-# Contributing to Tailware
+# Contributing to Tifoo
 
-First of all, thank you for considering contributing to Tailware! ❤️
+First of all, thank you for considering contributing to Tifoo! ❤️
 
 We welcome contributions of all forms and sizes. Whether it's fixing a typo, improving documentation, or adding a new feature, every contribution is valuable. We believe it's contributors like you that make the open-source community so amazing.
 
@@ -10,7 +10,7 @@ We welcome contributions of all forms and sizes. Whether it's fixing a typo, imp
 
 Found a bug? Have a new idea? We'd love to hear from you!
 
-- Simply [create a new issue](https://github.com/syncinsect/tailware/issues/new)
+- Simply [create a new issue](https://github.com/syncinsect/tifoo/issues/new)
 - Describe the problem you've encountered or your idea
 - If possible, include screenshots or GIFs to help explain your point
 
@@ -38,6 +38,6 @@ Remember, this is an open and inclusive community. We expect all participants to
 
 ## Questions?
 
-If you have any questions or need help, don't hesitate to [create an issue](https://github.com/syncinsect/tailware/issues/new) or email us at [syncinsect@gmail.com](mailto:syncinsect@gmail.com). We're here to help!
+If you have any questions or need help, don't hesitate to [create an issue](https://github.com/syncinsect/tifoo/issues/new) or email us at [syncinsect@gmail.com](mailto:syncinsect@gmail.com). We're here to help!
 
-Thank you again for your contribution. Let's make Tailware even better together!
+Thank you again for your contribution. Let's make Tifoo even better together!
