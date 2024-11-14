@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/syncinsect/tifoo">
-    <img src="/public/tw_logo.png" alt="Tifoo Logo" width="40%">
+    <img src="/public/tifoo_logo.png" alt="Tifoo Logo" width="40%">
   </a>
 </p>
 
@@ -9,17 +9,16 @@
     <a href="https://github.com/syncinsect/tifoo/releases"><img src="https://img.shields.io/github/v/release/syncinsect/tifoo" alt="GitHub release"></a>
     <a href="https://github.com/syncinsect/tifoo/issues"><img src="https://img.shields.io/github/issues/syncinsect/tifoo.svg" alt="GitHub issues"></a>
     <a href="https://github.com/syncinsect/tifoo/stargazers"><img src="https://img.shields.io/github/stars/syncinsect/tifoo.svg" alt="GitHub stars"></a>
-    <a href="https://github.com/syncinsect/tifoo/network/members"><img src="https://img.shields.io/github/forks/syncinsect/tifoo.svg" alt="GitHub forks"></a>
-    <a href="https://github.com/syncinsect/tifoo/commits/main"><img src="https://img.shields.io/github/last-commit/syncinsect/tifoo" alt="GitHub last commit"></a>
+    <a href="https://chromewebstore.google.com/detail/tifoo/fccohfilddfaljiionagbbjelbliokll"><img src="https://img.shields.io/chrome-web-store/users/fccohfilddfaljiionagbbjelbliokll" alt="Chrome Web Store users"></a>
 </p>
 
 <h3 align="center">🖲️ Effortless Tailwind Styling at Your Fingertips</h3>
 
-<p align="center">
+<!-- <p align="center">
   <a href="https://www.youtube.com/watch?v=uD4_m2jM7l8" target="_blank">
     <img src="https://img.youtube.com/vi/uD4_m2jM7l8/maxresdefault.jpg" alt="Tifoo Demo Video" width="80%">
   </a>
-</p>
+</p> -->
 
 ## 🏠 Getting Started
 
