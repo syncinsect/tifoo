@@ -56,8 +56,6 @@ We aim to make Tailwind CSS development more efficient and enjoyable for develop
 
 Install Tifoo directly from the [Chrome Web Store](https://chrome.google.com/webstore/detail/tifoo/fccohfilddfaljiionagbbjelbliokll).
 
-### Manual Installation
-
 1. Download the latest release from our [GitHub Releases](https://github.com/syncinsect/tifoo/releases) page
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable "Developer mode" in the top right corner
