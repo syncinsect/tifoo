@@ -1,6 +1,11 @@
 import { forwardRef } from "react";
 import type { FloatingWindowHeaderProps } from "@/types";
-import { CopyClassesIcon, CopyElementIcon, CloseMarkIcon } from "@/components";
+import {
+  CopyClassesIcon,
+  CopyElementIcon,
+  CloseMarkIcon,
+  TifooText,
+} from "@/components";
 const FloatingWindowHeader = forwardRef<
   HTMLDivElement,
   FloatingWindowHeaderProps
@@ -16,7 +21,7 @@ const FloatingWindowHeader = forwardRef<
           isFixed ? (isDragging ? "tw:cursor-grabbing" : "tw:cursor-grab") : ""
         }`}
       >
-        <span className="tw tw:font-righteous tw:text-sm">Tailware</span>
+        <TifooText className="text-md" />
         <div className="tw tw:flex tw:gap-2">
           <button
             onClick={onCopyClasses}
