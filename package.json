@@ -1,8 +1,8 @@
 {
-  "name": "tailware",
-  "displayName": "Tailware – Effortless Tailwind Styling",
-  "version": "0.0.2",
-  "description": "Effortless Tailwind CSS styling at your fingertips. Inspect, edit and manage Tailwind classes in real-time.",
+  "name": "tifoo",
+  "displayName": "Tifoo – Effortless Tailwind Styling",
+  "version": "0.0.3",
+  "description": "Streamline your Tailwind CSS development with real-time inspection and intuitive class management—right in your browser. Making Tailwind CSS development faster and more intuitive, no matter which webpage you're working on. With comprehensive features for class inspection, visual editing, and quick suggestions, Tifoo helps you develop with confidence, find the right classes quickly, and perfect your designs with ease.",
   "author": "syncinsect<syncinsect@gmail.com>",
   "license": "MIT",
   "scripts": {

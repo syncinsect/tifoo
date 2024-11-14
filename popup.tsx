@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import { TifooText } from "@/components";
 import "@/styles";
 
 function IndexPopup() {
@@ -51,7 +51,7 @@ function IndexPopup() {
       <div className="w-80">
         <div className="bg-[#1DA1F2] text-white p-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-righteous">Tailware</h1>
+            <TifooText className="text-xl" />
           </div>
           <div className="flex items-center space-x-2">
             <span

@@ -309,10 +309,10 @@ const extractBaseStyle = (mediaQueryStyle: string): string | null => {
 };
 
 const injectStyle = (styleContent: string): void => {
-  let styleElement = document.getElementById("tailware-injected-styles");
+  let styleElement = document.getElementById("tifoo-injected-styles");
   if (!styleElement) {
     styleElement = document.createElement("style");
-    styleElement.id = "tailware-injected-styles";
+    styleElement.id = "tifoo-injected-styles";
     document.head.appendChild(styleElement);
   }
 

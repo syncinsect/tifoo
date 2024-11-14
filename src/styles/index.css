@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Righteous&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caprasimo&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,8 +8,8 @@ body {
 }
 
 @layer base {
-  .font-righteous {
-    font-family: "Righteous", cursive;
+  .font-caprasimo {
+    font-family: "Caprasimo", serif;
   }
 }
 .floating-window {
