@@ -14,11 +14,11 @@
 
 <h3 align="center">🖲️ Effortless Tailwind Styling at Your Fingertips</h3>
 
-<!-- <p align="center">
-  <a href="https://www.youtube.com/watch?v=uD4_m2jM7l8" target="_blank">
-    <img src="https://img.youtube.com/vi/uD4_m2jM7l8/maxresdefault.jpg" alt="Tifoo Demo Video" width="80%">
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=z2EVJyF_s6Q" target="_blank">
+    <img src="/public/tifoo_video_cover.png" alt="Tifoo Demo Video" width="80%">
   </a>
-</p> -->
+</p>
 
 ## 🏠 Getting Started
 
