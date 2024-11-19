@@ -45,7 +45,7 @@ const App: React.FC = () => {
   const updateHighlightAndLines = useCallback(() => {
     if (highlightedElement) {
       setAnimatedRect(highlightedElement.getBoundingClientRect());
-      setHighlightedElement((prev: HTMLElement) => prev);
+      setHighlightedElement((prev) => prev);
     }
   }, [highlightedElement, setAnimatedRect, setHighlightedElement]);
 
