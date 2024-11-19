@@ -56,10 +56,5 @@ module.exports = {
       borderColor: ["focus"],
     },
   },
-  plugins: [
-    require("tailwind-scrollbar")({ nocompatible: true }),
-    plugin(function ({ addVariant }) {
-      addVariant("tw", ["&.tw", ".tw &"]);
-    }),
-  ],
+  plugins: [require("tailwind-scrollbar")({ nocompatible: true })],
 };

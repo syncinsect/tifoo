@@ -14,7 +14,6 @@ export const config: PlasmoCSConfig = {
 
 export const getRootContainer: PlasmoGetRootContainer = () => {
   const container = document.createElement("tifoo-container");
-  container.setAttribute("data-tw-ext", "");
   document.documentElement.appendChild(container);
   return container;
 };

@@ -21,8 +21,8 @@ const ClassTag: React.FC<ClassTagProps> = ({
   };
 
   return (
-    <div className="tw tw:bg-gray-50/50 tw:px-2 tw:py-1 tw:rounded-lg tw:text-xs tw:flex tw:items-center tw:justify-between tw:shadow-sm tw:transition-all tw:duration-200 tw:border tw:border-gray-100">
-      <div className="tw:flex tw:items-center tw:gap-1.5">
+    <div className="bg-gray-50/50 px-2 py-1 rounded-lg text-xs flex items-center justify-beeen shadow-sm transition-all duration-200 border border-gray-100">
+      <div className="flex items-center gap-1.5">
         <Switch
           checked={isChecked}
           onChange={handleChange}
