@@ -32,8 +32,12 @@ export const useTailware = ({
     (e: MouseEvent) => {
       if (!isActive) return;
       const target = e.target as HTMLElement;
+
       if (isFloatingWindowFixedRef.current) {
-        if (!target.closest(".floating-window")) {
+        if (
+          !target.closest(".floating-window") &&
+          !target.closest("tifoo-container")
+        ) {
           unfixFloatingWindow();
         }
       } else {

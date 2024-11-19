@@ -27,7 +27,6 @@ export const getRootContainer: PlasmoGetRootContainer = () => {
 
   container.style.inset = "0";
   container.style.zIndex = "9999";
-  appContainer.style.pointerEvents = "auto";
 
   document.documentElement.appendChild(container);
 
