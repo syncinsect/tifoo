@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 
-export const useTailwareState = () => {
+export const useTifooState = () => {
   const [isActive, setIsActive] = useState(false);
   const [highlightedElement, setHighlightedElement] =
     useState<HTMLElement | null>(null);

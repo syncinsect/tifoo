@@ -33,7 +33,7 @@ function IndexPopup() {
     try {
       const newState = !isActive;
       await sendMessageToActiveTab({
-        action: "toggleTailware",
+        action: "toggleTifoo",
         isActive: newState,
       });
       setIsActive(newState);

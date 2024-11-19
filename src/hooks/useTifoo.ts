@@ -1,12 +1,12 @@
-import type { UseTailwareProps } from "@/types";
+import type { useTifooProps } from "@/types";
 import { useCallback, useRef, useState } from "react";
 
-export const useTailware = ({
+export const useTifoo = ({
   isActive,
   setHighlightedElement,
   setFloatingWindowPosition,
   setIsFloatingWindowFixed,
-}: UseTailwareProps) => {
+}: useTifooProps) => {
   const [lastHighlightedElement, setLastHighlightedElement] =
     useState<HTMLElement | null>(null);
   const isFloatingWindowFixedRef = useRef(false);
@@ -132,7 +132,7 @@ export const useTailware = ({
     }
   }, [lastHighlightedElement, setHighlightedElement]);
 
-  const resetTailwareState = useCallback(() => {
+  const resetTifooState = useCallback(() => {
     setLastHighlightedElement(null);
     isFloatingWindowFixedRef.current = false;
     initialClickPositionRef.current = { x: 0, y: 0 };
@@ -146,6 +146,6 @@ export const useTailware = ({
     updateFloatingWindowPosition,
     isFloatingWindowFixed: isFloatingWindowFixedRef.current,
     handleScroll,
-    resetTailwareState,
+    resetTifooState,
   };
 };

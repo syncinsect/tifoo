@@ -52,8 +52,8 @@ export interface ToastProps {
   type: ToastType;
 }
 
-// Used in: src/hooks/useTailware.ts
-export interface UseTailwareProps {
+// Used in: src/hooks/useTifoo.ts
+export interface useTifooProps {
   isActive: boolean;
   setHighlightedElement: (element: HTMLElement | null) => void;
   setFloatingWindowPosition: (position: { x: number; y: number }) => void;

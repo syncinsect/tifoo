@@ -1,7 +1,7 @@
-import { useTailware } from "@/hooks";
+import { useTifoo } from "@/hooks";
 import { act, renderHook } from "@testing-library/react";
 
-describe("useTailware", () => {
+describe("useTifoo", () => {
   const mockSetHighlightedElement = jest.fn();
   const mockSetFloatingWindowPosition = jest.fn();
   const mockSetIsFloatingWindowFixed = jest.fn();
@@ -18,7 +18,7 @@ describe("useTailware", () => {
   });
 
   test("handleMouseOver sets highlighted element when active", () => {
-    const { result } = renderHook(() => useTailware(defaultProps));
+    const { result } = renderHook(() => useTifoo(defaultProps));
     const mockElement = document.createElement("div");
     const mockEvent = { target: mockElement } as unknown as MouseEvent;
 
@@ -30,7 +30,7 @@ describe("useTailware", () => {
   });
 
   test("handleMouseOut clears highlighted element when active", () => {
-    const { result } = renderHook(() => useTailware(defaultProps));
+    const { result } = renderHook(() => useTifoo(defaultProps));
 
     act(() => {
       result.current.handleMouseOut();
@@ -40,7 +40,7 @@ describe("useTailware", () => {
   });
 
   test("handleClick toggles isFloatingWindowFixed", () => {
-    const { result } = renderHook(() => useTailware(defaultProps));
+    const { result } = renderHook(() => useTifoo(defaultProps));
     const mockElement = document.createElement("div");
     const mockEvent = {
       preventDefault: jest.fn(),
@@ -69,7 +69,7 @@ describe("useTailware", () => {
   });
 
   test("updateFloatingWindowPosition updates position when not fixed", () => {
-    const { result } = renderHook(() => useTailware(defaultProps));
+    const { result } = renderHook(() => useTifoo(defaultProps));
     const mockEvent = {
       clientX: 100,
       clientY: 100,
@@ -88,7 +88,7 @@ describe("useTailware", () => {
   });
 
   test("handleScroll updates highlighted element when fixed", () => {
-    const { result } = renderHook(() => useTailware(defaultProps));
+    const { result } = renderHook(() => useTifoo(defaultProps));
     const mockElement = document.createElement("div");
 
     act(() => {

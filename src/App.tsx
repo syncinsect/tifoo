@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 
 import {
-  useTailware,
-  useTailwareState,
+  useTifoo,
+  useTifooState,
   useAnimationEffect,
   useMessageListener,
   useEventListeners,
@@ -26,7 +26,7 @@ const App: React.FC = () => {
     isFloatingWindowFixed,
     setIsFloatingWindowFixed,
     resetAllState,
-  } = useTailwareState();
+  } = useTifooState();
 
   const {
     handleMouseOver,
@@ -34,8 +34,8 @@ const App: React.FC = () => {
     handleClick,
     handleScroll,
     updateFloatingWindowPosition,
-    resetTailwareState,
-  } = useTailware({
+    resetTifooState,
+  } = useTifoo({
     isActive,
     setHighlightedElement,
     setFloatingWindowPosition,
@@ -45,7 +45,7 @@ const App: React.FC = () => {
   const updateHighlightAndLines = useCallback(() => {
     if (highlightedElement) {
       setAnimatedRect(highlightedElement.getBoundingClientRect());
-      setHighlightedElement((prev) => prev);
+      setHighlightedElement((prev: HTMLElement) => prev);
     }
   }, [highlightedElement, setAnimatedRect, setHighlightedElement]);
 
@@ -57,16 +57,16 @@ const App: React.FC = () => {
   const handleDeactivate = useCallback(() => {
     setIsActive(false);
     resetAllState();
-    resetTailwareState();
+    resetTifooState();
     resetClassManagement();
-    chrome.runtime.sendMessage({ action: "tailwareDeactivated" });
-  }, [resetAllState, setIsActive, resetTailwareState, resetClassManagement]);
+    chrome.runtime.sendMessage({ action: "tifooDeactivated" });
+  }, [resetAllState, setIsActive, resetTifooState, resetClassManagement]);
 
   useMessageListener(
     setIsActive,
     isActive,
     resetAllState,
-    resetTailwareState,
+    resetTifooState,
     resetClassManagement
   );
 
