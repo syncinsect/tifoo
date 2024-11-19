@@ -2,7 +2,6 @@
 const plugin = require("tailwindcss/plugin");
 
 module.exports = {
-  prefix: "",
   mode: "jit",
   content: [
     "./src/**/*.{ts,tsx,css,html}",
