@@ -7,6 +7,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 
 import App from "./App";
+import cssText from "data-text:./styles/index.css";
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
@@ -14,9 +15,22 @@ export const config: PlasmoCSConfig = {
 
 export const getRootContainer: PlasmoGetRootContainer = () => {
   const container = document.createElement("tifoo-container");
-  container.setAttribute("data-tw-ext", "");
+  const shadowRoot = container.attachShadow({ mode: "open" });
+
+  const style = document.createElement("style");
+  style.textContent = cssText;
+  shadowRoot.appendChild(style);
+
+  const appContainer = document.createElement("div");
+  appContainer.className = "tifoo-root";
+  shadowRoot.appendChild(appContainer);
+
+  container.style.inset = "0";
+  container.style.zIndex = "9999";
+
   document.documentElement.appendChild(container);
-  return container;
+
+  return appContainer;
 };
 
 export const render: PlasmoRender<typeof App> = async ({

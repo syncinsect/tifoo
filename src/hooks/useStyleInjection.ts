@@ -13,7 +13,7 @@ export const useStyleInjection = (isActive: boolean) => {
 
     return () => {
       const existingStyle = document.getElementById(styleId);
-      if (existingStyle && !document.querySelector("[data-tw-ext]")) {
+      if (existingStyle) {
         existingStyle.remove();
       }
     };
