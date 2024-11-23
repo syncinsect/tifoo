@@ -22,7 +22,7 @@ const FloatingWindowHeader = forwardRef<
         }`}
       >
         <TifooText className="text-md" />
-        <div className="tw flex gap-2">
+        <div className="flex gap-2">
           <button
             onClick={onCopyClasses}
             className="bg-transparent border-none text-white cursor-pointer p-1 rounded hover:bg-[#0C7ABF]"

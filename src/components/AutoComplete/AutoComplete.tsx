@@ -95,7 +95,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
   return (
     <div className="relative">
       {isOpen && options.length > 0 && (
-        <div className="absolute bottom-full left-0 right-0 z-10 mb-1 bg-white rounded-md shadow-lg border border-[#1DA1F2] overflow-hidden">
+        <div className=" absolute bottom-full left-0 right-0 z-10 mb-1 bg-white rounded-md shadow-lg border border-[#1DA1F2] overflow-hidden">
           <div className="max-w-full">
             <List
               ref={listRef}
@@ -119,7 +119,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
           onKeyDown={handleKeyDown}
           onFocus={() => setIsOpen(true)}
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-          className="w-full mt-2 bg-white border border-gray-300 focus:ring-1 focus:ring-[#1DA1F2] focus:outline-none shadow-sm p-1.5 pr-6 rounded text-xs placeholder-[#657786] transition duration-150 ease-in-out"
+          className=" w-full mt-2 bg-white border border-gray-300 focus:ring-1 focus:ring-[#1DA1F2] focus:outline-none shadow-sm p-1.5 pr-6 rounded text-xs placeholder-[#657786] transition duration-150 ease-in-out"
           placeholder="Add classes"
           autoComplete="off"
           spellCheck="false"
@@ -127,7 +127,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
         {inputValue && isOpen && (
           <button
             onClick={handleClear}
-            className="absolute right-1.5 top-1/2 mt-1 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-150 ease-in-out"
+            className=" absolute right-1.5 top-1/2 mt-1 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-150 ease-in-out"
             type="button"
           >
             <CloseCircleIcon className="size-4" />
