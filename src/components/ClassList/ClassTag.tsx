@@ -21,7 +21,7 @@ const ClassTag: React.FC<ClassTagProps> = ({
   };
 
   return (
-    <div className="bg-gray-50/50 px-2 py-1 rounded-lg text-xs flex items-center justify-beeen shadow-sm transition-all duration-200 border border-gray-100">
+    <div className="bg-gray-50/50 px-2 py-1 rounded-lg text-xs flex items-center justify-between shadow-sm transition-all duration-200 border border-gray-100">
       <div className="flex items-center gap-1.5">
         <Switch
           checked={isChecked}

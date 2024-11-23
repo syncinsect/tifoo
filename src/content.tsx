@@ -23,6 +23,7 @@ export const getRootContainer: PlasmoGetRootContainer = () => {
 
   const appContainer = document.createElement("div");
   appContainer.className = "tifoo-root";
+  appContainer.setAttribute("data-tifoo-ext", "");
   shadowRoot.appendChild(appContainer);
 
   container.style.inset = "0";

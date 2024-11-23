@@ -13,7 +13,7 @@ export const useStyleInjection = (isActive: boolean) => {
 
     return () => {
       const existingStyle = document.getElementById(styleId);
-      if (existingStyle) {
+      if (existingStyle && !document.querySelector("[data-tifoo-ext]")) {
         existingStyle.remove();
       }
     };

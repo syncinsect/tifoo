@@ -46,7 +46,7 @@ function IndexPopup() {
   };
 
   return (
-    <div>
+    <div data-tifoo-ext>
       <div className="w-80">
         <div className="bg-[#1DA1F2] text-white p-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
