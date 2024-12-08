@@ -1,7 +1,7 @@
 {
   "name": "tifoo",
   "displayName": "Tifoo – Effortless Tailwind Styling",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "Streamline your Tailwind CSS development with real-time inspection and intuitive class management—right in your browser.",
   "author": "syncinsect<syncinsect@gmail.com>",
   "license": "MIT",
