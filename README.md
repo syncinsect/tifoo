@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/syncinsect/tifoo">
-    <img src="/public/tifoo_logo.png" alt="Tifoo Logo" width="40%">
+    <img src="/public/tifoo_logo.png" alt="Tifoo" width="40%">
   </a>
 </p>
 

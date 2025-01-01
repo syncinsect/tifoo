@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 
 import {
   useTifoo,
@@ -85,6 +85,11 @@ const App: React.FC = () => {
 
   useStyleInjection(isActive);
 
+  const memoizedFloatingWindowPosition = useMemo(
+    () => floatingWindowPosition,
+    [floatingWindowPosition]
+  );
+
   return (
     <>
       {isActive && highlightedElement && (
@@ -96,7 +101,7 @@ const App: React.FC = () => {
           />
           <FloatingWindow
             element={highlightedElement}
-            position={floatingWindowPosition}
+            position={memoizedFloatingWindowPosition}
             isFixed={isFloatingWindowFixed}
             onDeactivate={handleDeactivate}
             onClassChange={updateHighlightAndLines}
@@ -108,4 +113,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default React.memo(App);
