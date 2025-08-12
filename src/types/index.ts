@@ -27,6 +27,7 @@ export interface FloatingWindowProps {
   isFixed: boolean;
   onDeactivate: () => void;
   onClassChange: () => void;
+  onElementSelect?: (element: HTMLElement) => void;
   setPosition: (position: { x: number; y: number }) => void;
 }
 

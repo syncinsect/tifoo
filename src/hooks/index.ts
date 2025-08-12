@@ -4,6 +4,7 @@ import { useHighlightedIndex } from "./useHighlightedIndex";
 import { useDraggable } from "./useDraggable";
 import { useFloatingWindowLogic } from "./useFloatingWindowLogic";
 import { useElementInfo } from "./useElementInfo";
+import { useElementNavigation } from "./useElementNavigation";
 import { useStyleInjection } from "./useStyleInjection";
 import { useTifooState } from "./useTifooState";
 import { useAnimationEffect } from "./useAnimationEffect";
@@ -15,6 +16,7 @@ export {
   useClassManagement,
   useHighlightedIndex,
   useElementInfo,
+  useElementNavigation,
   useDraggable,
   useFloatingWindowLogic,
   useStyleInjection,
