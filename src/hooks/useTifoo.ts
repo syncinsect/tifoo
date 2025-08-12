@@ -127,10 +127,9 @@ export const useTifoo = ({
     updateFloatingWindowPosition,
   ]);
   const handleScroll = useCallback(() => {
-    if (isFloatingWindowFixedRef.current && lastHighlightedElement) {
-      setHighlightedElement(lastHighlightedElement);
-    }
-  }, [lastHighlightedElement, setHighlightedElement]);
+    // Don't reset highlighted element on scroll when floating window is fixed
+    // This prevents reverting to the original element when user has selected a parent
+  }, []);
 
   const resetTifooState = useCallback(() => {
     setLastHighlightedElement(null);

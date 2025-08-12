@@ -10,6 +10,7 @@ import {
   ClassList,
   AutoComplete,
   Toast,
+  ElementNavigation,
 } from "@/components";
 
 const FloatingWindow: React.FC<FloatingWindowProps> = ({
@@ -18,6 +19,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   isFixed,
   onDeactivate,
   onClassChange,
+  onElementSelect,
   setPosition,
 }) => {
   const floatingWindowRef = useRef<HTMLDivElement>(null);
@@ -80,6 +82,12 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
         <div className="bg-[#E8F5FE] text-[#1DA1F2] p-1.5 rounded text-xs mb-2 font-bold">
           {element.tagName.toLowerCase()}
         </div>
+        {onElementSelect && (
+          <ElementNavigation
+            element={element}
+            onElementSelect={onElementSelect}
+          />
+        )}
         <ClassList
           classes={classes}
           element={element}

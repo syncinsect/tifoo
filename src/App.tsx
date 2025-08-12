@@ -62,6 +62,12 @@ const App: React.FC = () => {
     chrome.runtime.sendMessage({ action: "tifooDeactivated" });
   }, [resetAllState, setIsActive, resetTifooState, resetClassManagement]);
 
+  const handleElementSelect = useCallback((newElement: HTMLElement) => {
+    setHighlightedElement(newElement);
+    setAnimatedRect(newElement.getBoundingClientRect());
+    // Keep floating window position, don't reset position
+  }, [setHighlightedElement, setAnimatedRect]);
+
   useMessageListener(
     setIsActive,
     isActive,
@@ -105,6 +111,7 @@ const App: React.FC = () => {
             isFixed={isFloatingWindowFixed}
             onDeactivate={handleDeactivate}
             onClassChange={updateHighlightAndLines}
+            onElementSelect={handleElementSelect}
             setPosition={setFloatingWindowPosition}
           />
         </>
