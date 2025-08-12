@@ -79,9 +79,6 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
         onDeactivate={onDeactivate}
       />
       <div className="px-3 pb-3">
-        <div className="bg-[#E8F5FE] text-[#1DA1F2] p-1.5 rounded text-xs mb-2 font-bold">
-          {element.tagName.toLowerCase()}
-        </div>
         {onElementSelect && (
           <ElementNavigation
             element={element}
